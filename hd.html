@@ -10,30 +10,29 @@ html, body {
     padding:0;
     height:100%;
     font-family: Arial, sans-serif;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:center;
+    background: url("icons/logo.png") no-repeat center center fixed;
+    background-size: cover;
     position:relative;
     color:white;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
-
-/* Teljes háttér sötétítéssel */
-body {
-    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-                url("icons/logo.png") no-repeat center center fixed;
-    background-size: cover;
+body::before {
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.35);
+    z-index:0;
 }
-
-/* Gombok konténer */
 #buttonsContainer {
     display:grid;
     grid-template-columns: repeat(2, 150px);
-    gap: 20px;
-    margin-top:60px; /* gombok feljebb */
+    gap:20px;
+    margin-top:60px;
     z-index:1;
 }
-
 button {
     padding:20px;
     font-size:24px;
@@ -48,8 +47,6 @@ button:hover {
     background: rgba(255,215,0,0.2);
     transform: scale(1.05);
 }
-
-/* Vissza gomb */
 #backButton {
     position:absolute;
     bottom:40px;
@@ -65,26 +62,32 @@ button:hover {
     z-index:1;
     transition: all 0.3s ease;
 }
-#backButton:hover {
-    background: rgba(255,215,0,0.2);
-    transform: scale(1.05);
-}
 </style>
 </head>
 <body>
 <div id="buttonsContainer">
-    <button onclick="window.location.href='1.html'">1</button>
-    <button onclick="window.location.href='11.html'">11</button>
-    <button onclick="window.location.href='31.html'">31</button>
-    <button onclick="window.location.href='34.html'">34</button>
-    <button onclick="window.location.href='35.html'">35</button>
-    <button onclick="window.location.href='38.html'">38</button>
-    <button onclick="window.location.href='24.html'">24</button>
-    <button onclick="window.location.href='25.html'">25</button>
-    <button onclick="window.location.href='2.html'">2</button>
-    
+    <button id="btn1" onclick="window.location.href='1.html'">1 <span id="check1"></span></button>
+    <button id="btn11" onclick="">11 <span id="check11"></span></button>
+    <button id="btn31" onclick="">31 <span id="check31"></span></button>
+    <button id="btn34" onclick="">34 <span id="check34"></span></button>
+    <button id="btn35" onclick="">35 <span id="check35"></span></button>
+    <button id="btn38" onclick="">38 <span id="check38"></span></button>
+    <button id="btn24" onclick="">24 <span id="check24"></span></button>
+    <button id="btn25" onclick="">25 <span id="check25"></span></button>
+    <button id="btn2" onclick="">2 <span id="check2"></span></button>
 </div>
-
 <button id="backButton" onclick="window.location.href='arukiadas.html'">Vissza</button>
+
+<script>
+// pipák betöltése sessionStorage alapján
+window.addEventListener("load", ()=>{
+    const btns = ["1","11","31","34","35","38","24","25","2"];
+    btns.forEach(b=>{
+        if(sessionStorage.getItem(`${b}_completed`) === "true"){
+            document.getElementById(`check${b}`).innerHTML = "✅";
+        }
+    });
+});
+</script>
 </body>
 </html>
