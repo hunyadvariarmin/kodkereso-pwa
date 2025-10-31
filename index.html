@@ -3,68 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kezdőképernyő</title>
+<title>Főmenü - Kódkereső</title>
 <style>
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: #0a0a0a;
-  color: white;
   font-family: Arial, sans-serif;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
 }
-#logo {
-  margin-top: 60px;
-  width: 200px;
-  height: auto;
+
+/* Háttérkép */
+body {
+  background: url("icons/logo.png") no-repeat center center fixed;
+  background-size: cover;
 }
+
+/* Gombok elhelyezése */
 #menu {
-  margin-top: 100px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
+  position: absolute;
+  top: 30%; /* picit feljebb, nem középen */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
 }
+
+/* Gombstílus */
 button {
-  background: transparent;
+  display: block;
+  margin: 20px auto;
+  padding: 20px 60px;
+  font-size: 26px;
+  color: #FFD700; /* arany/sárga */
+  background: rgba(0,0,0,0.4);
   border: 2px solid #FFD700;
-  color: #FFD700;
-  font-size: 28px;
-  padding: 15px 60px;
   border-radius: 15px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
+
 button:hover {
-  background: rgba(255, 215, 0, 0.1);
+  background: rgba(255, 215, 0, 0.2);
   transform: scale(1.05);
 }
 </style>
 </head>
 <body>
 
-<img id="logo" src="icons/logo.png" alt="Logo">
-
 <div id="menu">
-  <button onclick="startKomisszio()">Komissiózás</button>
-  <button onclick="startArukiadas()">Árukiadás</button>
+  <button onclick="window.location.href='komissziozas.html'">📦 Komissiózás</button>
+  <button onclick="alert('Az Árukiadás rész fejlesztés alatt van!')">🚚 Árukiadás</button>
 </div>
-
-<script>
-// Komissiózás oldalra lépés
-function startKomisszio() {
-  window.location.href = "komissziozas.html";
-}
-
-// Árukiadás (később implementáljuk)
-function startArukiadas() {
-  alert("Az Árukiadás rész fejlesztés alatt áll.");
-}
-</script>
 
 </body>
 </html>
