@@ -5,9 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kódkereső</title>
 <style>
-html, body { margin:0; padding:0; height:100%; font-family: Arial; background:#000; color:white; overflow:hidden; }
-#reader { width:100vw; height:100vh; position:fixed; top:0; left:0; background:#000; z-index:0; }
-#centerResult { position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); font-size:100px; font-weight:bold; color:#00ff88; text-align:center; z-index:2; }
+html, body { margin:0; padding:0; height:100%; font-family: Arial; background:#0a0a0a; color:white; overflow:hidden; }
+#reader { width:100vw; height:100vh; position:fixed; top:0; left:0; z-index:0; }
+#centerResult { 
+    position:fixed; 
+    top:50%; 
+    left:50%; 
+    transform:translate(-50%, -50%); 
+    font-size:120px;  /* Növelt betűméret */
+    font-weight:bold; 
+    color:#00ff88; 
+    text-align:center; 
+    z-index:2; 
+}
 #bottomOverlay { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); padding:20px; text-align:center; z-index:2; }
 button { background:#007bff; border:none; color:white; font-size:24px; padding:15px 40px; border-radius:12px; cursor:pointer; margin-top:10px; }
 button:hover { background:#0056b3; }
@@ -86,21 +96,21 @@ async function startCamera() {
     }
     document.getElementById("reader").innerHTML = "";
 
-    // kis delay, hogy a kamera feloldódjon
+    // kis delay a stabil újraindításhoz
     await new Promise(r => setTimeout(r, 300));
 
     html5QrCode = new Html5Qrcode("reader");
 
     await html5QrCode.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: {width: window.innerWidth, height: window.innerHeight} },
+      { facingMode:"environment" },
+      { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
       onScanSuccess
     );
 
     document.getElementById("status").innerText = "Kamera aktív – olvass be egy kódot!";
     document.getElementById("centerResult").innerText = "";
   } catch(e) {
-    console.error("❌ Kamera hiba:", e);
+    console.error("❌ Kamera hiba:",e);
     document.getElementById("status").innerText = "Kamera indítása nem sikerült!";
   }
 }
@@ -110,8 +120,8 @@ function onScanSuccess(decodedText){
   console.log("📷 Beolvasott kód (eredeti):", decodedText);
   const value = findValueByCode(decodedText);
   document.getElementById("centerResult").innerText = value;
-  document.getElementById("status").innerText = "Beolvasás kész – nyomj az Új beolvasás gombra";
-  html5QrCode.stop().catch(()=>{}); // stop-oljuk a kamerát, csak gombbal indítható újra
+  document.getElementById("status").innerText = "Beolvasás kész – újraindítható a kamera";
+  html5QrCode.stop().catch(()=>{}); // Stop-oljuk a kamerát, újra a gombbal indítható
 }
 
 // --- Gomb ---
