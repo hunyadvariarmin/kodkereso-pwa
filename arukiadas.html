@@ -6,60 +6,55 @@
 <title>Árukiadás</title>
 <style>
 html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
+    margin:0;
+    padding:0;
+    height:100%;
     font-family: Arial, sans-serif;
-    overflow: hidden;
+    overflow:hidden;
     background: url("icons/logo.png") no-repeat center center fixed;
     background-size: cover;
-    color: white;
+    color:white;
 }
-
-#overlay {
+#topButtons, #bottomButtons {
     position: fixed;
     width: 100%;
-    height: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 30px 0;
-    box-sizing: border-box;
+    justify-content: center;
+    gap: 20px;
+    z-index: 2;
 }
-
+#topButtons { top: 5%; }
+#bottomButtons { bottom: 5%; }
 button {
-    width: 200px;
-    padding: 20px;
-    font-size: 28px;
-    color: #FFD700;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0,0,0,0.5);
     border: 2px solid #FFD700;
-    border-radius: 15px;
+    border-radius: 12px;
+    color: #FFD700;
+    font-size: 24px;
+    padding: 15px 40px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 button:hover {
-    background: rgba(255, 215, 0, 0.2);
+    background: rgba(255,215,0,0.2);
     transform: scale(1.05);
 }
 </style>
 </head>
 <body>
 
-<div id="overlay">
-    <button id="szamiButton">SZAMI</button>
+<div id="topButtons">
+    <button onclick="window.location.href='szami.html'">SZAMI</button>
     <button id="hdButton">HD</button>
 </div>
 
-<script>
-// Gombok események
-document.getElementById("szamiButton").addEventListener("click", () => {
-    window.location.href = "szami.html"; // ide jön a SZAMI oldal
-});
+<div id="bottomButtons">
+    <button onclick="window.location.href='index.html'">🏠 Vissza</button>
+</div>
 
+<script>
 document.getElementById("hdButton").addEventListener("click", () => {
-    window.location.href = "hd.html"; // ide jön a HD oldal
+    window.location.href = "hd.html";
 });
 </script>
 
