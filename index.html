@@ -35,8 +35,8 @@
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 20px 50px;
-    font-size: 1.5rem;
+    padding: 25px 60px;
+    font-size: 1.6rem;
     border: none;
     border-radius: 12px;
     background-color: #0078ff;
@@ -56,43 +56,37 @@
 <button id="restartBtn" disabled>Új beolvasás</button>
 
 <script>
-// Ide illeszd be a saját GitHub RAW Excel linket
-const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/adatok.xlsx";
+// IDE illeszd be a saját GitHub RAW Excel linket
+const GITHUB_RAW_URL = "IDE_A_SAJÁT_RAW_LINKED";
 
 let data = [];
 let html5QrCode;
 
-function loadExcelFromGitHub() {
-  fetch(GITHUB_RAW_URL)
-    .then(response => response.arrayBuffer())
-    .then(buffer => {
-      const workbook = XLSX.read(buffer, { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-      console.log("Excel betöltve:", data.length, "sor");
-      startScanner();
-    })
-    .catch(err => {
-      alert("Excel betöltése sikertelen: " + err);
-    });
+async function loadExcelFromGitHub() {
+  try {
+    const response = await fetch(GITHUB_RAW_URL);
+    const buffer = await response.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    console.log("Excel betöltve:", data.length, "sor");
+    startScanner();
+  } catch(err) {
+    alert("Excel betöltése sikertelen: " + err);
+  }
 }
 
 function findValueByCode(code) {
     if (!code || !data.length) return "Nincs találat!";
-
     const searchCode = String(code).trim();
-
     for (let i = 1; i < data.length; i++) {
         if (!data[i] || data[i].length < 2) continue;
-
         let cellValue = data[i][0];
         if (cellValue === undefined || cellValue === null) continue;
         cellValue = String(cellValue).trim();
-
         if (/^\d+\.0$/.test(cellValue)) {
             cellValue = cellValue.replace(/\.0$/, '');
         }
-
         if (cellValue === searchCode) {
             return data[i][1];
         }
@@ -100,14 +94,16 @@ function findValueByCode(code) {
     return "Nincs találat!";
 }
 
-function startScanner() {
+async function startScanner() {
   document.getElementById('result').textContent = "";
   document.getElementById('restartBtn').disabled = true;
 
   if (!html5QrCode) {
     html5QrCode = new Html5Qrcode("reader");
   } else {
-    html5QrCode.stop().catch(()=>{});
+    try {
+      await html5QrCode.stop();
+    } catch(e) {}
   }
 
   html5QrCode.start(
