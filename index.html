@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kezdőképernyő</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #0a0a0a;
+  color: white;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+#logo {
+  margin-top: 60px;
+  width: 200px;
+  height: auto;
+}
+#menu {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+button {
+  background: transparent;
+  border: 2px solid #FFD700;
+  color: #FFD700;
+  font-size: 28px;
+  padding: 15px 60px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+button:hover {
+  background: rgba(255, 215, 0, 0.1);
+  transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+
+<img id="logo" src="icons/logo.png" alt="Logo">
+
+<div id="menu">
+  <button onclick="startKomisszio()">Komissiózás</button>
+  <button onclick="startArukiadas()">Árukiadás</button>
+</div>
+
+<script>
+// Komissiózás oldalra lépés
+function startKomisszio() {
+  window.location.href = "komissziozas.html";
+}
+
+// Árukiadás (később implementáljuk)
+function startArukiadas() {
+  alert("Az Árukiadás rész fejlesztés alatt áll.");
+}
+</script>
+
+</body>
+</html>
