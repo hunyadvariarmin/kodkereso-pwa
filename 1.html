@@ -5,64 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1</title>
 <style>
-html, body {
-    margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; overflow: hidden;
-}
-body {
-    background: url("icons/logo.png") no-repeat center center fixed;
-    background-size: cover;
-    position: relative;
-    color: white;
-}
-
-/* Kamera teljes képernyő */
-#reader {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    object-fit: cover;
-    z-index: 3;
-    display: none;
-}
-
-/* Eredmény és számláló */
-#topDisplay {
-    position: fixed;
-    top: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 40px;
-    font-weight: bold;
-    color: #FFD700;
-    text-align: center;
-    z-index: 4;
-}
-
-/* Vissza gomb */
-#backButton {
-    position: fixed;
-    bottom: 30px; left: 50%;
-    transform: translateX(-50%);
-    padding: 20px 50px;
-    font-size: 28px;
-    color: yellow;
-    background: url("icons/hdxd.jpg") no-repeat center center;
-    background-size: cover;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    z-index: 4;
-}
-#backButton:hover {
-    transform: translateX(-50%) scale(1.05);
-}
+html, body { margin:0; padding:0; height:100%; font-family: Arial, sans-serif; overflow:hidden; }
+body { background: url("icons/logo.png") no-repeat center center fixed; background-size: cover; color:white; position:relative; }
+#reader { position: fixed; top:0; left:0; width:100vw; height:100vh; object-fit: cover; z-index:3; display:none; }
+#centerResult { position: fixed; top:6%; left:50%; transform:translateX(-50%); font-size:110px; font-weight:bold; color:#FFD700; text-align:center; z-index:2; white-space:pre-line; }
+#overlay { position: fixed; bottom:4%; left:50%; transform:translateX(-50%); width:80%; max-width:400px; text-align:center; z-index:2; display:flex; flex-direction:column; gap:10px; }
+button { width:100%; padding:20px; font-size:28px; color:#FFD700; background: rgba(0,0,0,0.4); border:2px solid #FFD700; border-radius:15px; cursor:pointer; transition: all 0.3s ease; }
+button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
+#backButton { position: fixed; bottom:40px; left:50%; transform:translateX(-50%); padding:20px 40px; font-size:26px; color:#FFD700; background: rgba(0,0,255,0.4); border:none; border-radius:12px; cursor:pointer; z-index:4; display:none; }
 </style>
 </head>
 <body>
 
 <div id="reader"></div>
-<div id="topDisplay">0 / 0</div>
-<button id="backButton" onclick="window.location.href='hd.html'">Vissza</button>
+<button id="backButton">Vissza</button>
+<div id="centerResult"></div>
+<div id="overlay">
+    <button id="mainButton">Kód beolvasása</button>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -71,29 +31,28 @@ body {
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
 let data = [];
 let html5QrCode;
+let state = "logo"; // logo, kamera, eredmeny
+let scannedCodes = JSON.parse(sessionStorage.getItem("1_scanned") || "[]");
 let totalCodes = 0;
-let counter = parseInt(localStorage.getItem("1_counter")) || 0;
 
 // --- Excel betöltése ---
 async function loadExcel() {
     try {
         const resp = await fetch(GITHUB_RAW_URL);
+        if(!resp.ok) throw new Error("Excel betöltési hiba!");
         const buffer = await resp.arrayBuffer();
-        const wb = XLSX.read(buffer,{type:"array"});
+        const wb = XLSX.read(buffer, { type:"array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet,{header:1});
-
-        // totalCodes számítása: A oszlop 2. sortól
-        totalCodes = 0;
-        for(let i=1; i<data.length; i++){
-            if(data[i][0] !== undefined && data[i][0] !== null && data[i][0] !== "") totalCodes++;
-        }
-        updateCounterDisplay();
-
-    } catch(e){console.error(e);}
+        data = XLSX.utils.sheet_to_json(sheet, {header:1});
+        totalCodes = data[0].length - 1; // A2-tól nézzük
+        renderCounter();
+    } catch(e) {
+        console.error("❌ Excel betöltési hiba:", e);
+        document.getElementById("centerResult").innerText = "Excel betöltési hiba!";
+    }
 }
 
-// --- Normalizáló ---
+// --- Normalizáló függvény ---
 function normalizeCode(str){
     if(!str) return "";
     str = String(str).trim().toUpperCase().replace(/\s+/g,'').replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,'');
@@ -107,38 +66,32 @@ function findValueByCode(code){
     if(!code || !data.length) return "Nincs járaton";
     const searchCode = normalizeCode(code);
     for(let i=1;i<data.length;i++){
-        if(data[i] && data[i].length>=3){
-            const szallitolevel = normalizeCode(data[i][0]);
-            if(szallitolevel===searchCode) return data[i][2];
-        }
-    }
-    for(let i=1;i<data.length;i++){
-        if(data[i] && data[i].length>=3){
-            const csomagszam = normalizeCode(data[i][1]);
-            if(csomagszam===searchCode) return data[i][2];
+        const row = data[i];
+        if(row && row.length>=3){
+            const szallitolevel = normalizeCode(row[0]);
+            const csomagszam = normalizeCode(row[1]);
+            if(szallitolevel===searchCode || csomagszam===searchCode) return row[2];
         }
     }
     return "Nincs járaton";
 }
 
-// --- Számláló frissítése ---
-function updateCounterDisplay(){
-    document.getElementById("topDisplay").innerText = `${totalCodes} / ${counter}`;
+// --- Számláló renderelés ---
+function renderCounter(){
+    document.getElementById("centerResult").innerText = `${totalCodes}/${scannedCodes.length}`;
 }
 
 // --- Kamera indítása ---
 async function startCamera(){
-    const reader = document.getElementById("reader");
-    reader.style.display = "block";
+    document.getElementById("reader").style.display="block";
+    document.getElementById("backButton").style.display="block";
+    document.getElementById("overlay").style.display="none";
+    state="kamera";
 
     try{
         if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-        await html5QrCode.start(
-            { facingMode:"environment" },
-            { fps:10, qrbox:null },
-            onScanSuccess
-        );
-    } catch(e){ console.error(e); }
+        await html5QrCode.start({facingMode:"environment"}, {fps:10, qrbox:null}, onScanSuccess);
+    }catch(e){ console.error("❌ Kamera hiba:", e);}
 }
 
 // --- Kamera leállítása ---
@@ -146,23 +99,56 @@ async function stopCamera(){
     if(html5QrCode){
         await html5QrCode.stop().catch(()=>{});
         html5QrCode.clear();
-        html5QrCode = null;
+        html5QrCode=null;
     }
-    document.getElementById("reader").style.display = "none";
+    document.getElementById("reader").style.display="none";
+    document.getElementById("backButton").style.display="none";
+    document.getElementById("overlay").style.display="flex";
+    renderButtons();
 }
 
 // --- Beolvasás callback ---
 function onScanSuccess(decodedText){
+    if(!scannedCodes.includes(decodedText)) scannedCodes.push(decodedText);
+    sessionStorage.setItem("1_scanned", JSON.stringify(scannedCodes));
+    renderCounter();
+
+    // megkeressük a visszaadott értéket
     const value = findValueByCode(decodedText);
-    if(value !== "Nincs járaton"){
-        counter++;
-        localStorage.setItem("1_counter", counter);
-    }
-    updateCounterDisplay();
+    const center = document.getElementById("centerResult");
+    center.innerText = value==="Nincs járaton" ? value : value;
+    center.style.fontSize = value==="Nincs járaton" ? "60px":"110px";
+    center.style.textAlign="center";
+
     stopCamera();
+    state="eredmeny";
 }
 
-loadExcel().then(startCamera);
+// --- Gombok renderelése ---
+function renderButtons(){
+    const overlay = document.getElementById("overlay");
+    overlay.innerHTML="";
+    if(state==="logo" || state==="eredmeny"){
+        const scanBtn = document.createElement("button");
+        scanBtn.innerText="Kód beolvasása";
+        scanBtn.onclick=startCamera;
+        overlay.appendChild(scanBtn);
+
+        const endBtn=document.createElement("button");
+        endBtn.innerText="Kommissiózás befejezése";
+        endBtn.onclick=()=>window.location.href="hd.html";
+        overlay.appendChild(endBtn);
+    }
+}
+
+// --- Vissza gomb ---
+document.getElementById("backButton").addEventListener("click", ()=>{
+    window.location.href="hd.html";
+});
+
+// --- Betöltés ---
+loadExcel().then(renderButtons);
 </script>
+
 </body>
 </html>
