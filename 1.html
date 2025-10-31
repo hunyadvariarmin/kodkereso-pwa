@@ -6,72 +6,101 @@
 <title>1 - Árukiadás</title>
 <style>
 html, body {
-    margin:0; padding:0; height:100%; font-family: Arial, sans-serif; overflow:hidden;
+    margin:0; padding:0; height:100%; font-family: Arial, sans-serif;
+}
+body {
     background: url("icons/logo.png") no-repeat center center fixed;
-    background-size: cover; color:white; position:relative;
+    background-size: cover;
+    color: white;
+    position: relative;
+    overflow: hidden;
 }
 #reader {
-    position: fixed; top:0; left:0; width:100vw; height:100vh; object-fit: cover; z-index:3; display:none;
+    position: fixed; top:0; left:0; width:100vw; height:100vh;
+    object-fit: cover; z-index:3; display:none; background:black;
 }
 #centerResult {
-    position: fixed; top:6%; left:50%; transform:translateX(-50%);
-    font-size:110px; font-weight:bold; color:#FFD700; text-align:center; z-index:2; white-space:pre-line;
+    position: fixed; top:6%; left:50%; transform: translateX(-50%);
+    font-size: 90px; font-weight: bold; color: #FFD700;
+    text-align:center; z-index:2; white-space:pre-line;
 }
 #overlay {
-    position: fixed; bottom:90px; left:50%; transform:translateX(-50%);
-    display:flex; flex-direction:column; align-items:center; gap:10px; z-index:2;
+    position: fixed;
+    bottom: 120px; /* a két alul lévő gomb fölött */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%; max-width: 350px;
+    text-align: center;
+    z-index:2;
 }
 button {
-    padding:16px 30px; font-size:24px; color:#FFD700; background: rgba(0,0,0,0.4); border:2px solid #FFD700;
-    border-radius:12px; cursor:pointer; transition: all 0.3s ease;
+    width:100%; padding:15px; font-size:22px; color:#FFD700;
+    background: rgba(0,0,0,0.4); border: 2px solid #FFD700;
+    border-radius: 12px; cursor:pointer; transition: all 0.3s ease;
 }
 button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
+
 #bottomButtons {
-    position: fixed; bottom:30px; left:50%; transform:translateX(-50%);
-    display:flex; gap:20px; z-index:2;
+    position: fixed; bottom:40px; left:50%; transform: translateX(-50%);
+    display:flex; gap:15px; z-index:2; width:80%; max-width:400px; justify-content:center;
 }
+#bottomButtons button { width:48%; padding:14px 0; font-size:20px; }
 </style>
 </head>
 <body>
 
 <div id="reader"></div>
-<div id="centerResult"></div>
+<div id="centerResult">0/0</div>
 
 <div id="overlay">
     <button id="scanButton">Kód beolvasása</button>
-    <div id="counter">0/0</div>
 </div>
 
 <div id="bottomButtons">
     <button id="finishButton">Árukiadás befejezése</button>
-    <button id="backButton" onclick="window.location.href='hd.html'">Vissza</button>
+    <button id="backButton">Vissza</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
+
 <script>
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
 let data = [];
 let html5QrCode;
+let totalCount = 0;
+let scannedCount = 0;
 let scannedCodes = [];
-let total = 0;
 
-// --- Excel betöltése ---
+// Betöltjük a beolvasottakat sessionStorage-ból
+if(sessionStorage.getItem('1_scanned')) {
+    scannedCount = Number(sessionStorage.getItem('1_scanned')) || 0;
+}
+if(sessionStorage.getItem('1_codes')) {
+    scannedCodes = JSON.parse(sessionStorage.getItem('1_codes'));
+}
+
+// Excel betöltése
 async function loadExcel() {
     try {
         const resp = await fetch(GITHUB_RAW_URL);
         const buffer = await resp.arrayBuffer();
-        const wb = XLSX.read(buffer, { type:"array" });
+        const wb = XLSX.read(buffer, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet, {header:1});
-        total = data.length - 1; // az első sor fejléc
-        document.getElementById("counter").innerText = "0/" + total;
-    } catch(e){
-        console.error("Excel hiba:", e);
-    }
+        data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        // totalCount: számoljuk hány A oszlopban van adat 2. sortól
+        totalCount = data.slice(1).reduce((acc,row)=> (row && row[0] && row[0].toString().trim() !== '') ? acc+1 : acc, 0);
+        updateCounter();
+    } catch(e){ console.error(e);}
 }
 
-function normalizeCode(str){
+// Számláló frissítése
+function updateCounter() {
+    document.getElementById("centerResult").innerText = `${scannedCount}/${totalCount}`;
+}
+
+// Normalizálás
+function normalizeCode(str) {
     if(!str) return "";
     str = String(str).trim().toUpperCase().replace(/\s+/g,'').replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,'');
     if(str.includes("/")) str = str.split("/")[0];
@@ -79,60 +108,64 @@ function normalizeCode(str){
     return str;
 }
 
-function findValueByCode(code){
-    if(!code || !data.length) return null;
+// Kód ellenőrzés
+function checkCode(code) {
     const searchCode = normalizeCode(code);
+    if(scannedCodes.includes(searchCode)) return false; // már beolvasva
     for(let i=1;i<data.length;i++){
-        if(normalizeCode(data[i][0]) === searchCode || normalizeCode(data[i][1]) === searchCode){
-            return true;
+        if(data[i] && data[i][0]){
+            if(normalizeCode(data[i][0])===searchCode) return true;
         }
     }
     return false;
 }
 
-async function startCamera(){
-    document.getElementById("reader").style.display = "block";
-    document.getElementById("overlay").style.display = "none";
-    try {
-        if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-        await html5QrCode.start(
-            { facingMode:"environment" },
-            { fps:10, qrbox:null },
-            onScanSuccess
-        );
-    } catch(e){ console.error(e); }
+// Kamera
+async function startCamera() {
+    document.getElementById("reader").style.display="block";
+    document.getElementById("overlay").style.display="none";
+
+    if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+    await html5QrCode.start({facingMode:"environment"}, {fps:10, qrbox:null}, onScanSuccess);
 }
 
-async function stopCamera(){
-    if(html5QrCode){
+async function stopCamera() {
+    if(html5QrCode) {
         await html5QrCode.stop().catch(()=>{});
-        html5QrCode.clear(); html5QrCode=null;
+        html5QrCode.clear();
+        html5QrCode = null;
     }
     document.getElementById("reader").style.display="none";
-    document.getElementById("overlay").style.display="flex";
+    document.getElementById("overlay").style.display="block";
 }
 
+// Beolvasás
 function onScanSuccess(decodedText){
-    if(scannedCodes.includes(decodedText)) return; // már beolvasva
-    if(findValueByCode(decodedText)){
-        scannedCodes.push(decodedText);
-        let parts = document.getElementById("counter").innerText.split("/");
-        let scanned = parseInt(parts[0]);
-        scanned += 1;
-        document.getElementById("counter").innerText = scanned + "/" + total;
+    const normCode = normalizeCode(decodedText);
+    if(checkCode(normCode)) {
+        scannedCount++;
+        scannedCodes.push(normCode);
+        sessionStorage.setItem('1_scanned', scannedCount);
+        sessionStorage.setItem('1_codes', JSON.stringify(scannedCodes));
+        updateCounter();
     }
     stopCamera();
 }
 
+// Gombok
 document.getElementById("scanButton").addEventListener("click", startCamera);
 
-document.getElementById("finishButton").addEventListener("click", () => {
-    if(document.getElementById("counter").innerText.split("/")[0] == total){
-        localStorage.setItem("1_done", "true"); // zöld pipához
+document.getElementById("finishButton").addEventListener("click", ()=>{
+    if(scannedCount<totalCount){
+        sessionStorage.removeItem('1_scanned');
+        sessionStorage.removeItem('1_codes');
+    } else {
+        localStorage.setItem("1_done","true"); // pipához HD.html
     }
-    scannedCodes = []; // memória törlés
     window.location.href="hd.html";
 });
+
+document.getElementById("backButton").addEventListener("click", ()=>{ window.location.href="hd.html"; });
 
 loadExcel();
 </script>
