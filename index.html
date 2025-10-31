@@ -79,19 +79,21 @@ function findValueByCode(code) {
 // --- Kamera indítása ---
 async function startCamera() {
   try {
-    // Ha már van kamera, állítsd le, töröld a DOM-ot, nullázd a változót
     if(html5QrCode) {
       await html5QrCode.stop().catch(()=>{});
       html5QrCode.clear();
       html5QrCode = null;
-      document.getElementById("reader").innerHTML = "";
     }
+    document.getElementById("reader").innerHTML = "";
+
+    // kis delay, hogy a kamera feloldódjon
+    await new Promise(r => setTimeout(r, 300));
 
     html5QrCode = new Html5Qrcode("reader");
 
     await html5QrCode.start(
-      { facingMode:"environment" },
-      { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
+      { facingMode: "environment" },
+      { fps: 10, qrbox: {width: window.innerWidth, height: window.innerHeight} },
       onScanSuccess
     );
 
