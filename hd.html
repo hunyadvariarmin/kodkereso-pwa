@@ -19,6 +19,7 @@ html, body {
     position:relative;
     color:white;
 }
+/* Sötétítés a teljes háttéren */
 body::before {
     content:"";
     position:absolute;
@@ -27,6 +28,7 @@ body::before {
     background: rgba(0,0,0,0.35);
     z-index:0;
 }
+
 #buttonsContainer {
     display:grid;
     grid-template-columns: repeat(2, 150px);
@@ -34,6 +36,7 @@ body::before {
     margin-top:60px; /* gombok feljebb */
     z-index:1;
 }
+
 button {
     padding:20px;
     font-size:24px;
@@ -48,6 +51,8 @@ button:hover {
     background: rgba(255,215,0,0.2);
     transform: scale(1.05);
 }
+
+/* Vissza gomb */
 #backButton {
     position:absolute;
     bottom:40px;
