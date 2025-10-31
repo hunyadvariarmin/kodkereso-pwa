@@ -9,8 +9,8 @@ html, body { margin:0; padding:0; height:100%; font-family: Arial, sans-serif; o
 body { background: url("icons/logo.png") no-repeat center center fixed; background-size: cover; color:white; position:relative; }
 #reader { position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:3; display:none; background-color:black; }
 #centerResult { position:fixed; top:6%; left:50%; transform:translateX(-50%); font-size:110px; font-weight:bold; color:#FFD700; text-align:center; z-index:2; }
-#overlay { position:fixed; bottom:4%; left:50%; transform:translateX(-50%); width:80%; max-width:400px; text-align:center; z-index:2; display:flex; flex-direction:column; gap:10px; }
-button { width:100%; padding:20px; font-size:28px; color:#FFD700; background: rgba(0,0,0,0.4); border:2px solid #FFD700; border-radius:15px; cursor:pointer; transition: all 0.3s ease; }
+#overlay { position:fixed; bottom:4%; left:50%; transform:translateX(-50%); width:90%; max-width:500px; text-align:center; z-index:2; display:flex; flex-direction:row; justify-content:space-between; gap:10px; }
+button { flex:1; padding:20px; font-size:28px; color:#FFD700; background: rgba(0,0,0,0.4); border:2px solid #FFD700; border-radius:15px; cursor:pointer; transition: all 0.3s ease; }
 button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
 </style>
 </head>
@@ -19,7 +19,7 @@ button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
 <div id="reader"></div>
 <div id="centerResult"></div>
 <div id="overlay">
-    <button id="mainButton">Kód beolvasása</button>
+    <button id="backButton">Vissza</button>
     <button id="finishButton">Árukiadás befejezése</button>
 </div>
 
@@ -35,7 +35,7 @@ let totalCount = 0;
 
 const centerResult = document.getElementById("centerResult");
 const overlay = document.getElementById("overlay");
-const mainButton = document.getElementById("mainButton");
+const backButton = document.getElementById("backButton");
 const finishButton = document.getElementById("finishButton");
 
 // --- Excel betöltése ---
@@ -122,19 +122,23 @@ function onScanSuccess(decodedText){
 }
 
 // --- Gombok ---
-mainButton.addEventListener("click", startCamera);
+backButton.addEventListener("click", ()=>{
+    // vissza HD.html-re, memóriát megtartja
+    window.location.href="hd.html";
+});
 
 finishButton.addEventListener("click", ()=>{
     if(scannedCodes.length === totalCount){
-        sessionStorage.removeItem("1_scannedCodes");
-        // HD.html-re visszatérve zöld pipa jelzés kell (HD.html-ben kell kezelni)
-        window.location.href="hd.html?done=1";
+        // Minden beolvasva, ne töröljük a memóriát
+        window.location.href="hd.html?done=1&code=1";
     } else {
-        alert("Még nincs minden kód beolvasva! Beolvasott: " + scannedCodes.length + "/" + totalCount);
+        // Még nincs kész, törlés
+        sessionStorage.removeItem("1_scannedCodes");
         window.location.href="hd.html";
     }
 });
 
+// Indítás
 loadExcel();
 updateCounter();
 </script>
