@@ -10,10 +10,10 @@ body { background: url("icons/logo.png") no-repeat center center fixed; backgrou
 
 #centerResult { 
     position: fixed; 
-    top: 15%; /* kicsit feljebb a korábbi 10%-hoz képest */
+    top: 10%; /* feljebb helyezve */
     left: 50%; 
     transform: translateX(-50%); 
-    font-size: 100px; 
+    font-size: 120px; 
     font-weight: bold; 
     color: #FFD700; 
     text-align: center; 
@@ -22,7 +22,7 @@ body { background: url("icons/logo.png") no-repeat center center fixed; backgrou
 
 #overlay { 
     position: fixed; 
-    bottom: 5%; /* gomb lejjebb, korábbi 10%-hoz képest */
+    bottom: 5%; 
     left: 50%; 
     transform: translateX(-50%);
     width: 80%;
@@ -124,6 +124,8 @@ async function startCamera() {
     document.getElementById("reader").style.display = "block";
     document.getElementById("centerResult").innerText = "";
     state = "kamera";
+    document.getElementById("mainButton").innerText = "Beolvasás folyamatban...";
+    document.getElementById("mainButton").disabled = true;
     try {
         if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
@@ -133,6 +135,7 @@ async function startCamera() {
         );
     } catch(e){
         console.error("❌ Kamera hiba:",e);
+        document.getElementById("mainButton").innerText = "Hiba a kamera indításakor";
     }
 }
 
@@ -141,6 +144,9 @@ function onScanSuccess(decodedText){
     document.getElementById("centerResult").innerText = value;
     stopCamera();
     state = "logo";
+    // Gomb újra engedélyezése
+    document.getElementById("mainButton").innerText = "Kód beolvasása";
+    document.getElementById("mainButton").disabled = false;
 }
 
 async function stopCamera(){
@@ -155,8 +161,6 @@ async function stopCamera(){
 document.getElementById("mainButton").addEventListener("click", async ()=>{
     if(state === "logo") {
         startCamera();
-        document.getElementById("mainButton").innerText = "Beolvasás folyamatban...";
-        document.getElementById("mainButton").disabled = true;
     }
 });
 
