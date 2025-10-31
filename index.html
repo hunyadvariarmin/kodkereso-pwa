@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kódkereső - push to scan</title>
+<title>Kódkereső - folyamatos kamera</title>
 <style>
 html, body { margin:0; padding:0; height:100%; font-family: Arial; background:#0a0a0a; color:white; overflow:hidden; }
-#reader { width:100vw; height:100vh; position:fixed; top:0; left:0; z-index:0; background:#000; }
+#reader { width:100vw; height:100vh; position:fixed; top:0; left:0; z-index:0; }
 #centerResult { 
     position:fixed; 
     top:50%; 
@@ -28,10 +28,10 @@ button:hover { background:#0056b3; }
 <body>
 
 <div id="reader"></div>
-<div id="centerResult">Nyomj az „Új beolvasás” gombra</div>
+<div id="centerResult">Kamera indításra vár...</div>
 
 <div id="overlay">
-  <button id="scanButton">📷 Új beolvasás</button>
+  <button id="scanButton">📷 Új beolvasás / Reset</button>
   <div id="status"></div>
 </div>
 
@@ -87,22 +87,15 @@ function findValueByCode(code) {
 // --- Kamera indítása ---
 async function startCamera() {
   try {
-    if(html5QrCode){
-      await html5QrCode.stop().catch(()=>{});
-      html5QrCode.clear();
-      html5QrCode = null;
-      document.getElementById("reader").innerHTML = "";
+    if(!html5QrCode){
+      html5QrCode = new Html5Qrcode("reader");
     }
-
-    html5QrCode = new Html5Qrcode("reader");
     await html5QrCode.start(
       { facingMode:"environment" },
       { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
       onScanSuccess
     );
-
-    document.getElementById("status").innerText = "Kamera aktív – olvass be egy kódot!";
-    document.getElementById("centerResult").innerText = "";
+    document.getElementById("status").innerText = "Kamera folyamatosan aktív – olvass be egy kódot!";
   } catch(e) {
     console.error("❌ Kamera hiba:", e);
     document.getElementById("status").innerText = "Kamera indítása nem sikerült!";
@@ -113,15 +106,22 @@ async function startCamera() {
 function onScanSuccess(decodedText){
   const value = findValueByCode(decodedText);
   document.getElementById("centerResult").innerText = value;
-  document.getElementById("status").innerText = "Beolvasás kész – nyomj az Új beolvasás gombra";
-  html5QrCode.stop().catch(()=>{});
 }
 
-// --- Gomb ---
-document.getElementById("scanButton").addEventListener("click", startCamera);
+// --- Új beolvasás / Reset gomb ---
+document.getElementById("scanButton").addEventListener("click", async ()=>{
+  document.getElementById("centerResult").innerText = "Kamera indításra vár...";
+  if(html5QrCode){
+    await html5QrCode.stop().catch(()=>{});
+    html5QrCode.clear();
+    html5QrCode = null;
+    document.getElementById("reader").innerHTML = "";
+  }
+  startCamera();
+});
 
 // --- Betöltés ---
-loadExcel();
+loadExcel().then(startCamera);
 </script>
 </body>
 </html>
