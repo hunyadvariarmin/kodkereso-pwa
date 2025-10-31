@@ -5,108 +5,115 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kommissiózás</title>
 <style>
-html, body { 
-    margin:0; padding:0; height:100%; font-family: Arial; overflow:hidden;
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial;
+    overflow: hidden;
 }
-body { 
-    background: url("icons/logo.png") no-repeat center center fixed; 
-    background-size: cover; 
-    color: white; 
+body {
+    background: url("icons/logo.png") no-repeat center center fixed;
+    background-size: cover;
+    color: white;
     position: relative;
 }
 
-/* Halvány fekete réteg a logón */
+/* Halvány sötét overlay a logón */
 body::before {
     content: "";
     position: absolute;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.45);
-    z-index:0;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 0;
 }
 
 /* Teljes képernyős kamera */
-#reader { 
-    position: fixed; 
-    top: 0; left: 0; 
-    width: 100vw; height: 100vh; 
+#reader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
     object-fit: cover;
-    z-index: 3; 
+    z-index: 3;
     display: none;
     background-color: black;
 }
 
-/* Középen megjelenő érték */
-#centerResult { 
-    position: fixed; 
-    top: 10%; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    font-size: 110px; 
-    font-weight: bold; 
-    color: #FFD700; 
-    text-align: center; 
-    z-index: 2; 
+/* A beolvasott érték */
+#centerResult {
+    position: fixed;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 110px;
+    font-weight: bold;
+    color: #FFD700;
+    text-align: center;
+    z-index: 2;
+    white-space: pre-line;
 }
 
-/* Gombok alul */
-#overlay { 
-    position: fixed; 
-    bottom: 5%; 
-    left: 50%; 
+/* Gombok alul (logós nézetben és eredmény után) */
+#overlay {
+    position: fixed;
+    bottom: 5%;
+    left: 50%;
     transform: translateX(-50%);
     width: 80%;
     max-width: 400px;
-    text-align: center; 
-    z-index: 2; 
+    text-align: center;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-/* Normál gombok */
-button { 
+button {
     width: 100%;
     padding: 20px;
     font-size: 28px;
-    color: #FFD700; 
-    background: rgba(0,0,0,0.4); 
-    border: 2px solid #FFD700; 
-    border-radius: 15px; 
-    cursor: pointer; 
-    transition: all 0.3s ease; 
+    color: #FFD700;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #FFD700;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
-button:hover { 
-    background: rgba(255, 215, 0, 0.2); 
-    transform: scale(1.05); 
+button:hover {
+    background: rgba(255, 215, 0, 0.2);
+    transform: scale(1.05);
 }
 
-/* --- Kamera alatt látható vissza gomb --- */
+/* --- Kamera alatt megjelenő "Vissza" gomb --- */
 #backButton {
     position: fixed;
-    bottom: 30px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(80, 80, 80, 0.8);
     color: white;
-    border: 1px solid rgba(255,255,255,0.5);
+    border: none;
     border-radius: 12px;
-    padding: 12px 25px;
-    font-size: 20px;
+    padding: 14px 30px;
+    font-size: 22px;
     cursor: pointer;
     z-index: 4;
     display: none;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
     transition: all 0.3s ease;
 }
 #backButton:hover {
-    background: rgba(0,0,0,0.6);
+    background: rgba(100, 100, 100, 0.9);
+    transform: translateX(-50%) scale(1.05);
 }
 </style>
 </head>
 <body>
 
 <div id="reader"></div>
-<button id="backButton">⬅️ Vissza</button>
+<button id="backButton">Vissza</button>
 
 <div id="centerResult"></div>
 <div id="overlay">
@@ -122,49 +129,50 @@ let data = [];
 let html5QrCode;
 let state = "logo"; // 'logo', 'kamera', 'eredmeny'
 
+// --- Excel betöltése ---
 async function loadExcel() {
     try {
         const resp = await fetch(GITHUB_RAW_URL);
         if (!resp.ok) throw new Error("Excel betöltési hiba!");
         const buffer = await resp.arrayBuffer();
-        const wb = XLSX.read(buffer, {type:"array"});
+        const wb = XLSX.read(buffer, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet, {header:1});
-        console.log("✅ Excel betöltve:", data.slice(0,5));
-    } catch(e) {
+        data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        console.log("✅ Excel betöltve:", data.slice(0, 5));
+    } catch (e) {
         console.error("❌ Excel betöltési hiba:", e);
         document.getElementById("centerResult").innerText = "Excel betöltési hiba!";
     }
 }
 
 function normalizeCode(str) {
-    if(!str) return "";
+    if (!str) return "";
     str = String(str).trim().toUpperCase()
-        .replace(/\s+/g,'')
-        .replace(/[‐-–—−]/g,'-')
-        .replace(/\\/g,'/')
-        .replace(/[^A-Z0-9\-\/]/g,'');
-    if(str.includes("/")) str = str.split("/")[0];
-    if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
+        .replace(/\s+/g, '')
+        .replace(/[‐-–—−]/g, '-')
+        .replace(/\\/g, '/')
+        .replace(/[^A-Z0-9\-\/]/g, '');
+    if (str.includes("/")) str = str.split("/")[0];
+    if (/^\d+\.0$/.test(str)) str = str.replace(/\.0$/, '');
     return str;
 }
 
 function findValueByCode(code) {
-    if(!code || !data.length) return "Nincs járaton";
+    if (!code || !data.length) return "Nincs járaton";
     const searchCode = normalizeCode(code);
 
-    for(let i=1;i<data.length;i++){
+    for (let i = 1; i < data.length; i++) {
         const row = data[i];
-        if(row && row.length>=3){
+        if (row && row.length >= 3) {
             const szallitolevel = normalizeCode(row[0]);
-            if(szallitolevel === searchCode) return row[2];
+            if (szallitolevel === searchCode) return row[2];
         }
     }
-    for(let i=1;i<data.length;i++){
+    for (let i = 1; i < data.length; i++) {
         const row = data[i];
-        if(row && row.length>=3){
+        if (row && row.length >= 3) {
             const csomagszam = normalizeCode(row[1]);
-            if(csomagszam === searchCode) return row[2];
+            if (csomagszam === searchCode) return row[2];
         }
     }
     return "Nincs járaton";
@@ -180,20 +188,20 @@ async function startCamera() {
     state = "kamera";
 
     try {
-        if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+        if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
-            { facingMode:"environment" },
-            { fps:10, qrbox:null }, // Teljes képernyő
+            { facingMode: "environment" },
+            { fps: 10, qrbox: null },
             onScanSuccess
         );
-    } catch(e){
-        console.error("❌ Kamera hiba:",e);
+    } catch (e) {
+        console.error("❌ Kamera hiba:", e);
     }
 }
 
-async function stopCamera(){
-    if(html5QrCode){
-        await html5QrCode.stop().catch(()=>{});
+async function stopCamera() {
+    if (html5QrCode) {
+        await html5QrCode.stop().catch(() => {});
         html5QrCode.clear();
         html5QrCode = null;
     }
@@ -205,7 +213,7 @@ async function stopCamera(){
     document.body.style.backgroundSize = "cover";
 }
 
-function onScanSuccess(decodedText){
+function onScanSuccess(decodedText) {
     const value = findValueByCode(decodedText);
     document.getElementById("centerResult").innerText = value;
     stopCamera();
@@ -213,15 +221,15 @@ function onScanSuccess(decodedText){
     renderButtons();
 }
 
-function renderButtons(){
+function renderButtons() {
     const overlay = document.getElementById("overlay");
     overlay.innerHTML = "";
-    if(state === "logo"){
+    if (state === "logo") {
         const btn = document.createElement("button");
         btn.innerText = "Kommissiózás kezdése";
         btn.onclick = startCamera;
         overlay.appendChild(btn);
-    } else if(state === "eredmeny"){
+    } else if (state === "eredmeny") {
         const scanBtn = document.createElement("button");
         scanBtn.innerText = "Kód beolvasása";
         scanBtn.onclick = startCamera;
@@ -229,13 +237,12 @@ function renderButtons(){
 
         const endBtn = document.createElement("button");
         endBtn.innerText = "Kommissiózás befejezése";
-        endBtn.onclick = () => { window.location.href="index.html"; };
+        endBtn.onclick = () => { window.location.href = "index.html"; };
         overlay.appendChild(endBtn);
     }
 }
 
-// --- "Vissza" gomb ---
-document.getElementById("backButton").addEventListener("click", async ()=>{
+document.getElementById("backButton").addEventListener("click", async () => {
     await stopCamera();
     state = "logo";
     renderButtons();
