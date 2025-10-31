@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1 - Árukiadás</title>
+<title>1</title>
 <style>
 html, body {
     margin:0; padding:0; height:100%; font-family: Arial, sans-serif;
@@ -26,7 +26,7 @@ body {
 }
 #overlay {
     position: fixed;
-    bottom: 120px; /* a két alul lévő gomb fölött */
+    bottom: 120px;
     left: 50%;
     transform: translateX(-50%);
     width: 70%; max-width: 350px;
@@ -88,7 +88,6 @@ async function loadExcel() {
         const wb = XLSX.read(buffer, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
         data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        // totalCount: számoljuk hány A oszlopban van adat 2. sortól
         totalCount = data.slice(1).reduce((acc,row)=> (row && row[0] && row[0].toString().trim() !== '') ? acc+1 : acc, 0);
         updateCounter();
     } catch(e){ console.error(e);}
@@ -108,10 +107,10 @@ function normalizeCode(str) {
     return str;
 }
 
-// Kód ellenőrzés
+// Ellenőrzés
 function checkCode(code) {
     const searchCode = normalizeCode(code);
-    if(scannedCodes.includes(searchCode)) return false; // már beolvasva
+    if(scannedCodes.includes(searchCode)) return false; // már beolvasott
     for(let i=1;i<data.length;i++){
         if(data[i] && data[i][0]){
             if(normalizeCode(data[i][0])===searchCode) return true;
@@ -122,7 +121,8 @@ function checkCode(code) {
 
 // Kamera
 async function startCamera() {
-    document.getElementById("reader").style.display="block";
+    const reader = document.getElementById("reader");
+    reader.style.display="block";
     document.getElementById("overlay").style.display="none";
 
     if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
@@ -141,10 +141,9 @@ async function stopCamera() {
 
 // Beolvasás
 function onScanSuccess(decodedText){
-    const normCode = normalizeCode(decodedText);
-    if(checkCode(normCode)) {
+    if(checkCode(decodedText)) {
         scannedCount++;
-        scannedCodes.push(normCode);
+        scannedCodes.push(normalizeCode(decodedText));
         sessionStorage.setItem('1_scanned', scannedCount);
         sessionStorage.setItem('1_codes', JSON.stringify(scannedCodes));
         updateCounter();
@@ -159,13 +158,15 @@ document.getElementById("finishButton").addEventListener("click", ()=>{
     if(scannedCount<totalCount){
         sessionStorage.removeItem('1_scanned');
         sessionStorage.removeItem('1_codes');
+        window.location.href="hd.html";
     } else {
-        localStorage.setItem("1_done","true"); // pipához HD.html
+        window.location.href = "hd.html?done=1&code=1";
     }
-    window.location.href="hd.html";
 });
 
-document.getElementById("backButton").addEventListener("click", ()=>{ window.location.href="hd.html"; });
+document.getElementById("backButton").addEventListener("click", ()=>{
+    window.location.href="hd.html";
+});
 
 loadExcel();
 </script>
