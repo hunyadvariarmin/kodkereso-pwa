@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1</title>
+<style>
+html, body {
+    margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; overflow: hidden;
+}
+body {
+    background: url("icons/logo.png") no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+    color: white;
+}
+
+/* Kamera teljes képernyő */
+#reader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    object-fit: cover;
+    z-index: 3;
+    display: none;
+}
+
+/* Eredmény és számláló */
+#topDisplay {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 40px;
+    font-weight: bold;
+    color: #FFD700;
+    text-align: center;
+    z-index: 4;
+}
+
+/* Vissza gomb */
+#backButton {
+    position: fixed;
+    bottom: 30px; left: 50%;
+    transform: translateX(-50%);
+    padding: 20px 50px;
+    font-size: 28px;
+    color: yellow;
+    background: url("icons/hdxd.jpg") no-repeat center center;
+    background-size: cover;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    z-index: 4;
+}
+#backButton:hover {
+    transform: translateX(-50%) scale(1.05);
+}
+</style>
+</head>
+<body>
+
+<div id="reader"></div>
+<div id="topDisplay">0 / 0</div>
+<button id="backButton" onclick="window.location.href='hd.html'">Vissza</button>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+let data = [];
+let html5QrCode;
+let totalCodes = 0;
+let counter = parseInt(localStorage.getItem("1_counter")) || 0;
+
+// --- Excel betöltése ---
+async function loadExcel() {
+    try {
+        const resp = await fetch(GITHUB_RAW_URL);
+        const buffer = await resp.arrayBuffer();
+        const wb = XLSX.read(buffer,{type:"array"});
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        data = XLSX.utils.sheet_to_json(sheet,{header:1});
+
+        // totalCodes számítása: A oszlop 2. sortól
+        totalCodes = 0;
+        for(let i=1; i<data.length; i++){
+            if(data[i][0] !== undefined && data[i][0] !== null && data[i][0] !== "") totalCodes++;
+        }
+        updateCounterDisplay();
+
+    } catch(e){console.error(e);}
+}
+
+// --- Normalizáló ---
+function normalizeCode(str){
+    if(!str) return "";
+    str = String(str).trim().toUpperCase().replace(/\s+/g,'').replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,'');
+    if(str.includes("/")) str = str.split("/")[0];
+    if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
+    return str;
+}
+
+// --- Keresés ---
+function findValueByCode(code){
+    if(!code || !data.length) return "Nincs járaton";
+    const searchCode = normalizeCode(code);
+    for(let i=1;i<data.length;i++){
+        if(data[i] && data[i].length>=3){
+            const szallitolevel = normalizeCode(data[i][0]);
+            if(szallitolevel===searchCode) return data[i][2];
+        }
+    }
+    for(let i=1;i<data.length;i++){
+        if(data[i] && data[i].length>=3){
+            const csomagszam = normalizeCode(data[i][1]);
+            if(csomagszam===searchCode) return data[i][2];
+        }
+    }
+    return "Nincs járaton";
+}
+
+// --- Számláló frissítése ---
+function updateCounterDisplay(){
+    document.getElementById("topDisplay").innerText = `${totalCodes} / ${counter}`;
+}
+
+// --- Kamera indítása ---
+async function startCamera(){
+    const reader = document.getElementById("reader");
+    reader.style.display = "block";
+
+    try{
+        if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+        await html5QrCode.start(
+            { facingMode:"environment" },
+            { fps:10, qrbox:null },
+            onScanSuccess
+        );
+    } catch(e){ console.error(e); }
+}
+
+// --- Kamera leállítása ---
+async function stopCamera(){
+    if(html5QrCode){
+        await html5QrCode.stop().catch(()=>{});
+        html5QrCode.clear();
+        html5QrCode = null;
+    }
+    document.getElementById("reader").style.display = "none";
+}
+
+// --- Beolvasás callback ---
+function onScanSuccess(decodedText){
+    const value = findValueByCode(decodedText);
+    if(value !== "Nincs járaton"){
+        counter++;
+        localStorage.setItem("1_counter", counter);
+    }
+    updateCounterDisplay();
+    stopCamera();
+}
+
+loadExcel().then(startCamera);
+</script>
+</body>
+</html>
