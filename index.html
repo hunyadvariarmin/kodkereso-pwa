@@ -75,11 +75,9 @@ function findValueByCode(code) {
 // --- Kamera indítása ---
 async function startCamera() {
   try {
-    if(html5QrCode) {
-      await html5QrCode.stop().catch(()=>{});
-      document.getElementById("reader").innerHTML = "";
+    if(!html5QrCode){
+      html5QrCode = new Html5Qrcode("reader");
     }
-    html5QrCode = new Html5Qrcode("reader");
     await html5QrCode.start(
       { facingMode:"environment" },
       { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
@@ -87,24 +85,4 @@ async function startCamera() {
     );
     document.getElementById("result").innerText = "Kamera aktív – olvass be egy kódot!";
   } catch(e) {
-    console.error("❌ Kamera hiba:",e);
-    document.getElementById("result").innerText = "Kamera indítása nem sikerült!";
-  }
-}
-
-// --- Beolvasás callback ---
-function onScanSuccess(decodedText){
-  console.log("📷 Beolvasott kód (eredeti):", decodedText);
-  const value = findValueByCode(decodedText);
-  document.getElementById("result").innerText = `Kód: ${decodedText}\nEredmény: ${value}`;
-  html5QrCode.stop().catch(()=>{});
-}
-
-// --- Gomb ---
-document.getElementById("scanButton").addEventListener("click", startCamera);
-
-// --- Betöltés ---
-loadExcel();
-</script>
-</body>
-</html>
+    console
