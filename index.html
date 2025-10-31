@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Főmenü - Kódkereső</title>
+<title>Kódkereső - Főmenü</title>
 <style>
 html, body {
   margin: 0;
@@ -19,23 +19,23 @@ body {
   background-size: cover;
 }
 
-/* Gombok elhelyezése */
+/* Alsó menü */
 #menu {
   position: absolute;
-  top: 30%; /* picit feljebb, nem középen */
+  bottom: 10%; /* az aljától kicsit feljebb */
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   text-align: center;
 }
 
-/* Gombstílus */
+/* Gomb stílus */
 button {
   display: block;
   margin: 20px auto;
   padding: 20px 60px;
-  font-size: 26px;
-  color: #FFD700; /* arany/sárga */
-  background: rgba(0,0,0,0.4);
+  font-size: 28px;
+  color: #FFD700; /* arany betűk */
+  background: rgba(0, 0, 0, 0.4);
   border: 2px solid #FFD700;
   border-radius: 15px;
   cursor: pointer;
@@ -51,8 +51,8 @@ button:hover {
 <body>
 
 <div id="menu">
-  <button onclick="window.location.href='komissziozas.html'">📦 Komissiózás</button>
-  <button onclick="alert('Az Árukiadás rész fejlesztés alatt van!')">🚚 Árukiadás</button>
+  <button onclick="window.location.href='komissiozas.html'">📦 Komissiózás</button>
+  <button onclick="alert('🚧 Az Árukiadás rész fejlesztés alatt!')">🚚 Árukiadás</button>
 </div>
 
 </body>
