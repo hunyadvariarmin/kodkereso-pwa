@@ -78,38 +78,37 @@ button:hover {
     transform: scale(1.05);
 }
 
-/* Vissza gomb a kamera képén hdxd háttérrel */
+/* Vissza gomb alulra */
 #backButton {
     position: fixed;
-    bottom: 40px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: url("icons/hdxd.jpg") no-repeat center center;
-    background-size: cover;
-    color: yellow;
-    border: none;
-    border-radius: 12px;
     padding: 20px 40px;
     font-size: 26px;
+    color: yellow;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid #FFD700;
+    border-radius: 12px;
     cursor: pointer;
     z-index: 4;
-    display: none;
-    box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 #backButton:hover {
-    transform: translateX(-50%) scale(1.05);
+    background: rgba(255,215,0,0.2);
 }
 </style>
 </head>
 <body>
 
 <div id="reader"></div>
-<button id="backButton">Vissza</button>
 
 <div id="centerResult"></div>
+
 <div id="overlay">
     <button id="mainButton">Kommissiózás kezdése</button>
 </div>
+
+<button id="backButton" onclick="window.location.href='index.html'">Vissza</button>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -172,7 +171,6 @@ function findValueByCode(code) {
 async function startCamera() {
     const reader = document.getElementById("reader");
     reader.style.display = "block";
-    document.getElementById("backButton").style.display = "block";
     document.getElementById("centerResult").innerText = "";
     document.getElementById("overlay").style.display = "none";
     state = "kamera";
@@ -196,10 +194,7 @@ async function stopCamera() {
         html5QrCode = null;
     }
     document.getElementById("reader").style.display = "none";
-    document.getElementById("backButton").style.display = "none";
     document.getElementById("overlay").style.display = "flex";
-    document.body.style.background = 'url("icons/logo.png") no-repeat center center fixed';
-    document.body.style.backgroundSize = "cover";
 }
 
 function onScanSuccess(decodedText) {
@@ -240,12 +235,6 @@ function renderButtons() {
         overlay.appendChild(endBtn);
     }
 }
-
-document.getElementById("backButton").addEventListener("click", async () => {
-    await stopCamera();
-    state = "logo";
-    renderButtons();
-});
 
 loadExcel().then(renderButtons);
 </script>
