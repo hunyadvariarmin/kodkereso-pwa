@@ -10,7 +10,7 @@ body { background: url("icons/logo.png") no-repeat center center fixed; backgrou
 
 #centerResult { 
     position: fixed; 
-    top: 10%; 
+    top: 15%; /* kicsit feljebb a korábbi 10%-hoz képest */
     left: 50%; 
     transform: translateX(-50%); 
     font-size: 100px; 
@@ -22,7 +22,7 @@ body { background: url("icons/logo.png") no-repeat center center fixed; backgrou
 
 #overlay { 
     position: fixed; 
-    bottom: 10%; 
+    bottom: 5%; /* gomb lejjebb, korábbi 10%-hoz képest */
     left: 50%; 
     transform: translateX(-50%);
     width: 80%;
@@ -51,9 +51,8 @@ button:hover { background: rgba(255, 215, 0, 0.2); transform: scale(1.05); }
     top: 0; 
     left: 0; 
     z-index: 0; 
-    display: none; /* alapból kamera rejtve */
+    display: none; 
 }
-#status { font-size: 20px; margin-top: 10px; color: white; word-wrap: break-word; }
 </style>
 </head>
 <body>
@@ -62,7 +61,6 @@ button:hover { background: rgba(255, 215, 0, 0.2); transform: scale(1.05); }
 <div id="centerResult"></div>
 <div id="overlay">
     <button id="mainButton">Kommissiózás kezdése</button>
-    <div id="status"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -72,7 +70,7 @@ button:hover { background: rgba(255, 215, 0, 0.2); transform: scale(1.05); }
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/adatok.xlsx";
 let data = [];
 let html5QrCode;
-let state = "logo"; // állapot: 'logo' vagy 'kamera'
+let state = "logo"; // 'logo' vagy 'kamera'
 
 async function loadExcel() {
     try {
@@ -105,7 +103,6 @@ function findValueByCode(code) {
     if(!code || !data.length) return "Nincs járaton";
     const searchCode = normalizeCode(code);
 
-    // Szállítólevél (A oszlop)
     for(let i=1;i<data.length;i++){
         const row = data[i];
         if(row && row.length>=3){
@@ -113,7 +110,6 @@ function findValueByCode(code) {
             if(szallitolevel === searchCode) return row[2];
         }
     }
-    // Csomagszám (B oszlop)
     for(let i=1;i<data.length;i++){
         const row = data[i];
         if(row && row.length>=3){
@@ -135,10 +131,8 @@ async function startCamera() {
             { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
             onScanSuccess
         );
-        document.getElementById("status").innerText = "Kamera aktív – olvass be egy kódot!";
     } catch(e){
         console.error("❌ Kamera hiba:",e);
-        document.getElementById("status").innerText = "Kamera indítása nem sikerült!";
     }
 }
 
@@ -160,16 +154,12 @@ async function stopCamera(){
 
 document.getElementById("mainButton").addEventListener("click", async ()=>{
     if(state === "logo") {
-        // kamera indítása
         startCamera();
         document.getElementById("mainButton").innerText = "Beolvasás folyamatban...";
         document.getElementById("mainButton").disabled = true;
-    } else if(state === "kamera") {
-        // sosem ide kattintunk
     }
 });
 
-// Excel betöltése
 loadExcel();
 </script>
 </body>
