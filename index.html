@@ -19,22 +19,32 @@ body {
   background-size: cover;
 }
 
-/* Alsó menü */
-#menu {
+/* Gomb elhelyezések */
+#topButton, #bottomButton {
   position: absolute;
-  bottom: 10%; /* az aljától kicsit feljebb */
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
+  width: 80%;
+  max-width: 400px;
 }
 
-/* Gomb stílus */
+/* Felső gomb */
+#topButton {
+  top: 15%;
+}
+
+/* Alsó gomb */
+#bottomButton {
+  bottom: 10%;
+}
+
+/* Gombok stílusa */
 button {
-  display: block;
-  margin: 20px auto;
-  padding: 20px 60px;
+  width: 100%;
+  padding: 20px;
   font-size: 28px;
-  color: #FFD700; /* arany betűk */
+  color: #FFD700; /* aranysárga betű */
   background: rgba(0, 0, 0, 0.4);
   border: 2px solid #FFD700;
   border-radius: 15px;
@@ -50,8 +60,11 @@ button:hover {
 </head>
 <body>
 
-<div id="menu">
-  <button onclick="window.location.href='komissiozas.html'">📦 Komissiózás</button>
+<div id="topButton">
+  <button onclick="window.location.href='kommisiozas.html'">📦 Kommissiózás</button>
+</div>
+
+<div id="bottomButton">
   <button onclick="alert('🚧 Az Árukiadás rész fejlesztés alatt!')">🚚 Árukiadás</button>
 </div>
 
