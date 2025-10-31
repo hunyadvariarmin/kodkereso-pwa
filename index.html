@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kódkereső</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0078ff" />
+<style>
+  :root{--accent:#0078ff;--bg:#f7f9fb;--card:#ffffff;--text:#1b1b1b;--muted:#6b7280}
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
+  body{background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+  .app{width:100%;max-width:520px;background:var(--card);border-radius:14px;box-shadow:0 8px 30px rgba(16,24,40,.08);overflow:hidden;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid #eef2f7}
+  .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#005fcc);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px}
+  h1{font-size:16px;margin:0;color:var(--text)}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  main{padding:18px;display:flex;flex-direction:column;gap:12px;flex:1}
+  #reader{width:100%;height:320px;border-radius:10px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #result{min-height:64px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--text);padding:12px;border-radius:8px;background:linear-gradient(180deg,#fbfdff,#ffffff);border:1px solid #eef2f7}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  button{background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(0,120,255,.12)}
+  .muted{color:var(--muted);font-size:13px}
+  footer{padding:12px 18px;border-top:1px solid #eef2f7;background:linear-gradient(180deg,transparent,rgba(255,255,255,.6))}
+  .small{font-size:12px;color:var(--muted)}
+  input[type=file]{display:none}
+  .hint{font-size:12px;color:var(--muted)}
+  @media (max-width:420px){#reader{height:260px}}
+</style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Kódkereső alkalmazás">
+    <header>
+      <div class="logo">KK</div>
+      <div>
+        <h1>Kódkereső</h1>
+        <p class="lead">Beolvassa a QR / vonalkódot, és visszaadja az Excelben tárolt értéket.</p>
+      </div>
+    </header>
+
+    <main>
+      <div id="reader" aria-live="polite">Kamera betöltése...</div>
+
+      <div id="result" aria-live="assertive">Várakozás az eredményre…</div>
+
+      <div class="controls">
+        <button id="restartBtn" class="ghost" aria-pressed="false">Új beolvasás</button>
+        <button id="downloadBtn" class="">Excel újratöltése</button>
+        <label class="hint" for="fileInput" title="Ha a GitHub-ról nem tölthető be a fájl, használhatod ezt">
+          <input id="fileInput" type="file" accept=".xlsx,.xls" />
+          <span class="small">Vagy tölts fel helyben Excel fájlt</span>
+        </label>
+      </div>
+
+      <div class="muted small">Megjegyzés: a kamera csak HTTPS alatt működik. Ha nem töltődik be az Excel a GitHubról, ellenőrizd, hogy a fájl nyilvános és a RAW URL pontos.</div>
+    </main>
+
+    <footer>
+      <div class="small">Készítve — könnyű, mobilbarát felület. Cseréld ki a <code>GITHUB_RAW_URL</code>-t a saját fájlod URL-jére.</div>
+    </footer>
+  </div>
+
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+/*
+  FONTOS: cseréld ki a GITHUB_RAW_URL értékét a saját nyilvános raw GitHub fájl URL-edre:
+  pl:
+  const GITHUB_RAW_URL = "https://raw.githubusercontent.com/felhasznalonev/kodkereso/main/adatok.xlsx";
+*/
+const GITHUB_RAW_URL = "https://raw.githubusercontent.com/USERNAME/REPO/main/adatok.xlsx";
+
+let data = [];
+let html5QrCode = null;
+let isScanning = false;
+const readerEl = document.getElementById('reader');
+const resultEl = document.getElementById('result');
+const restartBtn = document.getElementById('restartBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const fileInput = document.getElementById('fileInput');
+
+function logToResult(msg, isError=false){
+  resultEl.textContent = msg;
+  if(isError) resultEl.style.color = 'crimson'; else resultEl.style.color = '';
+}
+
+// Fetch Excel from GitHub raw URL and parse
+async function loadExcelFromGitHub(){
+  try{
+    logToResult('Excel betöltése a GitHubról...');
+    const resp = await fetch(GITHUB_RAW_URL);
+    if(!resp.ok) throw new Error('Nem sikerült letölteni a fájlt. Ellenőrizd a raw URL-t és hogy a repo nyilvános.');
+    const buffer = await resp.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    console.log('Betöltött sorok száma:', data.length, data.slice(0,5));
+    logToResult('Excel betöltve — ' + (data.length-1) + ' adat sor (ha van fejléc).');
+    startScanner();
+  }catch(err){
+    console.error(err);
+    logToResult('Excel betöltése sikertelen: ' + err.message, true);
+  }
+}
+
+// Fallback: user uploaded file
+fileInput.addEventListener('change', (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = (evt)=>{
+    try{
+      const workbook = XLSX.read(evt.target.result, { type: 'binary' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      console.log('Helyi fájl betöltve', data.slice(0,5));
+      logToResult('Helyi Excel betöltve: ' + (data.length-1) + ' sor.');
+      startScanner();
+    }catch(e){
+      logToResult('Hiba a helyi Excel feldolgozásakor', true);
+    }
+  };
+  r.readAsBinaryString(f);
+});
+
+downloadBtn.addEventListener('click', ()=>{
+  loadExcelFromGitHub();
+});
+
+// Find value
+function findValueByCode(code){
+  if(!data || data.length===0) return "Nincs betöltött adat!";
+  for(let i=0;i<data.length;i++){
+    const left = (data[i] && data[i][0] !== undefined) ? String(data[i][0]).trim() : '';
+    if(left === String(code).trim()) return (data[i] && data[i][1] !== undefined) ? String(data[i][1]) : '';
+  }
+  return "Nincs találat!";
+}
+
+// Start scanner robustly
+async function startScanner(){
+  // if already scanning, stop first
+  if(html5QrCode && isScanning){
+    try{ await html5QrCode.stop(); }catch(e){ console.warn('Stop hiba', e); }
+    isScanning = false;
+  }
+
+  // create instance if needed
+  if(!html5QrCode){
+    html5QrCode = new Html5Qrcode(/* element id */ "reader");
+  }
+
+  // clear UI
+  readerEl.innerHTML = '';
+  logToResult('Várakozás beolvasásra...');
+  restartBtn.disabled = true;
+  restartBtn.classList.add('ghost');
+
+  const config = { fps: 10, qrbox: { width: Math.min(320, readerEl.clientWidth-20), height: Math.min(320, readerEl.clientWidth-20) } };
+
+  try{
+    await html5QrCode.start({ facingMode: "environment" }, config,
+      (decodedText, decodedResult) => {
+        // successful decode
+        (async ()=>{
+          try{
+            await html5QrCode.stop();
+          }catch(e){ console.warn('stop error', e); }
+          isScanning = false;
+          const value = findValueByCode(decodedText);
+          logToResult(value);
+          restartBtn.disabled = false;
+          restartBtn.classList.remove('ghost');
+        })();
+      },
+      (errorMessage) => {
+        // optional: show scan errors in console
+        // console.debug('scan error', errorMessage);
+      }
+    );
+    isScanning = true;
+    logToResult('Kamera aktív — irányítsd a kódot a nézőképre.');
+  }catch(err){
+    console.error('Kamera indítási hiba', err);
+    logToResult('Kamera indítása sikertelen: ' + (err && err.message ? err.message : err), true);
+  }
+}
+
+// Restart button logic: always try to ensure camera restarts
+restartBtn.addEventListener('click', async ()=>{
+  restartBtn.disabled = true;
+  restartBtn.classList.add('ghost');
+  try{
+    await startScanner();
+  }catch(e){
+    console.warn('restart hiba', e);
+    logToResult('Nem sikerült újraindítani a kamerát.', true);
+    restartBtn.disabled = false;
+    restartBtn.classList.remove('ghost');
+  }
+});
+
+// Auto load on page ready
+window.addEventListener('load', ()=>{
+  // Try to load automatically from GitHub raw URL; if fails, user can upload
+  loadExcelFromGitHub();
+});
+
+// unregister service worker on unload to avoid stale behavior during dev
+window.addEventListener('beforeunload', async ()=>{
+  if(html5QrCode && isScanning){
+    try{ await html5QrCode.stop(); }catch(e){}
+  }
+});
+</script>
+</body>
+</html>
