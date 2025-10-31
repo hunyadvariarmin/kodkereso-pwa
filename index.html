@@ -5,34 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kódkereső</title>
 <style>
-html, body { margin:0; padding:0; height:100%; font-family: Arial; background:#0a0a0a; color:white; overflow:hidden; }
+html, body { margin:0; padding:0; height:100%; font-family: Arial; background:#0a0a0a; color:white; }
 #reader { width:100vw; height:100vh; position:fixed; top:0; left:0; z-index:0; }
-#centerResult { 
-    position:fixed; 
-    top:50%; 
-    left:50%; 
-    transform:translate(-50%, -50%); 
-    font-size:120px;  /* Nagy betűméret */
-    font-weight:bold; 
-    color:#00ff88; 
-    text-align:center; 
-    z-index:2; 
-    white-space:pre-line;
-}
 #overlay { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); padding:20px; text-align:center; z-index:2; }
-button { background:#007bff; border:none; color:white; font-size:24px; padding:15px 40px; border-radius:12px; margin-top:10px; cursor:pointer; }
+button { background:#007bff; border:none; color:white; font-size:20px; padding:15px 30px; border-radius:12px; margin-top:10px; cursor:pointer; }
 button:hover { background:#0056b3; }
-#status { font-size:20px; margin-top:10px; color:white; word-wrap:break-word; }
+#result { font-size:22px; margin-top:10px; color:#00ff88; word-wrap:break-word; }
 </style>
 </head>
 <body>
 
 <div id="reader"></div>
-<div id="centerResult">Kamera indításra vár...</div>
-
 <div id="overlay">
   <button id="scanButton">📷 Új beolvasás</button>
-  <div id="status"></div>
+  <div id="result">Kamera indításra vár...</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -55,7 +41,7 @@ async function loadExcel() {
     console.log("✅ Excel betöltve:", data.slice(0,5));
   } catch(e) {
     console.error("❌ Excel betöltési hiba:", e);
-    document.getElementById("centerResult").innerText = "Excel betöltési hiba!";
+    document.getElementById("result").innerText = "Excel betöltési hiba!";
   }
 }
 
@@ -89,27 +75,20 @@ function findValueByCode(code) {
 // --- Kamera indítása ---
 async function startCamera() {
   try {
-    if(html5QrCode){
+    if(html5QrCode) {
       await html5QrCode.stop().catch(()=>{});
-      html5QrCode.clear();
-      html5QrCode = null;
       document.getElementById("reader").innerHTML = "";
     }
-
-    await new Promise(r => setTimeout(r, 300)); // kis delay a stabil indításhoz
-
     html5QrCode = new Html5Qrcode("reader");
     await html5QrCode.start(
       { facingMode:"environment" },
       { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
       onScanSuccess
     );
-
-    document.getElementById("status").innerText = "Kamera aktív – olvass be egy kódot!";
-    document.getElementById("centerResult").innerText = "";
+    document.getElementById("result").innerText = "Kamera aktív – olvass be egy kódot!";
   } catch(e) {
-    console.error("❌ Kamera hiba:", e);
-    document.getElementById("status").innerText = "Kamera indítása nem sikerült!";
+    console.error("❌ Kamera hiba:",e);
+    document.getElementById("result").innerText = "Kamera indítása nem sikerült!";
   }
 }
 
@@ -117,8 +96,7 @@ async function startCamera() {
 function onScanSuccess(decodedText){
   console.log("📷 Beolvasott kód (eredeti):", decodedText);
   const value = findValueByCode(decodedText);
-  document.getElementById("centerResult").innerText = value;
-  document.getElementById("status").innerText = "Beolvasás kész – nyomj az Új beolvasás gombra";
+  document.getElementById("result").innerText = `Kód: ${decodedText}\nEredmény: ${value}`;
   html5QrCode.stop().catch(()=>{});
 }
 
