@@ -8,12 +8,22 @@
 html, body { margin:0; padding:0; height:100%; font-family: Arial; overflow:hidden; }
 body { background: url("icons/logo.png") no-repeat center center fixed; background-size: cover; color: white; }
 
+#reader { 
+    width: 100vw; 
+    height: 100vh; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    z-index: 0; 
+    display: none; 
+}
+
 #centerResult { 
     position: fixed; 
-    top: 10%; /* feljebb helyezve */
+    top: 15%; /* feljebb */
     left: 50%; 
     transform: translateX(-50%); 
-    font-size: 120px; 
+    font-size: 100px; 
     font-weight: bold; 
     color: #FFD700; 
     text-align: center; 
@@ -29,6 +39,9 @@ body { background: url("icons/logo.png") no-repeat center center fixed; backgrou
     max-width: 400px;
     text-align: center; 
     z-index: 2; 
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 button { 
@@ -43,16 +56,6 @@ button {
     transition: all 0.3s ease; 
 }
 button:hover { background: rgba(255, 215, 0, 0.2); transform: scale(1.05); }
-
-#reader { 
-    width: 100vw; 
-    height: 100vh; 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    z-index: 0; 
-    display: none; 
-}
 </style>
 </head>
 <body>
@@ -70,7 +73,7 @@ button:hover { background: rgba(255, 215, 0, 0.2); transform: scale(1.05); }
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/adatok.xlsx";
 let data = [];
 let html5QrCode;
-let state = "logo"; // 'logo' vagy 'kamera'
+let state = "logo"; // 'logo', 'kamera', 'eredmeny'
 
 async function loadExcel() {
     try {
@@ -124,8 +127,7 @@ async function startCamera() {
     document.getElementById("reader").style.display = "block";
     document.getElementById("centerResult").innerText = "";
     state = "kamera";
-    document.getElementById("mainButton").innerText = "Beolvasás folyamatban...";
-    document.getElementById("mainButton").disabled = true;
+    renderButtons();
     try {
         if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
@@ -135,18 +137,7 @@ async function startCamera() {
         );
     } catch(e){
         console.error("❌ Kamera hiba:",e);
-        document.getElementById("mainButton").innerText = "Hiba a kamera indításakor";
     }
-}
-
-function onScanSuccess(decodedText){
-    const value = findValueByCode(decodedText);
-    document.getElementById("centerResult").innerText = value;
-    stopCamera();
-    state = "logo";
-    // Gomb újra engedélyezése
-    document.getElementById("mainButton").innerText = "Kód beolvasása";
-    document.getElementById("mainButton").disabled = false;
 }
 
 async function stopCamera(){
@@ -158,13 +149,38 @@ async function stopCamera(){
     document.getElementById("reader").style.display = "none";
 }
 
-document.getElementById("mainButton").addEventListener("click", async ()=>{
-    if(state === "logo") {
-        startCamera();
-    }
-});
+function onScanSuccess(decodedText){
+    const value = findValueByCode(decodedText);
+    document.getElementById("centerResult").innerText = value;
+    stopCamera();
+    state = "eredmeny";
+    renderButtons();
+}
 
-loadExcel();
+function renderButtons(){
+    const overlay = document.getElementById("overlay");
+    overlay.innerHTML = "";
+    if(state === "logo"){
+        const btn = document.createElement("button");
+        btn.innerText = "Kommissiózás kezdése";
+        btn.onclick = startCamera;
+        overlay.appendChild(btn);
+    } else if(state === "kamera"){
+        // Kamera alatt nincs gomb
+    } else if(state === "eredmeny"){
+        const scanBtn = document.createElement("button");
+        scanBtn.innerText = "Kód beolvasása";
+        scanBtn.onclick = startCamera;
+        overlay.appendChild(scanBtn);
+
+        const endBtn = document.createElement("button");
+        endBtn.innerText = "Kommissiózás befejezése";
+        endBtn.onclick = () => { window.location.href="index.html"; };
+        overlay.appendChild(endBtn);
+    }
+}
+
+loadExcel().then(renderButtons);
 </script>
 </body>
 </html>
