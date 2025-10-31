@@ -21,29 +21,30 @@ body {
 }
 #centerResult {
     position: fixed; top:6%; left:50%; transform: translateX(-50%);
-    font-size: 110px; font-weight: bold; color: #FFD700;
+    font-size: 90px; font-weight: bold; color: #FFD700;
     text-align:center; z-index:2; white-space:pre-line;
 }
 #overlay {
     position: fixed;
-    bottom: 100px; /* a két alul lévő gomb fölött */
+    bottom: 120px; /* a két alul lévő gomb fölött */
     left: 50%;
     transform: translateX(-50%);
-    width: 80%; max-width: 400px;
+    width: 70%; max-width: 350px;
     text-align: center;
     z-index:2;
 }
 button {
-    width:100%; padding:20px; font-size:28px; color:#FFD700;
+    width:100%; padding:15px; font-size:22px; color:#FFD700;
     background: rgba(0,0,0,0.4); border: 2px solid #FFD700;
-    border-radius: 15px; cursor:pointer; transition: all 0.3s ease;
+    border-radius: 12px; cursor:pointer; transition: all 0.3s ease;
 }
 button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
+
 #bottomButtons {
     position: fixed; bottom:40px; left:50%; transform: translateX(-50%);
-    display:flex; gap:20px; z-index:2; width:80%; max-width:400px; justify-content:center;
+    display:flex; gap:15px; z-index:2; width:80%; max-width:400px; justify-content:center;
 }
-#bottomButtons button { width:50%; padding:18px 0; font-size:24px; }
+#bottomButtons button { width:48%; padding:14px 0; font-size:20px; }
 </style>
 </head>
 <body>
@@ -70,12 +71,12 @@ let html5QrCode;
 let totalCount = 0;
 let scannedCount = 0;
 
-// --- Betöltjük a beolvasottakat sessionStorage-ból ---
+// Betöltjük a beolvasottakat sessionStorage-ból
 if(sessionStorage.getItem('1_scanned')) {
-    scannedCount = Number(sessionStorage.getItem('1_scanned'));
+    scannedCount = Number(sessionStorage.getItem('1_scanned')) || 0;
 }
 
-// --- Excel betöltése ---
+// Excel betöltése
 async function loadExcel() {
     try {
         const resp = await fetch(GITHUB_RAW_URL);
@@ -83,18 +84,18 @@ async function loadExcel() {
         const wb = XLSX.read(buffer, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
         data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        // Számoljuk a totalCount-ot az A oszlop második sortól
-        totalCount = data.slice(1).filter(row => row[0] && row[0].toString().trim()!=='').length;
+        // totalCount: számoljuk hány A oszlopban van adat 2. sortól
+        totalCount = data.slice(1).reduce((acc,row)=> (row && row[0] && row[0].toString().trim() !== '') ? acc+1 : acc, 0);
         updateCounter();
     } catch(e){ console.error(e);}
 }
 
-// --- Frissíti a számlálót ---
+// Számláló frissítése
 function updateCounter() {
     document.getElementById("centerResult").innerText = `${scannedCount}/${totalCount}`;
 }
 
-// --- Normalizálás ---
+// Normalizálás
 function normalizeCode(str) {
     if(!str) return "";
     str = String(str).trim().toUpperCase().replace(/\s+/g,'').replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,'');
@@ -103,7 +104,7 @@ function normalizeCode(str) {
     return str;
 }
 
-// --- Kód ellenőrzés ---
+// Kód ellenőrzés
 function checkCode(code) {
     const searchCode = normalizeCode(code);
     for(let i=1;i<data.length;i++){
@@ -114,7 +115,7 @@ function checkCode(code) {
     return false;
 }
 
-// --- Kamera ---
+// Kamera
 async function startCamera() {
     const reader = document.getElementById("reader");
     reader.style.display="block";
@@ -134,6 +135,7 @@ async function stopCamera() {
     document.getElementById("overlay").style.display="block";
 }
 
+// Beolvasás
 function onScanSuccess(decodedText){
     if(checkCode(decodedText)) {
         scannedCount++;
@@ -143,13 +145,14 @@ function onScanSuccess(decodedText){
     stopCamera();
 }
 
-// --- Gombok ---
+// Gombok
 document.getElementById("scanButton").addEventListener("click", startCamera);
 
 document.getElementById("finishButton").addEventListener("click", ()=>{
     if(scannedCount<totalCount){
-        sessionStorage.removeItem('1_scanned'); // ha nem olvastuk be mindet, töröljük
+        sessionStorage.removeItem('1_scanned'); // törli a memória, ha nincs kész
     } else {
+        // vissza HD.html-re, pipával
         window.location.href = "hd.html?done=1&code=1";
     }
 });
@@ -160,6 +163,5 @@ document.getElementById("backButton").addEventListener("click", ()=>{
 
 loadExcel();
 </script>
-
 </body>
 </html>
