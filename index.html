@@ -1,150 +1,110 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kódkereső</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #0a0a0a;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-    #camera {
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
-    #overlay {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: rgba(0,0,0,0.7);
-      padding: 20px;
-      text-align: center;
-      z-index: 2;
-    }
-    button {
-      background-color: #007bff;
-      border: none;
-      color: white;
-      font-size: 20px;
-      padding: 15px 30px;
-      border-radius: 12px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #result {
-      font-size: 22px;
-      margin-top: 10px;
-      color: #00ff88;
-      word-wrap: break-word;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kódkereső</title>
+<style>
+body {margin:0; font-family: Arial; background:#0a0a0a; color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; overflow:hidden;}
+#camera {width:100vw; height:100vh; object-fit:cover; position:fixed; top:0; left:0; z-index:0;}
+#overlay {position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); padding:20px; text-align:center; z-index:2;}
+button {background:#007bff; border:none; color:white; font-size:20px; padding:15px 30px; border-radius:12px; margin-top:10px; cursor:pointer;}
+button:hover {background:#0056b3;}
+#result {font-size:22px; margin-top:10px; color:#00ff88; word-wrap:break-word;}
+</style>
 </head>
 <body>
-  <video id="camera" autoplay></video>
+<video id="camera" autoplay></video>
+<div id="overlay">
+  <button id="scanButton">📷 Új beolvasás</button>
+  <div id="result">Kamera indításra vár...</div>
+</div>
 
-  <div id="overlay">
-    <button id="scanButton">📷 Új beolvasás</button>
-    <div id="result">Kamera indításra vár...</div>
-  </div>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/adatok.xlsx";
+let data = [];
+let html5QrCode;
 
-  <script>
-    const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/adatok.xlsx";
-    let data = [];
-    let html5QrCode;
+// --- Excel betöltése ---
+async function loadExcel() {
+  try {
+    const resp = await fetch(GITHUB_RAW_URL);
+    if (!resp.ok) throw new Error("Excel betöltési hiba!");
+    const buffer = await resp.arrayBuffer();
+    const wb = XLSX.read(buffer, {type:"array"});
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    data = XLSX.utils.sheet_to_json(sheet, {header:1});
+    console.log("✅ Excel betöltve:", data.slice(0,5));
+  } catch(e) {
+    console.error("❌ Excel betöltési hiba:", e);
+    document.getElementById("result").innerText = "Excel betöltési hiba!";
+  }
+}
 
-    async function loadExcelFromGitHub() {
-      try {
-        const response = await fetch(GITHUB_RAW_URL);
-        if (!response.ok) throw new Error("Excel betöltési hiba!");
-        const arrayBuffer = await response.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        console.log("✅ Excel betöltve:", data.length, "sor");
-      } catch (error) {
-        console.error("❌ Excel betöltési hiba:", error);
-        document.getElementById("result").innerText = "Excel betöltési hiba!";
-      }
+// --- Normalizáló függvény ---
+function normalizeCode(str) {
+  if(!str) return "";
+  str = String(str).trim().toUpperCase()
+    .replace(/\s+/g,'')
+    .replace(/[‐-–—−]/g,'-')
+    .replace(/\\/g,'/')
+    .replace(/[^A-Z0-9\-\/]/g,'');
+  if(str.includes("/")) str = str.split("/")[0]; // levágja a / utáni részt
+  if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
+  return str;
+}
+
+// --- Keresés ---
+function findValueByCode(code) {
+  if(!code || !data.length) return "Nincs találat!";
+  const searchCode = normalizeCode(code);
+  console.log("🔹 Normalizált kód:", searchCode);
+  for(let i=1;i<data.length;i++){
+    if(!data[i] || data[i].length<2) continue;
+    const cellValue = normalizeCode(data[i][0]);
+    console.log("🧩 Összehasonlítás:", cellValue,"==",searchCode);
+    if(cellValue === searchCode) return data[i][1];
+  }
+  return "Nincs találat!";
+}
+
+// --- Kamera indítása ---
+async function startCamera() {
+  const video = document.getElementById("camera");
+  try {
+    if(html5QrCode) {
+      await html5QrCode.stop().catch(()=>{});
+      video.srcObject = null;
     }
+    html5QrCode = new Html5Qrcode("camera");
+    await html5QrCode.start(
+      { facingMode:"environment" },
+      { fps:10, qrbox:{width:250,height:250} },
+      onScanSuccess
+    );
+    document.getElementById("result").innerText = "Kamera aktív – olvass be egy kódot!";
+  } catch(e) {
+    console.error("❌ Kamera hiba:",e);
+    document.getElementById("result").innerText = "Kamera indítása nem sikerült!";
+  }
+}
 
-    function normalizeCode(str) {
-      if (!str) return "";
-      str = String(str)
-        .trim()
-        .toUpperCase()
-        .replace(/\s+/g, '')
-        .replace(/[‐-–—−]/g, '-')
-        .replace(/\\/g, '/')
-        .replace(/[^A-Z0-9\-\/]/g, '');
-      if (str.includes("/")) {
-        str = str.split("/")[0]; // levágja a per utáni részt
-      }
-      if (/^\d+\.0$/.test(str)) str = str.replace(/\.0$/, '');
-      return str;
-    }
+// --- Beolvasás callback ---
+function onScanSuccess(decodedText){
+  console.log("📷 Beolvasott kód (eredeti):", decodedText);
+  const value = findValueByCode(decodedText);
+  document.getElementById("result").innerText = `Kód: ${decodedText}\nEredmény: ${value}`;
+  html5QrCode.stop().catch(()=>{});
+}
 
-    function findValueByCode(code) {
-      if (!code || !data.length) return "Nincs találat!";
-      const searchCode = normalizeCode(code);
-      for (let i = 1; i < data.length; i++) {
-        if (!data[i] || data[i].length < 2) continue;
-        let cellValue = normalizeCode(data[i][0]);
-        if (cellValue === searchCode) {
-          return data[i][1];
-        }
-      }
-      return "Nincs találat!";
-    }
+// --- Gomb ---
+document.getElementById("scanButton").addEventListener("click", startCamera);
 
-    async function startCamera() {
-      try {
-        if (html5QrCode) {
-          await html5QrCode.stop();
-          document.getElementById("camera").srcObject = null;
-        }
-
-        html5QrCode = new Html5Qrcode("camera");
-        await html5QrCode.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          onScanSuccess
-        );
-        document.getElementById("result").innerText = "Kamera aktív – olvass be egy kódot!";
-      } catch (error) {
-        console.error("❌ Kamera hiba:", error);
-        document.getElementById("result").innerText = "Kamera indítása nem sikerült!";
-      }
-    }
-
-    function onScanSuccess(decodedText) {
-      console.log("📷 Beolvasott kód (eredeti):", decodedText);
-      const value = findValueByCode(decodedText);
-      document.getElementById("result").innerText = `Kód: ${decodedText}\nEredmény: ${value}`;
-      html5QrCode.stop();
-    }
-
-    document.getElementById("scanButton").addEventListener("click", startCamera);
-    loadExcelFromGitHub();
-  </script>
+// --- Betöltés ---
+loadExcel();
+</script>
 </body>
 </html>
