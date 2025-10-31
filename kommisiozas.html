@@ -13,9 +13,9 @@ html, body {
     overflow: hidden;
 }
 
-/* Háttér */
+/* Teljes háttér */
 body {
-    background: url("icons/hdxd.jpg") no-repeat center center fixed;
+    background: url("icons/logo.png") no-repeat center center fixed;
     background-size: cover;
     color: white;
     position: relative;
@@ -78,13 +78,14 @@ button:hover {
     transform: scale(1.05);
 }
 
-/* Vissza gomb a kamera képén */
+/* Vissza gomb a kamera képén hdxd háttérrel */
 #backButton {
     position: fixed;
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    background: blue;
+    background: url("icons/hdxd.jpg") no-repeat center center;
+    background-size: cover;
     color: yellow;
     border: none;
     border-radius: 12px;
@@ -197,7 +198,7 @@ async function stopCamera() {
     document.getElementById("reader").style.display = "none";
     document.getElementById("backButton").style.display = "none";
     document.getElementById("overlay").style.display = "flex";
-    document.body.style.background = 'url("icons/hdxd.jpg") no-repeat center center fixed';
+    document.body.style.background = 'url("icons/logo.png") no-repeat center center fixed';
     document.body.style.backgroundSize = "cover";
 }
 
