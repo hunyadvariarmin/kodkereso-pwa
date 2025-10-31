@@ -15,29 +15,45 @@ html, body {
     color:white;
     display:flex;
     flex-direction:column;
-    justify-content:center;
+    justify-content:space-between;
     align-items:center;
 }
+#topButtons {
+    display:flex;
+    justify-content:center;
+    gap: 20px;
+    margin-top: 20px;
+}
 button {
-    width:200px;
+    width:150px;
     padding:20px;
-    font-size:28px;
+    font-size:24px;
     color:#FFD700;
     background: rgba(0,0,0,0.4);
     border: 2px solid #FFD700;
-    border-radius:15px;
+    border-radius:12px;
     cursor:pointer;
-    margin:15px;
     transition: all 0.3s ease;
 }
 button:hover {
     background: rgba(255,215,0,0.2);
     transform: scale(1.05);
 }
+#bottomButton {
+    margin-bottom: 20px;
+}
 </style>
 </head>
 <body>
-    <button onclick="window.location.href='szami.html'">SZAMI</button>
-    <button onclick="window.location.href='hd.html'">HD</button>
+    <!-- Felül a két gomb -->
+    <div id="topButtons">
+        <button onclick="window.location.href='szami.html'">SZAMI</button>
+        <button onclick="window.location.href='hd.html'">HD</button>
+    </div>
+
+    <!-- Alul a Vissza gomb -->
+    <div id="bottomButton">
+        <button onclick="window.location.href='index.html'">Vissza</button>
+    </div>
 </body>
 </html>
