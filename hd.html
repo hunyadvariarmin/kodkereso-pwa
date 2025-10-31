@@ -6,61 +6,87 @@
 <title>HD</title>
 <style>
 html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
+    margin:0;
+    padding:0;
+    height:100%;
     font-family: Arial, sans-serif;
+    overflow:hidden;
     background: url("icons/logo.png") no-repeat center center fixed;
     background-size: cover;
-    color: white;
+    color:white;
+    position: relative;
+}
+/* Sötétítő réteg a háttérre */
+body::before {
+    content: "";
+    position: absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.45);
+    z-index:0;
 }
 
-#container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
-#buttons {
+#buttonContainer {
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
     display: grid;
-    grid-template-columns: repeat(2, 150px);
-    grid-gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+    z-index: 1;
+    width: 300px; /* Igazítsd a gombokhoz */
 }
 
 button {
     padding: 20px;
     font-size: 28px;
     color: #FFD700;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0,0,0,0.6);
     border: 2px solid #FFD700;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-align: center;
+}
+button:hover {
+    background: rgba(255,215,0,0.2);
+    transform: scale(1.05);
 }
 
-button:hover {
-    background: rgba(255, 215, 0, 0.2);
-    transform: scale(1.05);
+#backButton {
+    position: fixed;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 18px 40px;
+    font-size: 24px;
+    background: rgba(0,0,0,0.6);
+    border: 2px solid #FFD700;
+    border-radius: 12px;
+    color: #FFD700;
+    cursor: pointer;
+    z-index: 2;
+}
+#backButton:hover {
+    background: rgba(255,215,0,0.2);
 }
 </style>
 </head>
 <body>
 
-<div id="container">
-    <div id="buttons">
-        <button>1</button>
-        <button>2</button>
-        <button>11</button>
-        <button>24</button>
-        <button>31</button>
-        <button>25</button>
-        <button>34</button>
-        <button>35</button>
-        <button>38</button>
-    </div>
+<div id="buttonContainer">
+    <button>1</button>
+    <button>11</button>
+    <button>31</button>
+    <button>34</button>
+    <button>35</button>
+    <button>38</button>
+    <button>24</button>
+    <button>25</button>
+    <button>2</button>
 </div>
+
+<button id="backButton" onclick="window.location.href='arukiadas.html'">Vissza</button>
 
 </body>
 </html>
