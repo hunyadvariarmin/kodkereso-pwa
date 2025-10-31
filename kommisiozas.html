@@ -56,7 +56,7 @@ body::before {
 /* Alul lévő gombterület */
 #overlay {
     position: fixed;
-    bottom: 5%;
+    bottom: 3%;
     left: 50%;
     transform: translateX(-50%);
     width: 80%;
@@ -65,16 +65,16 @@ body::before {
     z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 button {
     width: 100%;
-    padding: 20px;
-    font-size: 28px;
+    padding: 18px;
+    font-size: 26px;
     color: #FFD700;
     background: rgba(0, 0, 0, 0.4);
-    border: 2px solid #FFD700;
+    border: none;
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -84,39 +84,38 @@ button:hover {
     transform: scale(1.05);
 }
 
-/* Vissza gomb módosított stílus */
+/* Vissza gomb */
 #backButton {
     position: fixed;
     bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 32px;
+    font-size: 36px;
     font-weight: bold;
     cursor: pointer;
     z-index: 4;
     display: none;
-    background: rgba(0,0,0,0); /* átlátszó külső */
-    border: 3px solid #FFD700; /* sárga keret */
-    border-radius: 15px;
-    padding: 18px 60px;
-    color: #FFD700; /* felirat sárga */
-    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    background: #007BFF; /* kék háttér */
+    border: none;
+    border-radius: 18px;
+    padding: 20px 60px;
+    color: #FFD700; /* sárga felirat */
+    text-shadow: 0 0 5px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
 }
 #backButton:hover {
     transform: translateX(-50%) scale(1.05);
-    box-shadow: inset 0 0 0 100% rgba(0,123,255,0.2);
 }
 #backButton::before {
     content: "← ";
-    font-size: 36px;
+    font-size: 40px;
 }
 </style>
 </head>
 <body>
 
 <div id="reader"></div>
-<button id="backButton"></button>
+<button id="backButton">Vissza</button>
 
 <div id="centerResult"></div>
 <div id="overlay">
@@ -164,7 +163,6 @@ function findValueByCode(code) {
     if (!code || !data.length) return "Nincs járaton";
     const searchCode = normalizeCode(code);
 
-    // először szállítólevél
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (row && row.length >= 3) {
@@ -172,7 +170,6 @@ function findValueByCode(code) {
             if (szallitolevel === searchCode) return row[2];
         }
     }
-    // ha nincs, akkor csomagszám
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (row && row.length >= 3) {
@@ -222,7 +219,6 @@ function onScanSuccess(decodedText) {
     const centerResult = document.getElementById("centerResult");
     centerResult.innerText = value;
 
-    // ha "Nincs járaton" -> kisebb méret és középre
     if (value === "Nincs járaton") {
         centerResult.style.fontSize = "60px";
         centerResult.style.textAlign = "center";
