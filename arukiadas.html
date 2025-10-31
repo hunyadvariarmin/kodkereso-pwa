@@ -10,29 +10,24 @@ html, body {
     padding:0;
     height:100%;
     font-family: Arial, sans-serif;
-    overflow:hidden;
     background: url("icons/logo.png") no-repeat center center fixed;
     background-size: cover;
     color:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
 }
-#topButtons, #bottomButtons {
-    position: fixed;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    z-index: 2;
-}
-#topButtons { top: 5%; }
-#bottomButtons { bottom: 5%; }
 button {
-    background: rgba(0,0,0,0.5);
+    width:200px;
+    padding:20px;
+    font-size:28px;
+    color:#FFD700;
+    background: rgba(0,0,0,0.4);
     border: 2px solid #FFD700;
-    border-radius: 12px;
-    color: #FFD700;
-    font-size: 24px;
-    padding: 15px 40px;
-    cursor: pointer;
+    border-radius:15px;
+    cursor:pointer;
+    margin:15px;
     transition: all 0.3s ease;
 }
 button:hover {
@@ -42,21 +37,7 @@ button:hover {
 </style>
 </head>
 <body>
-
-<div id="topButtons">
     <button onclick="window.location.href='szami.html'">SZAMI</button>
-    <button id="hdButton">HD</button>
-</div>
-
-<div id="bottomButtons">
-    <button onclick="window.location.href='index.html'">🏠 Vissza</button>
-</div>
-
-<script>
-document.getElementById("hdButton").addEventListener("click", () => {
-    window.location.href = "hd.html";
-});
-</script>
-
+    <button onclick="window.location.href='hd.html'">HD</button>
 </body>
 </html>
