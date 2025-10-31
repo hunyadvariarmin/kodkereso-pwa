@@ -10,8 +10,6 @@ html, body {
     padding:0;
     height:100%;
     font-family: Arial, sans-serif;
-    background: url("icons/logo.png") no-repeat center center fixed;
-    background-size: cover;
     display:flex;
     flex-direction:column;
     justify-content:flex-start;
@@ -19,16 +17,15 @@ html, body {
     position:relative;
     color:white;
 }
-/* Sötétítés a teljes háttéren */
-body::before {
-    content:"";
-    position:absolute;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.35);
-    z-index:0;
+
+/* Teljes háttér sötétítéssel */
+body {
+    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+                url("icons/logo.png") no-repeat center center fixed;
+    background-size: cover;
 }
 
+/* Gombok konténer */
 #buttonsContainer {
     display:grid;
     grid-template-columns: repeat(2, 150px);
