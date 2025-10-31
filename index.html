@@ -57,7 +57,7 @@ function normalizeCode(str) {
     .replace(/[‐-–—−]/g,'-')
     .replace(/\\/g,'/')
     .replace(/[^A-Z0-9\-\/]/g,'');
-  if(str.includes("/")) str = str.split("/")[0];
+  if(str.includes("/")) str = str.split("/")[0]; // levágja a / utáni részt
   if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
   return str;
 }
@@ -79,20 +79,26 @@ function findValueByCode(code) {
 // --- Kamera indítása ---
 async function startCamera() {
   try {
+    // Ha már van kamera, állítsd le, töröld a DOM-ot, nullázd a változót
     if(html5QrCode) {
       await html5QrCode.stop().catch(()=>{});
+      html5QrCode.clear();
+      html5QrCode = null;
       document.getElementById("reader").innerHTML = "";
     }
+
     html5QrCode = new Html5Qrcode("reader");
+
     await html5QrCode.start(
       { facingMode:"environment" },
       { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
       onScanSuccess
     );
+
     document.getElementById("status").innerText = "Kamera aktív – olvass be egy kódot!";
     document.getElementById("centerResult").innerText = "";
   } catch(e) {
-    console.error("❌ Kamera hiba:",e);
+    console.error("❌ Kamera hiba:", e);
     document.getElementById("status").innerText = "Kamera indítása nem sikerült!";
   }
 }
