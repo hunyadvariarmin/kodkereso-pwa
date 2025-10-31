@@ -12,12 +12,12 @@ html, body { margin:0; padding:0; height:100%; font-family: Arial; background:#0
     top:50%; 
     left:50%; 
     transform:translate(-50%, -50%); 
-    font-size:120px; /* Nagy betűméret */
+    font-size:120px;  /* Nagy betűméret */
     font-weight:bold; 
     color:#00ff88; 
     text-align:center; 
     z-index:2; 
-    white-space:pre-line; /* Többsoros szöveg támogatás */
+    white-space:pre-line;
 }
 #overlay { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); padding:20px; text-align:center; z-index:2; }
 button { background:#007bff; border:none; color:white; font-size:24px; padding:15px 40px; border-radius:12px; margin-top:10px; cursor:pointer; }
@@ -67,7 +67,7 @@ function normalizeCode(str) {
     .replace(/[‐-–—−]/g,'-')
     .replace(/\\/g,'/')
     .replace(/[^A-Z0-9\-\/]/g,'');
-  if(str.includes("/")) str = str.split("/")[0];
+  if(str.includes("/")) str = str.split("/")[0]; // levágja a / utáni részt
   if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
   return str;
 }
@@ -89,7 +89,7 @@ function findValueByCode(code) {
 // --- Kamera indítása ---
 async function startCamera() {
   try {
-    if(html5QrCode) {
+    if(html5QrCode){
       await html5QrCode.stop().catch(()=>{});
       html5QrCode.clear();
       html5QrCode = null;
@@ -104,6 +104,7 @@ async function startCamera() {
       { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
       onScanSuccess
     );
+
     document.getElementById("status").innerText = "Kamera aktív – olvass be egy kódot!";
     document.getElementById("centerResult").innerText = "";
   } catch(e) {
