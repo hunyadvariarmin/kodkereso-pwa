@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HD</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: url("icons/logo.png") no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+}
+
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 150px);
+    grid-gap: 20px;
+}
+
+button {
+    padding: 20px;
+    font-size: 28px;
+    color: #FFD700;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #FFD700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+button:hover {
+    background: rgba(255, 215, 0, 0.2);
+    transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+
+<div id="container">
+    <div id="buttons">
+        <button>1</button>
+        <button>2</button>
+        <button>11</button>
+        <button>24</button>
+        <button>31</button>
+        <button>25</button>
+        <button>34</button>
+        <button>35</button>
+        <button>38</button>
+    </div>
+</div>
+
+</body>
+</html>
