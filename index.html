@@ -56,34 +56,22 @@
 <button id="restartBtn" disabled>Új beolvasás</button>
 
 <script>
-// IDE illeszd be a saját GitHub RAW Excel linket
+// --- A te GitHub RAW Excel linked ---
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/adatok.xlsx";
 
 let data = [];
 let html5QrCode;
 
-async function loadExcelFromGitHub() {
-  try {
-    const response = await fetch(GITHUB_RAW_URL);
-    const buffer = await response.arrayBuffer();
-    const workbook = XLSX.read(buffer, { type: "array" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    console.log("Excel betöltve:", data.length, "sor");
-    startScanner();
-  } catch(err) {
-    alert("Excel betöltése sikertelen: " + err);
-  }
-}
-
+// --- Javított findValueByCode ---
 function findValueByCode(code) {
     if (!code || !data.length) return "Nincs találat!";
-    const searchCode = String(code).trim();
+    const searchCode = String(code).trim().toUpperCase(); // nagybetűsítés
     for (let i = 1; i < data.length; i++) {
         if (!data[i] || data[i].length < 2) continue;
         let cellValue = data[i][0];
         if (cellValue === undefined || cellValue === null) continue;
-        cellValue = String(cellValue).trim();
+        cellValue = String(cellValue).trim().toUpperCase();
+        // számok esetén a .0 végződést levágjuk
         if (/^\d+\.0$/.test(cellValue)) {
             cellValue = cellValue.replace(/\.0$/, '');
         }
@@ -94,6 +82,7 @@ function findValueByCode(code) {
     return "Nincs találat!";
 }
 
+// --- Kamera indítása ---
 async function startScanner() {
   document.getElementById('result').textContent = "";
   document.getElementById('restartBtn').disabled = true;
@@ -116,6 +105,21 @@ async function startScanner() {
       document.getElementById('restartBtn').disabled = false;
     }
   );
+}
+
+// --- Excel betöltése a RAW linkről ---
+async function loadExcelFromGitHub() {
+  try {
+    const response = await fetch(GITHUB_RAW_URL);
+    const buffer = await response.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    console.log("Excel betöltve:", data.length, "sor");
+    startScanner();
+  } catch(err) {
+    alert("Excel betöltése sikertelen: " + err);
+  }
 }
 
 document.getElementById('restartBtn').addEventListener('click', () => {
