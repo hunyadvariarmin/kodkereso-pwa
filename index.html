@@ -5,16 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kódkereső</title>
 <style>
-body {margin:0; font-family: Arial; background:#0a0a0a; color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; overflow:hidden;}
-#camera {width:100vw; height:100vh; object-fit:cover; position:fixed; top:0; left:0; z-index:0;}
-#overlay {position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); padding:20px; text-align:center; z-index:2;}
-button {background:#007bff; border:none; color:white; font-size:20px; padding:15px 30px; border-radius:12px; margin-top:10px; cursor:pointer;}
-button:hover {background:#0056b3;}
-#result {font-size:22px; margin-top:10px; color:#00ff88; word-wrap:break-word;}
+html, body { margin:0; padding:0; height:100%; font-family: Arial; background:#0a0a0a; color:white; }
+#reader { width:100vw; height:100vh; position:fixed; top:0; left:0; z-index:0; }
+#overlay { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); padding:20px; text-align:center; z-index:2; }
+button { background:#007bff; border:none; color:white; font-size:20px; padding:15px 30px; border-radius:12px; margin-top:10px; cursor:pointer; }
+button:hover { background:#0056b3; }
+#result { font-size:22px; margin-top:10px; color:#00ff88; word-wrap:break-word; }
 </style>
 </head>
 <body>
-<video id="camera" autoplay></video>
+
+<div id="reader"></div>
 <div id="overlay">
   <button id="scanButton">📷 Új beolvasás</button>
   <div id="result">Kamera indításra vár...</div>
@@ -73,16 +74,15 @@ function findValueByCode(code) {
 
 // --- Kamera indítása ---
 async function startCamera() {
-  const video = document.getElementById("camera");
   try {
     if(html5QrCode) {
       await html5QrCode.stop().catch(()=>{});
-      video.srcObject = null;
+      document.getElementById("reader").innerHTML = "";
     }
-    html5QrCode = new Html5Qrcode("camera");
+    html5QrCode = new Html5Qrcode("reader");
     await html5QrCode.start(
       { facingMode:"environment" },
-      { fps:10, qrbox:{width:250,height:250} },
+      { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
       onScanSuccess
     );
     document.getElementById("result").innerText = "Kamera aktív – olvass be egy kódot!";
