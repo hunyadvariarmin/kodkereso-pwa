@@ -36,7 +36,7 @@ body {
 /* Eredmény szöveg */
 #centerResult {
     position: fixed;
-    top: 6%;
+    top: 10%;
     left: 50%;
     transform: translateX(-50%);
     font-size: 110px;
@@ -47,22 +47,18 @@ body {
     white-space: pre-line;
 }
 
-/* Alul lévő gombterület */
-#overlay {
+/* Fent lévő gombterület */
+#topButton {
     position: fixed;
-    bottom: 4%;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80%;
-    max-width: 400px;
+    width: 200px;
     text-align: center;
     z-index: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
 }
 
-button {
+#topButton button {
     width: 100%;
     padding: 20px;
     font-size: 28px;
@@ -73,12 +69,12 @@ button {
     cursor: pointer;
     transition: all 0.3s ease;
 }
-button:hover {
+#topButton button:hover {
     background: rgba(255, 215, 0, 0.2);
     transform: scale(1.05);
 }
 
-/* Vissza gomb alulra */
+/* Alul lévő Vissza gomb */
 #backButton {
     position: fixed;
     bottom: 20px;
@@ -104,7 +100,7 @@ button:hover {
 
 <div id="centerResult"></div>
 
-<div id="overlay">
+<div id="topButton">
     <button id="mainButton">Kommissiózás kezdése</button>
 </div>
 
@@ -117,7 +113,7 @@ button:hover {
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/adatok.xlsx";
 let data = [];
 let html5QrCode;
-let state = "logo"; // 'logo', 'kamera', 'eredmeny'
+let state = "logo";
 
 // --- Excel betöltése ---
 async function loadExcel() {
@@ -172,7 +168,7 @@ async function startCamera() {
     const reader = document.getElementById("reader");
     reader.style.display = "block";
     document.getElementById("centerResult").innerText = "";
-    document.getElementById("overlay").style.display = "none";
+    document.getElementById("topButton").style.display = "none";
     state = "kamera";
 
     try {
@@ -194,7 +190,7 @@ async function stopCamera() {
         html5QrCode = null;
     }
     document.getElementById("reader").style.display = "none";
-    document.getElementById("overlay").style.display = "flex";
+    document.getElementById("topButton").style.display = "block";
 }
 
 function onScanSuccess(decodedText) {
@@ -211,32 +207,11 @@ function onScanSuccess(decodedText) {
     }
 
     stopCamera();
-    state = "eredmeny";
-    renderButtons();
 }
 
-function renderButtons() {
-    const overlay = document.getElementById("overlay");
-    overlay.innerHTML = "";
-    if (state === "logo") {
-        const btn = document.createElement("button");
-        btn.innerText = "Kommissiózás kezdése";
-        btn.onclick = startCamera;
-        overlay.appendChild(btn);
-    } else if (state === "eredmeny") {
-        const scanBtn = document.createElement("button");
-        scanBtn.innerText = "Kód beolvasása";
-        scanBtn.onclick = startCamera;
-        overlay.appendChild(scanBtn);
+document.getElementById("mainButton").addEventListener("click", startCamera);
 
-        const endBtn = document.createElement("button");
-        endBtn.innerText = "Kommissiózás befejezése";
-        endBtn.onclick = () => { window.location.href = "index.html"; };
-        overlay.appendChild(endBtn);
-    }
-}
-
-loadExcel().then(renderButtons);
+loadExcel();
 </script>
 </body>
 </html>
