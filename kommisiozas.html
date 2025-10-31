@@ -9,7 +9,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     overflow: hidden;
 }
 body {
@@ -18,8 +18,6 @@ body {
     color: white;
     position: relative;
 }
-
-/* Halvány sötét overlay a logón */
 body::before {
     content: "";
     position: absolute;
@@ -29,7 +27,7 @@ body::before {
     z-index: 0;
 }
 
-/* Teljes képernyős kamera */
+/* Teljes kameranézet */
 #reader {
     position: fixed;
     top: 0; left: 0;
@@ -41,7 +39,7 @@ body::before {
     background-color: black;
 }
 
-/* A beolvasott érték */
+/* Eredmény szöveg */
 #centerResult {
     position: fixed;
     top: 6%;
@@ -55,7 +53,7 @@ body::before {
     white-space: pre-line;
 }
 
-/* Gombok alul (logós nézetben és eredmény után) */
+/* Alul lévő gombterület */
 #overlay {
     position: fixed;
     bottom: 5%;
@@ -86,7 +84,7 @@ button:hover {
     transform: scale(1.05);
 }
 
-/* --- Kamera alatt megjelenő "Vissza" gomb --- */
+/* Vissza gomb */
 #backButton {
     position: fixed;
     bottom: 40px;
@@ -215,7 +213,18 @@ async function stopCamera() {
 
 function onScanSuccess(decodedText) {
     const value = findValueByCode(decodedText);
-    document.getElementById("centerResult").innerText = value;
+    const centerResult = document.getElementById("centerResult");
+    centerResult.innerText = value;
+
+    // ha "Nincs járaton" -> kisebb méret és középre igazított
+    if (value === "Nincs járaton") {
+        centerResult.style.fontSize = "60px";
+        centerResult.style.textAlign = "center";
+    } else {
+        centerResult.style.fontSize = "110px";
+        centerResult.style.textAlign = "center";
+    }
+
     stopCamera();
     state = "eredmeny";
     renderButtons();
