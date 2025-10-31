@@ -12,14 +12,15 @@ html, body { margin:0; padding:0; height:100%; font-family: Arial; background:#0
     top:50%; 
     left:50%; 
     transform:translate(-50%, -50%); 
-    font-size:120px;  /* Növelt betűméret */
+    font-size:120px; /* Nagy betűméret */
     font-weight:bold; 
     color:#00ff88; 
     text-align:center; 
     z-index:2; 
+    white-space:pre-line; /* Többsoros szöveg támogatás */
 }
-#bottomOverlay { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); padding:20px; text-align:center; z-index:2; }
-button { background:#007bff; border:none; color:white; font-size:24px; padding:15px 40px; border-radius:12px; cursor:pointer; margin-top:10px; }
+#overlay { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); padding:20px; text-align:center; z-index:2; }
+button { background:#007bff; border:none; color:white; font-size:24px; padding:15px 40px; border-radius:12px; margin-top:10px; cursor:pointer; }
 button:hover { background:#0056b3; }
 #status { font-size:20px; margin-top:10px; color:white; word-wrap:break-word; }
 </style>
@@ -27,10 +28,9 @@ button:hover { background:#0056b3; }
 <body>
 
 <div id="reader"></div>
-
 <div id="centerResult">Kamera indításra vár...</div>
 
-<div id="bottomOverlay">
+<div id="overlay">
   <button id="scanButton">📷 Új beolvasás</button>
   <div id="status"></div>
 </div>
@@ -67,7 +67,7 @@ function normalizeCode(str) {
     .replace(/[‐-–—−]/g,'-')
     .replace(/\\/g,'/')
     .replace(/[^A-Z0-9\-\/]/g,'');
-  if(str.includes("/")) str = str.split("/")[0]; // levágja a / utáni részt
+  if(str.includes("/")) str = str.split("/")[0];
   if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
   return str;
 }
@@ -93,24 +93,21 @@ async function startCamera() {
       await html5QrCode.stop().catch(()=>{});
       html5QrCode.clear();
       html5QrCode = null;
+      document.getElementById("reader").innerHTML = "";
     }
-    document.getElementById("reader").innerHTML = "";
 
-    // kis delay a stabil újraindításhoz
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 300)); // kis delay a stabil indításhoz
 
     html5QrCode = new Html5Qrcode("reader");
-
     await html5QrCode.start(
       { facingMode:"environment" },
       { fps:10, qrbox:{width:window.innerWidth,height:window.innerHeight} },
       onScanSuccess
     );
-
     document.getElementById("status").innerText = "Kamera aktív – olvass be egy kódot!";
     document.getElementById("centerResult").innerText = "";
   } catch(e) {
-    console.error("❌ Kamera hiba:",e);
+    console.error("❌ Kamera hiba:", e);
     document.getElementById("status").innerText = "Kamera indítása nem sikerült!";
   }
 }
@@ -120,14 +117,12 @@ function onScanSuccess(decodedText){
   console.log("📷 Beolvasott kód (eredeti):", decodedText);
   const value = findValueByCode(decodedText);
   document.getElementById("centerResult").innerText = value;
-  document.getElementById("status").innerText = "Beolvasás kész – újraindítható a kamera";
-  html5QrCode.stop().catch(()=>{}); // Stop-oljuk a kamerát, újra a gombbal indítható
+  document.getElementById("status").innerText = "Beolvasás kész – nyomj az Új beolvasás gombra";
+  html5QrCode.stop().catch(()=>{});
 }
 
 // --- Gomb ---
-document.getElementById("scanButton").addEventListener("click", async ()=>{
-  await startCamera();
-});
+document.getElementById("scanButton").addEventListener("click", startCamera);
 
 // --- Betöltés ---
 loadExcel();
