@@ -6,15 +6,20 @@
 <title>HD</title>
 <style>
 html, body {
-    margin:0; padding:0; height:100%; font-family: Arial, sans-serif;
-}
-body {
-    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), 
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family: Arial, sans-serif;
+    color:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:center;
+    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
                 url("icons/logo.png") no-repeat center center fixed;
     background-size: cover;
-    display:flex; flex-direction:column; justify-content:flex-start; align-items:center; position:relative; color:white;
 }
-body::before { content: none; } /* kikapcsoljuk a pseudo-elementet */
+body::before { content: none; }
 
 #buttonsContainer {
     display:grid;
@@ -38,12 +43,16 @@ button:hover {
     background: rgba(255,215,0,0.2);
     transform: scale(1.05);
 }
-.greenCheck {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    font-size: 20px;
-    color: #00ff00;
+
+/* ✅ KÉSZ gomb (zöld) */
+button.done {
+    background: rgba(0,128,0,0.7);
+    border-color: limegreen;
+    color: white;
+}
+button.done:hover {
+    background: rgba(0,180,0,0.8);
+    transform: scale(1.05);
 }
 
 #backButton {
@@ -70,32 +79,45 @@ button:hover {
 <body>
 
 <div id="buttonsContainer">
-    <button id="btn1" onclick="window.location.href='1.html'">1</button>
-    <button id="btn11" onclick="window.location.href='11.html'">11</button>
-    <button id="btn31" onclick="window.location.href='31.html'">31</button>
-    <button id="btn34" onclick="window.location.href='34.html'">34</button>
-    <button id="btn35" onclick="window.location.href='35.html'">35</button>
-    <button id="btn38" onclick="window.location.href='38.html'">38</button>
-    <button id="btn24" onclick="window.location.href='24.html'">24</button>
-    <button id="btn25" onclick="window.location.href='25.html'">25</button>
-    <button id="btn2" onclick="window.location.href='2.html'">2</button>
+    <button onclick="openPage('1')">1</button>
+    <button onclick="openPage('11')">11</button>
+    <button onclick="openPage('31')">31</button>
+    <button onclick="openPage('34')">34</button>
+    <button onclick="openPage('35')">35</button>
+    <button onclick="openPage('38')">38</button>
+    <button onclick="openPage('24')">24</button>
+    <button onclick="openPage('25')">25</button>
+    <button onclick="openPage('2')">2</button>
 </div>
 
 <button id="backButton" onclick="window.location.href='arukiadas.html'">Vissza</button>
 
 <script>
-// Query paraméterek ellenőrzése
+// Ha a 1.html "done" paraméterrel tér vissza:
 const urlParams = new URLSearchParams(window.location.search);
-const done = urlParams.get('done');
-const code = urlParams.get('code');
+const doneCode = urlParams.get('code');
+const isDone = urlParams.get('done');
 
-// Ha done=1 & code=1, zöld pipa az 1-es gomb mellé
-if(done === "1" && code === "1"){
-    const btn = document.getElementById('btn1');
-    const check = document.createElement('span');
-    check.classList.add('greenCheck');
-    check.innerText = '✔';
-    btn.appendChild(check);
+// Ha minden kód be lett olvasva, mentsük el tartósan a pipát (most már zöld hátteret)
+if (isDone === '1' && doneCode) {
+    localStorage.setItem('done_' + doneCode, 'true');
+}
+
+// Gombok frissítése (zöld ha done)
+function refreshButtons() {
+    document.querySelectorAll('#buttonsContainer button').forEach(btn=>{
+        const code = btn.innerText.trim();
+        if(localStorage.getItem('done_' + code)==='true'){
+            btn.classList.add('done');
+        }
+    });
+}
+
+// Lap betöltésekor ellenőrizzük
+refreshButtons();
+
+function openPage(num){
+    window.location.href = num + ".html";
 }
 </script>
 
