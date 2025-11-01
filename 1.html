@@ -114,6 +114,7 @@ let data = [];
 let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
+const TOUR_ID = 1; // Az aktuális túraszám
 
 // Betöltjük az eddigi beolvasásokat
 if (sessionStorage.getItem('1_scannedList')) {
@@ -143,6 +144,7 @@ function normalizeCode(str) {
     if(!str) return "";
     str = String(str).trim().toUpperCase().replace(/\s+/g,'')
         .replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,'');
+
     if(str.includes("/")) str = str.split("/")[0];
     if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
     return str;
@@ -151,9 +153,12 @@ function normalizeCode(str) {
 // Kód ellenőrzése
 function checkCode(code) {
     const searchCode = normalizeCode(code);
-    for(let i=1;i<data.length;i++){
-        if(data[i] && data[i][0]){
-            if(normalizeCode(data[i][0])===searchCode) return true;
+    for (let i = 1; i < data.length; i++) {
+        if (data[i] && data[i][0]) {
+            const rowTourId = data[i][2]; // A túraszám az Excel harmadik oszlopában (C oszlop)
+            if (normalizeCode(data[i][0]) === searchCode && rowTourId === TOUR_ID) {
+                return true;
+            }
         }
     }
     return false;
@@ -162,27 +167,31 @@ function checkCode(code) {
 // Kamera indítása
 async function startCamera() {
     const reader = document.getElementById("reader");
-    reader.style.display="block";
-    document.getElementById("overlay").style.display="none";
-    if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-    await html5QrCode.start({facingMode:"environment"}, {fps:10, qrbox:null}, onScanSuccess);
+    reader.style.display = "block";
+    document.getElementById("overlay").style.display = "none";
+    if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+    await html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: null }, onScanSuccess);
 }
 
 // Kamera leállítása
 async function stopCamera() {
-    if(html5QrCode) {
-        await html5QrCode.stop().catch(()=>{});
+    if (html5QrCode) {
+        await html5QrCode.stop().catch(() => { });
         html5QrCode.clear();
         html5QrCode = null;
     }
-    document.getElementById("reader").style.display="none";
-    document.getElementById("overlay").style.display="block";
+    document.getElementById("reader").style.display = "none";
+    document.getElementById("overlay").style.display = "block";
 }
 
 // Beolvasás
-function onScanSuccess(decodedText){
+function onScanSuccess(decodedText) {
     const normalized = normalizeCode(decodedText);
-    if(checkCode(normalized) && !scannedCodes.has(normalized)) {
+    if (scannedCodes.has(normalized)) {
+        alert("Ezt a kódot már olvasta");
+    } else if (!checkCode(normalized)) {
+        alert("Nem a járathoz tartozó termék");
+    } else {
         scannedCodes.add(normalized);
         sessionStorage.setItem('1_scannedList', JSON.stringify([...scannedCodes]));
         updateCounter();
@@ -193,17 +202,17 @@ function onScanSuccess(decodedText){
 // Gombok eseményei
 document.getElementById("scanButton").addEventListener("click", startCamera);
 
-document.getElementById("finishButton").addEventListener("click", ()=>{
-    if(scannedCodes.size < totalCount){
+document.getElementById("finishButton").addEventListener("click", () => {
+    if (scannedCodes.size < totalCount) {
         sessionStorage.removeItem('1_scannedList');
     } else {
-        localStorage.setItem('done_1','true');
+        localStorage.setItem('done_1', 'true');
         window.location.href = "hd.html?done=1&code=1";
     }
 });
 
-document.getElementById("backButton").addEventListener("click", ()=>{
-    window.location.href="hd.html";
+document.getElementById("backButton").addEventListener("click", () => {
+    window.location.href = "hd.html";
 });
 
 loadExcel();
