@@ -47,7 +47,7 @@ body {
     white-space: pre-line;
 }
 
-/* Alul lévő gombterület (Kommissiózás kezdése / Kód beolvasása / Kommissiózás befejezése) */
+/* Alul lévő gombterület */
 #overlay {
     position: fixed;
     bottom: 4%;
@@ -108,20 +108,21 @@ button:hover {
     height: 100vh;
     pointer-events: none;
     z-index: 4;
-    display: none;              /* alapból NEM látszik */
+    display: none;              /* csak kamera közben */
     align-items: center;
     justify-content: center;
 }
 
+/* Csak a lézer vonal tartója – NINCS piros keret! */
 .scan-box {
     position: relative;
-    border: 2px solid rgba(255, 0, 0, 0.6);
-    width: 60vw;
-    max-width: 400px;
-    aspect-ratio: 1 / 1; /* négyzet */
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    width: 80vw;
+    max-width: 500px;
+    height: 18vh;
+    max-height: 160px;
 }
 
+/* vízszintes piros vonal, fel-le mozog */
 .scan-line {
     position: absolute;
     left: 0;
@@ -151,9 +152,7 @@ button:hover {
 <button id="backButton">Vissza</button>
 
 <div id="centerResult"></div>
-<div id="overlay">
-    <!-- ide kerül dinamikusan: Kommissiózás kezdése / Kód beolvasása / Kommissiózás befejezése -->
-</div>
+<div id="overlay"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -225,20 +224,20 @@ async function startCamera() {
     state = "kamera";
 
     try {
-        const qrBoxSize = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.6);
+        const qrBoxWidth  = Math.floor(window.innerWidth * 0.8);
+        const qrBoxHeight = Math.floor(window.innerHeight * 0.18);
 
         if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
             { facingMode: "environment" },
             {
                 fps: 15,
-                qrbox: { width: qrBoxSize, height: qrBoxSize }
+                qrbox: { width: qrBoxWidth, height: qrBoxHeight } // FEHÉR KERET: vízszintes téglalap
             },
             onScanSuccess
         );
     } catch (e) {
         console.error("❌ Kamera hiba:", e);
-        // ha nem indul a kamera, rejtsük el az overlayt is
         document.getElementById("reader").style.display = "none";
         document.getElementById("backButton").style.display = "none";
         document.getElementById("scanOverlay").style.display = "none";
