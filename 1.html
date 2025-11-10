@@ -129,6 +129,8 @@ button:hover {
 
 <script>
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+const TOUR_ID = "1"; // C oszlopban lévő túraszám ehhez az oldalhoz
+
 let data = [];
 let html5QrCode;
 let totalCount = 0;
@@ -139,15 +141,24 @@ if (sessionStorage.getItem('1_scannedList')) {
     scannedCodes = new Set(JSON.parse(sessionStorage.getItem('1_scannedList')));
 }
 
-// Excel betöltése
+// Excel betöltése – CSAK a saját túraszám sorait hagyjuk meg
 async function loadExcel() {
     try {
         const resp = await fetch(GITHUB_RAW_URL);
         const buffer = await resp.arrayBuffer();
         const wb = XLSX.read(buffer, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        totalCount = data.slice(1).reduce((acc,row)=> (row && row[0] && row[0].toString().trim() !== '') ? acc+1 : acc, 0);
+
+        const raw = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const header = raw[0] || [];
+
+        // C oszlop (index 2) = TOUR_ID
+        const filtered = raw.slice(1).filter(row => row && String(row[2]).trim() === TOUR_ID);
+
+        // csak a saját túrához tartozó sorok maradnak a data-ban
+        data = [header, ...filtered];
+        totalCount = filtered.length;
+
         updateCounter();
     } catch(e){ console.error(e); }
 }
@@ -167,7 +178,7 @@ function normalizeCode(str) {
     return str;
 }
 
-// Kód ellenőrzése
+// Kód ellenőrzése – csak a saját túrasorok között keres
 function checkCode(code) {
     const searchCode = normalizeCode(code);
     for(let i=1;i<data.length;i++){
@@ -213,15 +224,15 @@ function onScanSuccess(decodedText){
     const normalized = normalizeCode(decodedText);
     if (scannedCodes.has(normalized)) {
         showAlert("Ezt a kódot már olvasta");
-        // Ne állítsuk le a kamerát, folytassuk a szkennelést
+        // kamera marad aktív
     } else if (!checkCode(normalized)) {
         showAlert("Nem a járathoz tartozó termék");
-        // Ne állítsuk le a kamerát, folytassuk a szkennelést
+        // kamera marad aktív
     } else {
         scannedCodes.add(normalized);
         sessionStorage.setItem('1_scannedList', JSON.stringify([...scannedCodes]));
         updateCounter();
-        stopCamera(); // Ha sikerült beolvasni, akkor állítsuk le a kamerát
+        stopCamera(); // jó kód után leállítjuk
     }
 }
 
@@ -243,6 +254,7 @@ document.getElementById("backButton").addEventListener("click", () => {
 
 loadExcel();
 </script>
+
 
 </body>
 </html>
