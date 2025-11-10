@@ -180,9 +180,9 @@ document.getElementById("scanButton").addEventListener("click", startCamera);
 
 document.getElementById("finishButton").addEventListener("click", ()=> {
     if (scannedCodes.size < totalCount) {
-        sessionStorage.removeItem('24_scannedList');
+        sessionStorage.removeItem('1_scannedList');
     } else {
-        localStorage.setItem('done_24', 'true');
+        localStorage.setItem('done_1', 'true');
         window.location.href = "hd.html?done=1&code=24";
     }
 });
