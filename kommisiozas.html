@@ -108,8 +108,7 @@ button:hover {
     height: 100vh;
     pointer-events: none;
     z-index: 4;
-    display: none; /* csak kamera közben látszódik */
-    display: flex;
+    display: none;              /* alapból NEM látszik */
     align-items: center;
     justify-content: center;
 }
@@ -142,6 +141,7 @@ button:hover {
 <body>
 
 <div id="reader"></div>
+
 <div id="scanOverlay">
     <div class="scan-box">
         <div class="scan-line"></div>
@@ -225,16 +225,11 @@ async function startCamera() {
     state = "kamera";
 
     try {
-        // qrbox méret
         const qrBoxSize = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.6);
 
         if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
-            {
-                facingMode: "environment",
-                width: { ideal: 1920 },
-                height: { ideal: 1080 }
-            },
+            { facingMode: "environment" },
             {
                 fps: 15,
                 qrbox: { width: qrBoxSize, height: qrBoxSize }
@@ -243,6 +238,11 @@ async function startCamera() {
         );
     } catch (e) {
         console.error("❌ Kamera hiba:", e);
+        // ha nem indul a kamera, rejtsük el az overlayt is
+        document.getElementById("reader").style.display = "none";
+        document.getElementById("backButton").style.display = "none";
+        document.getElementById("scanOverlay").style.display = "none";
+        document.getElementById("overlay").style.display = "flex";
     }
 }
 
@@ -254,8 +254,8 @@ async function stopCamera() {
     }
     document.getElementById("reader").style.display = "none";
     document.getElementById("backButton").style.display = "none";
-    document.getElementById("overlay").style.display = "flex";
     document.getElementById("scanOverlay").style.display = "none";
+    document.getElementById("overlay").style.display = "flex";
     document.body.style.background = 'url("icons/logo.png") no-repeat center center fixed';
     document.body.style.backgroundSize = "cover";
 }
