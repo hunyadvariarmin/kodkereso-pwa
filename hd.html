@@ -10,17 +10,18 @@ html, body {
     padding:0;
     height:100%;
     font-family: Arial, sans-serif;
-    color:white;
+    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+                url("icons/logo.png") no-repeat center center fixed;
+    background-size: cover;
     display:flex;
     flex-direction:column;
     justify-content:flex-start;
     align-items:center;
-    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-                url("icons/logo.png") no-repeat center center fixed;
-    background-size: cover;
+    position:relative;
+    color:white;
 }
-body::before { content: none; }
 
+/* Gombok rácsa */
 #buttonsContainer {
     display:grid;
     grid-template-columns: repeat(2, 150px);
@@ -28,6 +29,7 @@ body::before { content: none; }
     margin-top:60px;
     z-index:1;
 }
+
 button {
     padding:20px;
     font-size:24px;
@@ -37,88 +39,132 @@ button {
     border-radius:12px;
     cursor:pointer;
     transition: all 0.3s ease;
-    position: relative;
 }
 button:hover {
     background: rgba(255,215,0,0.2);
     transform: scale(1.05);
 }
 
-/* ✅ KÉSZ gomb (zöld) */
-button.done {
-    background: rgba(0,128,0,0.7);
-    border-color: limegreen;
-    color: white;
-}
-button.done:hover {
-    background: rgba(0,180,0,0.8);
-    transform: scale(1.05);
-}
-
-#backButton {
+/* Alsó gombsor: Vissza + Frissít */
+#bottomActions {
     position:absolute;
     bottom:40px;
     left:50%;
     transform: translateX(-50%);
-    padding:18px 36px;
-    font-size:24px;
-    color:#FFD700;
-    background: rgba(0,0,0,0.4);
-    border: 2px solid #FFD700;
-    border-radius:12px;
-    cursor:pointer;
+    display:flex;
+    gap:20px;
     z-index:1;
-    transition: all 0.3s ease;
+    width:80%;
+    max-width:400px;
+    justify-content:center;
 }
-#backButton:hover {
-    background: rgba(255,215,0,0.2);
-    transform: scale(1.05);
+
+#bottomActions button {
+    width:48%;
+    padding:14px 0;
+    font-size:20px;
 }
 </style>
 </head>
 <body>
 
 <div id="buttonsContainer">
-    <button onclick="openPage('1')">1</button>
-    <button onclick="openPage('11')">11</button>
-    <button onclick="openPage('31')">31</button>
-    <button onclick="openPage('34')">34</button>
-    <button onclick="openPage('35')">35</button>
-    <button onclick="openPage('38')">38</button>
-    <button onclick="openPage('24')">24</button>
-    <button onclick="openPage('25')">25</button>
-    <button onclick="openPage('2')">2</button>
+    <button data-code="1"  onclick="window.location.href='1.html'">1</button>
+    <button data-code="11" onclick="window.location.href='11.html'">11</button>
+    <button data-code="31" onclick="window.location.href='31.html'">31</button>
+    <button data-code="34" onclick="window.location.href='34.html'">34</button>
+    <button data-code="35" onclick="window.location.href='35.html'">35</button>
+    <button data-code="38" onclick="window.location.href='38.html'">38</button>
+    <button data-code="24" onclick="window.location.href='24.html'">24</button>
+    <button data-code="25" onclick="window.location.href='25.html'">25</button>
+    <button data-code="2"  onclick="window.location.href='2.html'">2</button>
 </div>
 
-<button id="backButton" onclick="window.location.href='arukiadas.html'">Vissza</button>
+<div id="bottomActions">
+    <button id="backButton">Vissza</button>
+    <button id="refreshButton">Frissít</button>
+</div>
 
 <script>
-// Ha a 1.html "done" paraméterrel tér vissza:
-const urlParams = new URLSearchParams(window.location.search);
-const doneCode = urlParams.get('code');
-const isDone = urlParams.get('done');
+// melyik gombhoz melyik localStorage kulcs tartozik (zöld jelölés)
+const DONE_MAP = {
+    "1":  "done_1",
+    "11": "done_11",
+    "31": "done_31",
+    "34": "done_34",
+    "35": "done_35",
+    "38": "done_38",
+    "24": "done_24",
+    "25": "done_25",
+    "2":  "done_2"
+};
 
-// Ha minden kód be lett olvasva, mentsük el tartósan a pipát (most már zöld hátteret)
-if (isDone === '1' && doneCode) {
-    localStorage.setItem('done_' + doneCode, 'true');
+// a szám oldalak sessionStorage kulcsai (beolvasott kódok listája)
+const SCAN_KEYS = [
+    "1_scannedList",
+    "11_scannedList",
+    "31_scannedList",
+    "34_scannedList",
+    "35_scannedList",
+    "38_scannedList",
+    "24_scannedList",
+    "25_scannedList",
+    "2_scannedList"
+];
+
+// eredeti gombstílus visszaállítása
+function resetButtonStyles() {
+    const buttons = document.querySelectorAll('#buttonsContainer button');
+    buttons.forEach(btn => {
+        btn.style.backgroundColor = "rgba(0,0,0,0.4)";
+        btn.style.borderColor = "#FFD700";
+        btn.style.color = "#FFD700";
+    });
 }
 
-// Gombok frissítése (zöld ha done)
-function refreshButtons() {
-    document.querySelectorAll('#buttonsContainer button').forEach(btn=>{
-        const code = btn.innerText.trim();
-        if(localStorage.getItem('done_' + code)==='true'){
-            btn.classList.add('done');
+// zöld jelölések alkalmazása
+function applyDoneStyles() {
+    resetButtonStyles();
+
+    Object.entries(DONE_MAP).forEach(([label, key]) => {
+        if (localStorage.getItem(key) === "true") {
+            const btn = document.querySelector(`button[data-code="${label}"]`);
+            if (btn) {
+                btn.style.backgroundColor = "rgba(0,128,0,0.7)"; // zöld háttér
+                btn.style.borderColor = "#00ff00";
+                btn.style.color = "#ffffff";
+            }
         }
     });
 }
 
-// Lap betöltésekor ellenőrizzük
-refreshButtons();
+// oldal betöltésekor
+window.addEventListener("DOMContentLoaded", () => {
+    applyDoneStyles();
 
-function openPage(num){
-    window.location.href = num + ".html";
-}
+    // Vissza gomb -> Árukiadás oldal
+    document.getElementById("backButton").addEventListener("click", () => {
+        window.location.href = "arukiadas.html";
+    });
+
+    // Frissít gomb -> megerősítés + minden done_* és *_scannedList törlése
+    document.getElementById("refreshButton").addEventListener("click", () => {
+        const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot?");
+        if (!ok) return;
+
+        // zöld jelölések törlése
+        Object.values(DONE_MAP).forEach(key => {
+            localStorage.removeItem(key);
+        });
+
+        // beolvasott listák törlése
+        SCAN_KEYS.forEach(k => {
+            sessionStorage.removeItem(k);
+        });
+
+        applyDoneStyles();
+    });
+});
 </script>
 
 </body>
