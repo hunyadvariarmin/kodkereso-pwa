@@ -66,48 +66,57 @@ button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
 
 <script>
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+const TOUR_ID = "1"; // C oszlopban lévő túraszám ehhez az oldalhoz
+
 let data = [];
 let html5QrCode;
 let totalCount = 0;
-let scannedCount = 0;
 let scannedCodes = new Set();
 
-// Betöltjük a beolvasottakat sessionStorage-ból
-if(sessionStorage.getItem('2_scanned')){
-    scannedCount = Number(sessionStorage.getItem('2_scanned')) || 0;
-    const saved = sessionStorage.getItem('2_codes');
-    if(saved) scannedCodes = new Set(JSON.parse(saved));
+// Betöltjük az eddigi beolvasásokat
+if (sessionStorage.getItem('1_scannedList')) {
+    scannedCodes = new Set(JSON.parse(sessionStorage.getItem('1_scannedList')));
 }
 
-// Excel betöltése
-async function loadExcel(){
+// Excel betöltése – CSAK a saját túraszám sorait hagyjuk meg
+async function loadExcel() {
     try {
         const resp = await fetch(GITHUB_RAW_URL);
         const buffer = await resp.arrayBuffer();
-        const wb = XLSX.read(buffer, { type:"array" });
+        const wb = XLSX.read(buffer, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet, { header:1 });
-        totalCount = data.slice(1).reduce((acc,row)=> (row && row[0] && row[0].toString().trim() !== '') ? acc+1 : acc, 0);
+
+        const raw = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const header = raw[0] || [];
+
+        // C oszlop (index 2) = TOUR_ID
+        const filtered = raw.slice(1).filter(row => row && String(row[2]).trim() === TOUR_ID);
+
+        // csak a saját túrához tartozó sorok maradnak a data-ban
+        data = [header, ...filtered];
+        totalCount = filtered.length;
+
         updateCounter();
     } catch(e){ console.error(e); }
 }
 
-// Számláló frissítése
-function updateCounter(){
-    document.getElementById("centerResult").innerText = `${scannedCount}/${totalCount}`;
+// Számláló frissítés
+function updateCounter() {
+    document.getElementById("centerResult").innerText = `${scannedCodes.size}/${totalCount}`;
 }
 
 // Normalizálás
-function normalizeCode(str){
+function normalizeCode(str) {
     if(!str) return "";
-    str = String(str).trim().toUpperCase().replace(/\s+/g,'').replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,'');
+    str = String(str).trim().toUpperCase().replace(/\s+/g,'')
+        .replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,'');
     if(str.includes("/")) str = str.split("/")[0];
     if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
     return str;
 }
 
-// Kód ellenőrzés
-function checkCode(code){
+// Kód ellenőrzése – csak a saját túrasorok között keres
+function checkCode(code) {
     const searchCode = normalizeCode(code);
     for(let i=1;i<data.length;i++){
         if(data[i] && data[i][0]){
@@ -117,20 +126,31 @@ function checkCode(code){
     return false;
 }
 
-// Kamera
-async function startCamera(){
-    const reader=document.getElementById("reader");
+// Felugró üzenet megjelenítése
+function showAlert(message) {
+    const alertDiv = document.getElementById("alertMessage");
+    alertDiv.innerText = message;
+    alertDiv.style.display = "block";
+    setTimeout(() => {
+        alertDiv.style.display = "none";
+    }, 2000); // 2 másodperc után eltűnik
+}
+
+// Kamera indítása
+async function startCamera() {
+    const reader = document.getElementById("reader");
     reader.style.display="block";
     document.getElementById("overlay").style.display="none";
-    if(!html5QrCode) html5QrCode=new Html5Qrcode("reader");
+    if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
     await html5QrCode.start({facingMode:"environment"}, {fps:10, qrbox:null}, onScanSuccess);
 }
 
-async function stopCamera(){
-    if(html5QrCode){
+// Kamera leállítása
+async function stopCamera() {
+    if(html5QrCode) {
         await html5QrCode.stop().catch(()=>{});
         html5QrCode.clear();
-        html5QrCode=null;
+        html5QrCode = null;
     }
     document.getElementById("reader").style.display="none";
     document.getElementById("overlay").style.display="block";
@@ -138,29 +158,35 @@ async function stopCamera(){
 
 // Beolvasás
 function onScanSuccess(decodedText){
-    const norm = normalizeCode(decodedText);
-    if(checkCode(norm) && !scannedCodes.has(norm)){
-        scannedCodes.add(norm);
-        scannedCount++;
-        sessionStorage.setItem('2_scanned', scannedCount);
-        sessionStorage.setItem('2_codes', JSON.stringify([...scannedCodes]));
+    const normalized = normalizeCode(decodedText);
+    if (scannedCodes.has(normalized)) {
+        showAlert("Ezt a kódot már olvasta");
+        // kamera marad aktív
+    } else if (!checkCode(normalized)) {
+        showAlert("Nem a járathoz tartozó termék");
+        // kamera marad aktív
+    } else {
+        scannedCodes.add(normalized);
+        sessionStorage.setItem('1_scannedList', JSON.stringify([...scannedCodes]));
         updateCounter();
+        stopCamera(); // jó kód után leállítjuk
     }
-    stopCamera();
 }
 
-// Gombok
+// Gombok eseményei
 document.getElementById("scanButton").addEventListener("click", startCamera);
-document.getElementById("finishButton").addEventListener("click", ()=>{
-    if(scannedCount < totalCount){
-        sessionStorage.removeItem('2_scanned');
-        sessionStorage.removeItem('2_codes');
+
+document.getElementById("finishButton").addEventListener("click", ()=> {
+    if (scannedCodes.size < totalCount) {
+        sessionStorage.removeItem('1_scannedList');
     } else {
-        window.location.href = "hd.html?done=1&code=2";
+        localStorage.setItem('done_1', 'true');
+        window.location.href = "hd.html?done=1&code=1";
     }
 });
-document.getElementById("backButton").addEventListener("click", ()=>{
-    window.location.href = "hd.html";
+
+document.getElementById("backButton").addEventListener("click", () => {
+    window.location.href="hd.html";
 });
 
 loadExcel();
