@@ -47,7 +47,7 @@ body {
     white-space: pre-line;
 }
 
-/* Alul lévő gombterület */
+/* Alul lévő gombterület (Kommissiózás kezdése / Kód beolvasása / Kommissiózás befejezése) */
 #overlay {
     position: fixed;
     bottom: 4%;
@@ -92,23 +92,67 @@ button:hover {
     padding: 20px 40px;
     font-size: 26px;
     cursor: pointer;
-    z-index: 4;
+    z-index: 5;
     display: none;
     box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 #backButton:hover {
     transform: translateX(-50%) scale(1.05);
 }
+
+/* Piros "lézer" overlay a kamerán */
+#scanOverlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 4;
+    display: none; /* csak kamera közben látszódik */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scan-box {
+    position: relative;
+    border: 2px solid rgba(255, 0, 0, 0.6);
+    width: 60vw;
+    max-width: 400px;
+    aspect-ratio: 1 / 1; /* négyzet */
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.scan-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(255,0,0,0.8);
+    animation: scan-move 1.5s linear infinite;
+}
+
+@keyframes scan-move {
+    0%   { top: 10%; }
+    50%  { top: 90%; }
+    100% { top: 10%; }
+}
 </style>
 </head>
 <body>
 
 <div id="reader"></div>
+<div id="scanOverlay">
+    <div class="scan-box">
+        <div class="scan-line"></div>
+    </div>
+</div>
+
 <button id="backButton">Vissza</button>
 
 <div id="centerResult"></div>
 <div id="overlay">
-    <button id="mainButton">Kommissiózás kezdése</button>
+    <!-- ide kerül dinamikusan: Kommissiózás kezdése / Kód beolvasása / Kommissiózás befejezése -->
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -152,6 +196,7 @@ function findValueByCode(code) {
     if (!code || !data.length) return "Nincs járaton";
     const searchCode = normalizeCode(code);
 
+    // először szállítólevélszám (A oszlop)
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (row && row.length >= 3) {
@@ -159,6 +204,7 @@ function findValueByCode(code) {
             if (szallitolevel === searchCode) return row[2];
         }
     }
+    // majd csomagszám (B oszlop)
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (row && row.length >= 3) {
@@ -175,13 +221,24 @@ async function startCamera() {
     document.getElementById("backButton").style.display = "block";
     document.getElementById("centerResult").innerText = "";
     document.getElementById("overlay").style.display = "none";
+    document.getElementById("scanOverlay").style.display = "flex";
     state = "kamera";
 
     try {
+        // qrbox méret
+        const qrBoxSize = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.6);
+
         if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: null },
+            {
+                facingMode: "environment",
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            },
+            {
+                fps: 15,
+                qrbox: { width: qrBoxSize, height: qrBoxSize }
+            },
             onScanSuccess
         );
     } catch (e) {
@@ -198,6 +255,7 @@ async function stopCamera() {
     document.getElementById("reader").style.display = "none";
     document.getElementById("backButton").style.display = "none";
     document.getElementById("overlay").style.display = "flex";
+    document.getElementById("scanOverlay").style.display = "none";
     document.body.style.background = 'url("icons/logo.png") no-repeat center center fixed';
     document.body.style.backgroundSize = "cover";
 }
@@ -228,6 +286,11 @@ function renderButtons() {
         btn.innerText = "Kommissiózás kezdése";
         btn.onclick = startCamera;
         overlay.appendChild(btn);
+
+        const backIndex = document.createElement("button");
+        backIndex.innerText = "Vissza";
+        backIndex.onclick = () => { window.location.href = "index.html"; };
+        overlay.appendChild(backIndex);
     } else if (state === "eredmeny") {
         const scanBtn = document.createElement("button");
         scanBtn.innerText = "Kód beolvasása";
@@ -247,6 +310,7 @@ document.getElementById("backButton").addEventListener("click", async () => {
     renderButtons();
 });
 
+// induláskor
 loadExcel().then(renderButtons);
 </script>
 </body>
