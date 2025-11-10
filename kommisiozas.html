@@ -113,16 +113,16 @@ button:hover {
     justify-content: center;
 }
 
-/* Csak a lézer vonal tartója – NINCS piros keret! */
+/* Csak a lézer vonal tartója – lapos, vízszintes sáv */
 .scan-box {
     position: relative;
     width: 80vw;
     max-width: 500px;
-    height: 18vh;
-    max-height: 160px;
+    height: 12vh;          /* ALACSONYABB lett */
+    max-height: 100px;
 }
 
-/* vízszintes piros vonal, fel-le mozog */
+/* vízszintes piros vonal, fel-le mozog a sávban */
 .scan-line {
     position: absolute;
     left: 0;
@@ -225,14 +225,14 @@ async function startCamera() {
 
     try {
         const qrBoxWidth  = Math.floor(window.innerWidth * 0.8);
-        const qrBoxHeight = Math.floor(window.innerHeight * 0.18);
+        const qrBoxHeight = Math.floor(window.innerHeight * 0.12); // ALACSONYABB fehér keret
 
         if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
             { facingMode: "environment" },
             {
                 fps: 15,
-                qrbox: { width: qrBoxWidth, height: qrBoxHeight } // FEHÉR KERET: vízszintes téglalap
+                qrbox: { width: qrBoxWidth, height: qrBoxHeight } // vízszintes, lapos keret
             },
             onScanSuccess
         );
