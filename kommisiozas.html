@@ -13,12 +13,20 @@ html, body {
     overflow: hidden;
 }
 
-/* Teljes háttér */
+/* Teljes háttér logo + halvány sötétítés */
 body {
     background: url("icons/logo.png") no-repeat center center fixed;
     background-size: cover;
     color: white;
     position: relative;
+}
+body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45);
+    z-index: 0;
 }
 
 /* Teljes kameranézet */
@@ -33,7 +41,7 @@ body {
     background-color: black;
 }
 
-/* Eredmény szöveg */
+/* Eredmény szöveg (túraszám) */
 #centerResult {
     position: fixed;
     top: 6%;
@@ -78,7 +86,7 @@ button:hover {
     transform: scale(1.05);
 }
 
-/* Vissza gomb a kamera képén hdxd háttérrel */
+/* Vissza gomb a KAMERA képén hdxd háttérrel */
 #backButton {
     position: fixed;
     bottom: 40px;
@@ -92,67 +100,24 @@ button:hover {
     padding: 20px 40px;
     font-size: 26px;
     cursor: pointer;
-    z-index: 5;
+    z-index: 4;
     display: none;
     box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 #backButton:hover {
     transform: translateX(-50%) scale(1.05);
 }
-
-/* Piros "lézer" overlay a kamerán */
-#scanOverlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 4;
-    display: none;              /* csak kamera közben */
-    align-items: center;
-    justify-content: center;
-}
-
-/* Csak a lézer vonal tartója – MÉG LAPOSABB sáv */
-.scan-box {
-    position: relative;
-    width: 80vw;
-    max-width: 500px;
-    height: 40vw;          /* laposabb */
-    max-height: 60px;
-}
-
-/* vízszintes piros vonal, fel-le mozog a sávban */
-.scan-line {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: rgba(255,0,0,0.8);
-    animation: scan-move 1.5s linear infinite;
-}
-
-@keyframes scan-move {
-    0%   { top: 10%; }
-    50%  { top: 90%; }
-    100% { top: 10%; }
-}
 </style>
 </head>
 <body>
 
 <div id="reader"></div>
-
-<div id="scanOverlay">
-    <div class="scan-box">
-        <div class="scan-line"></div>
-    </div>
-</div>
-
 <button id="backButton">Vissza</button>
 
 <div id="centerResult"></div>
-<div id="overlay"></div>
+<div id="overlay">
+    <!-- ide tesszük JS-ből a gombokat -->
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -179,6 +144,7 @@ async function loadExcel() {
     }
 }
 
+// Normalizálás
 function normalizeCode(str) {
     if (!str) return "";
     str = String(str).trim().toUpperCase()
@@ -191,6 +157,7 @@ function normalizeCode(str) {
     return str;
 }
 
+// A: szállítólevél, B: csomagszám → C: túraszám
 function findValueByCode(code) {
     if (!code || !data.length) return "Nincs járaton";
     const searchCode = normalizeCode(code);
@@ -214,37 +181,34 @@ function findValueByCode(code) {
     return "Nincs járaton";
 }
 
+// --- Kamera indítása ---
 async function startCamera() {
     const reader = document.getElementById("reader");
     reader.style.display = "block";
     document.getElementById("backButton").style.display = "block";
     document.getElementById("centerResult").innerText = "";
     document.getElementById("overlay").style.display = "none";
-    document.getElementById("scanOverlay").style.display = "flex";
     state = "kamera";
 
     try {
-        const qrBoxWidth  = Math.floor(window.innerWidth * 0.8);
-        const qrBoxHeight = Math.floor(window.innerHeight * 0.08); // MÉG LAPOSABB fehér keret
-
         if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
             { facingMode: "environment" },
             {
-                fps: 15,
-                qrbox: { width: qrBoxWidth, height: qrBoxHeight }
+                fps: 10,
+                qrbox: null   // teljes képernyő, saját fehér keretével
             },
             onScanSuccess
         );
     } catch (e) {
         console.error("❌ Kamera hiba:", e);
-        document.getElementById("reader").style.display = "none";
+        reader.style.display = "none";
         document.getElementById("backButton").style.display = "none";
-        document.getElementById("scanOverlay").style.display = "none";
         document.getElementById("overlay").style.display = "flex";
     }
 }
 
+// --- Kamera leállítása ---
 async function stopCamera() {
     if (html5QrCode) {
         await html5QrCode.stop().catch(() => {});
@@ -253,12 +217,10 @@ async function stopCamera() {
     }
     document.getElementById("reader").style.display = "none";
     document.getElementById("backButton").style.display = "none";
-    document.getElementById("scanOverlay").style.display = "none";
     document.getElementById("overlay").style.display = "flex";
-    document.body.style.background = 'url("icons/logo.png") no-repeat center center fixed';
-    document.body.style.backgroundSize = "cover";
 }
 
+// --- Beolvasás callback ---
 function onScanSuccess(decodedText) {
     const value = findValueByCode(decodedText);
     const centerResult = document.getElementById("centerResult");
@@ -277,25 +239,32 @@ function onScanSuccess(decodedText) {
     renderButtons();
 }
 
+// --- Gombok kirajzolása állapot szerint ---
 function renderButtons() {
     const overlay = document.getElementById("overlay");
     overlay.innerHTML = "";
-    if (state === "logo") {
-        const btn = document.createElement("button");
-        btn.innerText = "Kommissiózás kezdése";
-        btn.onclick = startCamera;
-        overlay.appendChild(btn);
 
+    if (state === "logo") {
+        // felső: Kommissiózás kezdése
+        const startBtn = document.createElement("button");
+        startBtn.innerText = "Kommissiózás kezdése";
+        startBtn.onclick = startCamera;
+        overlay.appendChild(startBtn);
+
+        // alatta: Vissza (indexre)
         const backIndex = document.createElement("button");
         backIndex.innerText = "Vissza";
         backIndex.onclick = () => { window.location.href = "index.html"; };
         overlay.appendChild(backIndex);
+
     } else if (state === "eredmeny") {
+        // újra kód beolvasása
         const scanBtn = document.createElement("button");
         scanBtn.innerText = "Kód beolvasása";
         scanBtn.onclick = startCamera;
         overlay.appendChild(scanBtn);
 
+        // befejezés → index.html
         const endBtn = document.createElement("button");
         endBtn.innerText = "Kommissiózás befejezése";
         endBtn.onclick = () => { window.location.href = "index.html"; };
@@ -303,6 +272,7 @@ function renderButtons() {
     }
 }
 
+// Kamera közbeni Vissza gomb (hdxd-s)
 document.getElementById("backButton").addEventListener("click", async () => {
     await stopCamera();
     state = "logo";
