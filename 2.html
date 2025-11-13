@@ -247,10 +247,10 @@ document.getElementById("scanButton").addEventListener("click", startCamera);
 
 document.getElementById("finishButton").addEventListener("click", ()=> {
     if (scannedCodes.size < totalCount) {
-        sessionStorage.removeItem('25_scannedList');
+        sessionStorage.removeItem('2_scannedList');
     } else {
-        localStorage.setItem('done_25', 'true');
-        window.location.href = "hd.html?done=1&code=25";
+        localStorage.setItem('done_2', 'true');
+        window.location.href = "hd.html?done=1&code=2";
     }
 });
 
