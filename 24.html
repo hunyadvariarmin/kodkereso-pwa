@@ -5,37 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>24</title>
 <style>
+/* ugyanaz a CSS mint fent */
 html, body { margin:0; padding:0; height:100%; font-family: Arial, sans-serif; }
-body {
-    background: url("icons/logo.png") no-repeat center center fixed;
-    background-size: cover; color: white; position: relative; overflow: hidden;
-}
+body { background: url("icons/logo.png") no-repeat center center fixed; background-size: cover; color: white; position: relative; overflow: hidden; }
 #reader { position: fixed; top:0; left:0; width:100vw; height:100vh; object-fit: cover; z-index:3; display:none; background:black; }
-#centerResult {
-    position: fixed; top: 6%; left: 50%; transform: translateX(-50%);
-    font-size: 90px; font-weight: bold; color: #FFD700; text-align: center; z-index: 2; white-space: pre-line;
-}
-#overlay {
-    position: fixed; bottom: 95px; left: 50%; transform: translateX(-50%);
-    width: 80%; max-width: 350px; text-align: center; z-index: 2; display: flex; justify-content: center;
-}
-button {
-    width: 100%; padding: 15px; font-size: 22px; color: #FFD700;
-    background: rgba(0,0,0,0.4); border: 2px solid #FFD700; border-radius: 12px;
-    cursor: pointer; transition: all 0.3s ease;
-}
+#centerResult { position: fixed; top: 6%; left: 50%; transform: translateX(-50%); font-size: 90px; font-weight: bold; color: #FFD700; text-align: center; z-index: 2; white-space: pre-line; }
+#overlay { position: fixed; bottom: 95px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 350px; text-align: center; z-index: 2; display: flex; justify-content: center; }
+button { width: 100%; padding: 15px; font-size: 22px; color: #FFD700; background: rgba(0,0,0,0.4); border: 2px solid #FFD700; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; }
 button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
-#bottomButtons {
-    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 20px; z-index: 2; width: 80%; max-width: 400px; justify-content: center;
-}
+#bottomButtons { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 2; width: 80%; max-width: 400px; justify-content: center; }
 #bottomButtons button { width: 48%; padding: 14px 0; font-size: 20px; }
 #overlay { margin-bottom: 40px; }
-#alertMessage {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    padding: 20px; background-color: rgba(0, 0, 0, 0.7); color: #FFD700;
-    font-size: 20px; border-radius: 12px; display: none; z-index: 4; text-align: center;
-}
+#modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 5; }
+.modalBox { background: rgba(0,0,0,0.85); border: 2px solid #FFD700; border-radius: 14px; padding: 24px 28px; max-width: 90%; text-align: center; }
+.modalMessage { color: #FFD700; font-size: 26px; line-height: 1.3; margin-bottom: 18px; }
+.modalActions button { width: auto; min-width: 140px; padding: 12px 20px; font-size: 20px; }
 </style>
 </head>
 <body>
@@ -52,146 +36,76 @@ button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
     <button id="backButton">Vissza</button>
 </div>
 
-<div id="alertMessage"></div>
+<div id="modalOverlay">
+  <div class="modalBox">
+    <div class="modalMessage" id="modalMessage"></div>
+    <div class="modalActions">
+      <button id="modalOk">OK</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-const GITHUB_RAW_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
-const TOUR_ID = "24"; // C oszlopban lévő túraszám, amit ez az oldal kezel
+const TOUR = "24";
+const XLSX_URL    = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+const SCANNED_KEY = `${TOUR}_scannedList`;
+const DONE_KEY    = `done_${TOUR}`;
 
 let data = [];
+let allowedCodes = new Set();
 let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
 
-// korábban beolvasott kódok visszatöltése
-if (sessionStorage.getItem('24_scannedList')) {
-    scannedCodes = new Set(JSON.parse(sessionStorage.getItem('24_scannedList')));
-}
+{ const saved = sessionStorage.getItem(SCANNED_KEY); if (saved){ try{ scannedCodes = new Set(JSON.parse(saved)); }catch(e){} } }
 
-// túraszám normalizálása (C oszlop)
-function normalizeTour(value) {
-    if (value === undefined || value === null) return "";
-    return String(value).trim();
-}
+let scannerPaused=false;
+function pauseScanner(){ if(html5QrCode && typeof html5QrCode.pause==="function"){ html5QrCode.pause(true); scannerPaused=true; } }
+function resumeScanner(){ if(!html5QrCode) return; if(typeof html5QrCode.resume==="function") html5QrCode.resume(); else stopCamera().then(startCamera); scannerPaused=false; }
+function showModal(msg){ document.getElementById('modalMessage').innerText=msg; document.getElementById('modalOverlay').style.display='flex'; pauseScanner(); }
+function hideModal(){ document.getElementById('modalOverlay').style.display='none'; if(scannerPaused) resumeScanner(); }
+document.getElementById('modalOk').addEventListener('click', hideModal);
 
-// Excel betöltése – csak a C oszlopban 24-es túrák maradnak
-async function loadExcel() {
-    try {
-        const resp = await fetch(GITHUB_RAW_URL);
-        const buffer = await resp.arrayBuffer();
-        const wb = XLSX.read(buffer, { type: "array" });
-        const sheet = wb.Sheets[wb.SheetNames[0]];
+function normalizeCode(str){ if(!str) return ""; let s=String(str).trim().toUpperCase().replace(/\s+/g,'').replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,''); if(s.includes("/")) s=s.split("/")[0]; if(/^\d+\.0$/.test(s)) s=s.replace(/\.0$/,''); return s; }
+function updateCounter(){ document.getElementById("centerResult").innerText = `${scannedCodes.size}/${totalCount}`; }
 
-        const raw = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        const header = raw[0] || [];
-
-        const filtered = raw.slice(1).filter(row => {
-            if (!row) return false;
-            return normalizeTour(row[2]) === TOUR_ID;
-        });
-
-        console.log("Túra:", TOUR_ID, "talált sorok (C oszlop):", filtered.length);
-
-        data = [header, ...filtered];
-        totalCount = filtered.length;
-
-        updateCounter();
-    } catch(e){
-        console.error(e);
-    }
-}
-
-// számláló frissítés
-function updateCounter() {
-    document.getElementById("centerResult").innerText = `${scannedCodes.size}/${totalCount}`;
-}
-
-// kód normalizálása
-function normalizeCode(str) {
-    if(!str) return "";
-    str = String(str).trim().toUpperCase().replace(/\s+/g,'')
-        .replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,'');
-    if(str.includes("/")) str = str.split("/")[0];
-    if(/^\d+\.0$/.test(str)) str = str.replace(/\.0$/,'');
-    return str;
-}
-
-// csak a saját túra sorai között keresünk
-function checkCode(code) {
-    const searchCode = normalizeCode(code);
+async function loadExcel(){
+  try{
+    const resp=await fetch(XLSX_URL);
+    const buffer=await resp.arrayBuffer();
+    const wb=XLSX.read(buffer,{type:"array"});
+    const sheet=wb.Sheets[wb.SheetNames[0]];
+    data=XLSX.utils.sheet_to_json(sheet,{header:1});
+    allowedCodes.clear();
     for(let i=1;i<data.length;i++){
-        if(data[i] && data[i][0]){
-            if(normalizeCode(data[i][0])===searchCode) return true;
-        }
+      const row=data[i];
+      const tourVal=row?.[2]!=null?String(row[2]).trim():"";
+      if(tourVal===TOUR){
+        const aVal=row?.[0];
+        if(aVal!=null && String(aVal).trim()!==""){ allowedCodes.add(normalizeCode(aVal)); }
+      }
     }
-    return false;
+    totalCount=allowedCodes.size; updateCounter();
+  }catch(e){ console.error("Excel betöltési hiba:",e); }
 }
-
-// felugró üzenet
-function showAlert(message) {
-    const alertDiv = document.getElementById("alertMessage");
-    alertDiv.innerText = message;
-    alertDiv.style.display = "block";
-    setTimeout(() => {
-        alertDiv.style.display = "none";
-    }, 2000);
-}
-
-// kamera indítása
-async function startCamera() {
-    const reader = document.getElementById("reader");
-    reader.style.display="block";
-    document.getElementById("overlay").style.display="none";
-    if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-    await html5QrCode.start({facingMode:"environment"}, {fps:10, qrbox:null}, onScanSuccess);
-}
-
-// kamera leállítása
-async function stopCamera() {
-    if(html5QrCode) {
-        await html5QrCode.stop().catch(()=>{});
-        html5QrCode.clear();
-        html5QrCode = null;
-    }
-    document.getElementById("reader").style.display="none";
-    document.getElementById("overlay").style.display="block";
-}
-
-// beolvasás
+async function startCamera(){ const r=document.getElementById("reader"); r.style.display="block"; document.getElementById("overlay").style.display="none"; if(!html5QrCode) html5QrCode=new Html5Qrcode("reader"); await html5QrCode.start({facingMode:"environment"},{fps:10, qrbox:null}, onScanSuccess); }
+async function stopCamera(){ if(html5QrCode){ await html5QrCode.stop().catch(()=>{}); html5QrCode.clear(); html5QrCode=null; } document.getElementById("reader").style.display="none"; document.getElementById("overlay").style.display="block"; }
 function onScanSuccess(decodedText){
-    const normalized = normalizeCode(decodedText);
-    if (scannedCodes.has(normalized)) {
-        showAlert("Ezt a kódot már olvasta");
-    } else if (!checkCode(normalized)) {
-        showAlert("Nem a járathoz tartozó termék");
-    } else {
-        scannedCodes.add(normalized);
-        sessionStorage.setItem('24_scannedList', JSON.stringify([...scannedCodes]));
-        updateCounter();
-        stopCamera();
-    }
+  const k=normalizeCode(decodedText);
+  if(scannedCodes.has(k)){ showModal("Ezt a csomagot már olvasta"); return; }
+  if(!allowedCodes.has(k)){ showModal("NEM KELL IDE"); return; }
+  scannedCodes.add(k); sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes])); updateCounter(); stopCamera();
 }
-
-// gomb események
 document.getElementById("scanButton").addEventListener("click", startCamera);
-
-document.getElementById("finishButton").addEventListener("click", ()=> {
-    if (scannedCodes.size < totalCount) {
-        sessionStorage.removeItem('24_scannedList');
-    } else {
-        localStorage.setItem('done_24', 'true');
-        window.location.href = "hd.html?done=1&code=24";
-    }
+document.getElementById("finishButton").addEventListener("click", ()=>{
+  if(scannedCodes.size<totalCount){ sessionStorage.removeItem(SCANNED_KEY); }
+  else { localStorage.setItem(DONE_KEY,'true'); window.location.href="hd.html?done=1&code="+TOUR; return; }
+  window.location.href="hd.html?done=1&code="+TOUR;
 });
-
-document.getElementById("backButton").addEventListener("click", () => {
-    window.location.href="hd.html";
-});
-
-// induláskor excel betöltése
+document.getElementById("backButton").addEventListener("click",()=>{ window.location.href="hd.html"; });
 loadExcel();
 </script>
 
