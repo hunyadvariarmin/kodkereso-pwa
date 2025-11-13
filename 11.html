@@ -103,7 +103,7 @@ async function stopCamera(){ if(html5QrCode){ await html5QrCode.stop().catch(()=
 function onScanSuccess(decodedText){
   const k=normalizeCode(decodedText);
   if (scannedCodes.has(k)){ showModal("Ezt a csomagot már olvasta"); return; }
-  if (!allowedCodes.has(k)){ showModal("NEM KELL IDE"); return; }
+  if (!allowedCodes.has(k)){ showModal("VEDD KI A TÚRÁBÓL!"); return; }
   scannedCodes.add(k);
   sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
   updateCounter();
