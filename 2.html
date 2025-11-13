@@ -212,7 +212,7 @@ function normalizeCode(str) {
         .replace(/[‐-–—−]/g,'-')
         .replace(/\\/g,'/')
         .replace(/[^A-Z0-9\-\/]/g,'');
-    if (s.includes("/")) s = s.split("/")[0];   // pl. "123/1" -> "123"
+       // pl. "123/1" -> "123"
     if (/^\d+\.0$/.test(s)) s = s.replace(/\.0$/,'');
     return s;
 }
