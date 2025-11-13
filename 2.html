@@ -247,13 +247,11 @@ document.getElementById("scanButton").addEventListener("click", startCamera);
 
 document.getElementById("finishButton").addEventListener("click", ()=> {
     if (scannedCodes.size < totalCount) {
-        // nem kész -> törölhetjük a rész-eredményt
-        sessionStorage.removeItem(SCANNED_KEY);
+        sessionStorage.removeItem('25_scannedList');
     } else {
-        // kész -> jelöljük késznek a HD oldalon
-        localStorage.setItem(DONE_KEY, 'true');
+        localStorage.setItem('done_25', 'true');
+        window.location.href = "hd.html?done=1&code=25";
     }
-    window.location.href = "hd.html?done=1&code=" + TOUR;
 });
 
 document.getElementById("backButton").addEventListener("click", () => {
