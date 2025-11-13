@@ -172,13 +172,35 @@ let scannedCodes = new Set();
     }
 }
 
-/* ===== Egyedi modál vezérlés ===== */
+/* ===== Egyedi modál + szkenner pause/resume ===== */
+let scannerPaused = false;
+
+function pauseScanner() {
+  if (html5QrCode && typeof html5QrCode.pause === "function") {
+    html5QrCode.pause(true); // csak a dekódolás áll meg, a kamera kép marad
+    scannerPaused = true;
+  }
+}
+
+function resumeScanner() {
+  if (!html5QrCode) return;
+  if (typeof html5QrCode.resume === "function") {
+    html5QrCode.resume();
+  } else {
+    // fallback: ha nincs resume(), indítsuk újra a szkennert
+    stopCamera().then(startCamera);
+  }
+  scannerPaused = false;
+}
+
 function showModal(msg) {
     document.getElementById('modalMessage').innerText = msg;
     document.getElementById('modalOverlay').style.display = 'flex';
+    pauseScanner();
 }
 function hideModal() {
     document.getElementById('modalOverlay').style.display = 'none';
+    if (scannerPaused) resumeScanner();
 }
 document.getElementById('modalOk').addEventListener('click', hideModal);
 
@@ -251,11 +273,11 @@ function onScanSuccess(decodedText) {
 
     if (scannedCodes.has(k)) {
         showModal("Ezt a csomagot már olvasta");
-        return; // kamera marad
+        return; // kamera kép marad, dekódolás pauzéban
     }
     if (!allowedCodes.has(k)) {
         showModal("NEM KELL IDE");
-        return; // kamera marad
+        return; // kamera kép marad, dekódolás pauzéban
     }
 
     // Jó kód a 2-es túrához:
