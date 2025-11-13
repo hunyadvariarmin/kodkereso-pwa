@@ -121,7 +121,7 @@ function normalizeCode(str) {
     let s = String(str).trim().toUpperCase()
         .replace(/\s+/g,'').replace(/[‐-–—−]/g,'-').replace(/\\/g,'/')
         .replace(/[^A-Z0-9\-\/]/g,'');
-    if (s.includes("/")) s = s.split("/")[0];
+    
     if (/^\d+\.0$/.test(s)) s = s.replace(/\.0$/,'');
     return s;
 }
