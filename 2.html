@@ -369,4 +369,151 @@ async function loadExcel() {
         totalCount = allowedCodes.size;
         updateCounter();
     } catch(e){
-        consol
+        console.error("Excel betöltési hiba:", e);
+    }
+}
+
+/* ===== Kamera vezérlés ===== */
+async function startCamera() {
+    const reader = document.getElementById("reader");
+    reader.style.display="block";
+    document.getElementById("overlay").style.display="none";
+    document.getElementById("cameraBack").style.display="block";
+    if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+    await html5QrCode.start(
+        {facingMode:"environment"},
+        {fps:10, qrbox:null},
+        onScanSuccess
+    );
+}
+
+async function stopCamera() {
+    if(html5QrCode) {
+        await html5QrCode.stop().catch(()=>{});
+        html5QrCode.clear();
+        html5QrCode = null;
+    }
+    document.getElementById("reader").style.display="none";
+    document.getElementById("overlay").style.display="block";
+    document.getElementById("cameraBack").style.display="none";
+}
+
+/* ===== Beolvasás callback (KAMERA – A oszlop) ===== */
+function onScanSuccess(decodedText) {
+    const k = normalizeCode(decodedText);
+
+    if (scannedCodes.has(k)) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+    if (!allowedCodes.has(k)) {
+        showAlert("NEM KELL IDE");
+        return;
+    }
+
+    scannedCodes.add(k);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
+    updateCounter();
+    stopCamera();
+}
+
+/* ===== MENÜ logika ===== */
+const menuBtn = document.getElementById('menuBtn');
+const menuOverlay = document.getElementById('menuOverlay');
+const manualOverlay = document.getElementById('manualOverlay');
+const manualInput = document.getElementById('manualInput');
+
+menuBtn.addEventListener('click', ()=> {
+    menuOverlay.style.display = 'block';
+});
+menuOverlay.addEventListener('click', (e)=>{
+    if (e.target === menuOverlay) menuOverlay.style.display = 'none';
+});
+
+// Rendelések
+document.getElementById('menuOrders').addEventListener('click', ()=>{
+    window.location.href = 'rendelesek.html';
+});
+
+// Kézi bevitel
+document.getElementById('menuManual').addEventListener('click', ()=>{
+    menuOverlay.style.display = 'none';
+    manualOverlay.style.display = 'block';
+    manualInput.value = "";
+    manualInput.focus();
+});
+
+// Frissít – csak 2-es túra adatai
+document.getElementById('menuRefresh').addEventListener('click', ()=>{
+    const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot ezen a túrán?");
+    if (!ok) return;
+
+    localStorage.removeItem(DONE_KEY);
+    sessionStorage.removeItem(SCANNED_KEY);
+
+    scannedCodes = new Set();
+    updateCounter();
+    showAlert("A túra adatai törölve");
+    menuOverlay.style.display = 'none';
+});
+
+/* ===== Kézi bevitel (D oszlop) ===== */
+function processManualCode(raw) {
+    const dCode = normalizeCode(raw);
+
+    if (!dCode) {
+        showAlert("Üres kód!");
+        return;
+    }
+
+    const aList = manualMap.get(dCode);
+    if (!aList || aList.length === 0) {
+        showAlert("VEDD KI A TÚRÁBÓL!");
+        return;
+    }
+
+    let aToSave = null;
+    for (const aCode of aList) {
+        if (!aCode) continue;
+        if (!scannedCodes.has(aCode)) {
+            aToSave = aCode;
+            break;
+        }
+    }
+
+    if (!aToSave) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+
+    scannedCodes.add(aToSave);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
+    updateCounter();
+}
+
+/* ===== Gombok eseményei ===== */
+document.getElementById("scanButton").addEventListener("click", startCamera);
+
+document.getElementById("cameraBackButton").addEventListener("click", () => {
+    stopCamera();
+});
+
+document.getElementById("finishButton").addEventListener("click", ()=> {
+    if (scannedCodes.size < totalCount) {
+        sessionStorage.removeItem('2_scannedList');
+    } else {
+        localStorage.setItem('done_2', 'true');
+        window.location.href = "hd.html?done=1&code=2";
+    }
+});
+
+document.getElementById("backButton").addEventListener("click", () => {
+    window.location.href="hd.html";
+});
+
+/* Indítás */
+loadExcel();
+</script>
+
+</body>
+</html>
