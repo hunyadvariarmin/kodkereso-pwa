@@ -6,10 +6,10 @@
 <title>2</title>
 <style>
 html, body {
-    margin:0; padding:0; height:100%;
+    margin:0;
+    padding:0;
+    height:100%;
     font-family: Arial, sans-serif;
-}
-body {
     background: url("icons/logo.png") no-repeat center center fixed;
     background-size: cover;
     color: white;
@@ -149,9 +149,9 @@ button:hover {
 }
 .menuItem {
     width: 100%;
-    padding: 10px 0px;           /* KISEBB padding */
+    padding: 18px 10px;      /* magasabb gomb */
     margin-top: 10px;
-    font-size: 20px;         /* KISEBB betűméret */
+    font-size: 18px;
     color: #FFD700;
     background: rgba(0,0,0,0.35);
     border: 2px solid #FFD700;
@@ -234,6 +234,7 @@ button:hover {
     <h3>Menü</h3>
     <div id="menuOrders" class="menuItem">Rendelések</div>
     <div id="menuManual" class="menuItem">Kézi bevitel</div>
+    <div id="menuRefresh" class="menuItem">Frissít</div> <!-- ÚJ: csak 2-es túrára -->
   </div>
 </div>
 
@@ -422,17 +423,14 @@ const manualOverlay = document.getElementById('manualOverlay');
 const manualInput = document.getElementById('manualInput');
 
 menuBtn.addEventListener('click', ()=> {
-    // kamera maradhat, ez csak menü
     menuOverlay.style.display = 'block';
 });
 menuOverlay.addEventListener('click', (e)=>{
-    // csak a háttérre kattintva zárjuk
     if (e.target === menuOverlay) menuOverlay.style.display = 'none';
 });
 
 // Rendelések
 document.getElementById('menuOrders').addEventListener('click', ()=>{
-    // Ha lesz külön oldal:
     window.location.href = 'rendelesek.html';
 });
 
@@ -444,14 +442,19 @@ document.getElementById('menuManual').addEventListener('click', ()=>{
     manualInput.focus();
 });
 
-// Kézi bevitel gombok
-document.getElementById('manualCancel').addEventListener('click', ()=>{
-    manualOverlay.style.display = 'none';
-});
-document.getElementById('manualOk').addEventListener('click', ()=>{
-    const value = manualInput.value || "";
-    processManualCode(value);
-    manualOverlay.style.display = 'none';
+// Frissít – csak 2-es túra adatai
+document.getElementById('menuRefresh').addEventListener('click', ()=>{
+    const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot ezen a túrán?");
+    if (!ok) return;
+
+    // csak a 2-es oldalhoz tartozó kulcsok
+    localStorage.removeItem(DONE_KEY);
+    sessionStorage.removeItem(SCANNED_KEY);
+
+    scannedCodes = new Set();
+    updateCounter();
+    showAlert("A túra adatai törölve");
+    menuOverlay.style.display = 'none';
 });
 
 /* ===== Kézi bevitel (D oszlop) ===== */
@@ -497,7 +500,6 @@ function processManualCode(raw) {
 document.getElementById("scanButton").addEventListener("click", startCamera);
 
 document.getElementById("cameraBackButton").addEventListener("click", () => {
-    // csak kamera bezárása, semmi más
     stopCamera();
 });
 
