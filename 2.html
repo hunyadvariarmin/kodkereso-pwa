@@ -253,6 +253,7 @@ button:hover {
     font-size: 18px;
     margin: 4px 0;
     color: red;           /* alap: piros */
+    text-align: center;   /* középre igazítás */
 }
 .orderRow.scanned {
     color: #00ff00;       /* beolvasott: zöld */
@@ -491,25 +492,37 @@ function openOrdersOverlay() {
     const listDiv = document.getElementById('ordersList');
     listDiv.innerHTML = "";
 
-    const dCodes = Array.from(manualMap.keys()).sort();
+    // minden előfordulást külön sorba tesszük
+    const rows = [];
+    manualMap.forEach(function(aList, dCode) {
+        for (let i = 0; i < aList.length; i++) {
+            rows.push({
+                dCode: dCode,
+                aCode: aList[i]
+            });
+        }
+    });
 
-    if (dCodes.length === 0) {
+    // rendezés szállítólevélszám szerint
+    rows.sort(function(r1, r2) {
+        if (r1.dCode < r2.dCode) return -1;
+        if (r1.dCode > r2.dCode) return 1;
+        return 0;
+    });
+
+    if (rows.length === 0) {
         const info = document.createElement('div');
         info.textContent = "Nincs rendelés az aktuális túrához.";
         listDiv.appendChild(info);
     } else {
-        dCodes.forEach(function(dCode){
+        rows.forEach(function(row){
             const rowDiv = document.createElement('div');
             rowDiv.className = "orderRow";    // alap: piros
-            rowDiv.textContent = dCode;
+            rowDiv.textContent = row.dCode;
 
-            const aList = manualMap.get(dCode) || [];
-            for (let i = 0; i < aList.length; i++) {
-                const aCode = aList[i];
-                if (aCode && scannedCodes.has(aCode)) {
-                    rowDiv.classList.add("scanned"); // zöld
-                    break;
-                }
+            // ha az ehhez a sorhoz tartozó A kód már be van olvasva -> zöld
+            if (row.aCode && scannedCodes.has(row.aCode)) {
+                rowDiv.classList.add("scanned");
             }
 
             listDiv.appendChild(rowDiv);
