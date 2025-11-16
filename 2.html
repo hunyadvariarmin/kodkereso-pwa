@@ -216,6 +216,56 @@ button:hover {
     font-size: 18px;
 }
 
+/* Rendelések lista modal */
+#ordersOverlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    z-index: 7;
+}
+#ordersBox {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: min(90%, 420px);
+    max-height: 70vh;
+    background: rgba(0,0,0,0.85);
+    border: 2px solid #FFD700;
+    border-radius: 14px;
+    padding: 18px;
+    color: #FFD700;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+#ordersBox h4 {
+    margin: 6px 0 12px 0;
+    font-size: 22px;
+    text-align: center;
+}
+#ordersList {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    padding-right: 4px;
+}
+.orderRow {
+    font-size: 18px;
+    margin: 4px 0;
+    color: red;           /* alap: piros */
+}
+.orderRow.scanned {
+    color: #00ff00;       /* beolvasott: zöld */
+}
+#ordersButtons {
+    text-align: center;
+}
+#ordersButtons button {
+    width: 50%;
+    padding: 10px 0;
+    font-size: 18px;
+}
+
 /* Kamera nézethez alul Vissza gomb */
 #cameraBack {
     position: fixed;
@@ -256,6 +306,17 @@ button:hover {
   </div>
 </div>
 
+<!-- Rendelések lista modal -->
+<div id="ordersOverlay">
+  <div id="ordersBox">
+    <h4>Rendelések</h4>
+    <div id="ordersList"></div>
+    <div id="ordersButtons">
+      <button id="ordersClose">Bezár</button>
+    </div>
+  </div>
+</div>
+
 <div id="reader"></div>
 <div id="centerResult">0/0</div>
 
@@ -292,7 +353,7 @@ let allowedCodes = new Set();
 let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
-let manualMap = new Map();
+let manualMap = new Map();   // D kód -> A kód(ok) listája
 
 /* Beolvasottak visszatöltése */
 (function(){
@@ -424,11 +485,46 @@ function onScanSuccess(decodedText) {
     stopCamera();
 }
 
+/* ===== Rendelések lista építése ===== */
+function openOrdersOverlay() {
+    const overlay = document.getElementById('ordersOverlay');
+    const listDiv = document.getElementById('ordersList');
+    listDiv.innerHTML = "";
+
+    const dCodes = Array.from(manualMap.keys()).sort();
+
+    if (dCodes.length === 0) {
+        const info = document.createElement('div');
+        info.textContent = "Nincs rendelés az aktuális túrához.";
+        listDiv.appendChild(info);
+    } else {
+        dCodes.forEach(function(dCode){
+            const rowDiv = document.createElement('div');
+            rowDiv.className = "orderRow";    // alap: piros
+            rowDiv.textContent = dCode;
+
+            const aList = manualMap.get(dCode) || [];
+            for (let i = 0; i < aList.length; i++) {
+                const aCode = aList[i];
+                if (aCode && scannedCodes.has(aCode)) {
+                    rowDiv.classList.add("scanned"); // zöld
+                    break;
+                }
+            }
+
+            listDiv.appendChild(rowDiv);
+        });
+    }
+
+    overlay.style.display = "block";
+}
+
 /* ===== MENÜ logika ===== */
 const menuBtn = document.getElementById('menuBtn');
 const menuOverlay = document.getElementById('menuOverlay');
 const manualOverlay = document.getElementById('manualOverlay');
 const manualInput = document.getElementById('manualInput');
+const ordersOverlay = document.getElementById('ordersOverlay');
 
 menuBtn.addEventListener('click', function(){
     menuOverlay.style.display = 'block';
@@ -439,10 +535,16 @@ menuOverlay.addEventListener('click', function(e){
 
 // Rendelések
 document.getElementById('menuOrders').addEventListener('click', function(){
-    window.location.href = 'rendelesek.html';
+    menuOverlay.style.display = 'none';
+    openOrdersOverlay();
 });
 
-// Kézi bevitel
+// Rendelések bezár
+document.getElementById('ordersClose').addEventListener('click', function(){
+    ordersOverlay.style.display = 'none';
+});
+
+/* Kézi bevitel */
 document.getElementById('menuManual').addEventListener('click', function(){
     menuOverlay.style.display = 'none';
     manualOverlay.style.display = 'block';
