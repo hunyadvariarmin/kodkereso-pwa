@@ -149,9 +149,9 @@ button:hover {
 }
 .menuItem {
     width: 100%;
-    padding: 14px;
+    padding: 10px;           /* KISEBB padding */
     margin-top: 10px;
-    font-size: 20px;
+    font-size: 20px;         /* KISEBB betűméret */
     color: #FFD700;
     background: rgba(0,0,0,0.35);
     border: 2px solid #FFD700;
@@ -209,6 +209,18 @@ button:hover {
     padding: 12px 0;
     font-size: 18px;
 }
+
+/* Kamera nézethez alul Vissza gomb */
+#cameraBack {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 300px;
+    z-index: 4;          /* a kameranézet fölé kerül */
+    display: none;       /* csak kamera módban látszik */
+}
 </style>
 </head>
 <body>
@@ -247,6 +259,11 @@ button:hover {
 <div id="bottomButtons">
     <button id="finishButton">Árukiadás befejezése</button>
     <button id="backButton">Vissza</button>
+</div>
+
+<!-- Kamera nézet Vissza gomb -->
+<div id="cameraBack">
+    <button id="cameraBackButton">Vissza</button>
 </div>
 
 <!-- Felugró üzenet -->
@@ -356,6 +373,7 @@ async function startCamera() {
     const reader = document.getElementById("reader");
     reader.style.display="block";
     document.getElementById("overlay").style.display="none";
+    document.getElementById("cameraBack").style.display="block";  // kamera Vissza gomb látszik
     if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
     await html5QrCode.start(
         {facingMode:"environment"},
@@ -372,6 +390,7 @@ async function stopCamera() {
     }
     document.getElementById("reader").style.display="none";
     document.getElementById("overlay").style.display="block";
+    document.getElementById("cameraBack").style.display="none";   // kamera Vissza gomb elrejtése
 }
 
 /* ===== Beolvasás callback (KAMERA – A oszlop) ===== */
@@ -476,6 +495,11 @@ function processManualCode(raw) {
 
 /* ===== Gombok eseményei ===== */
 document.getElementById("scanButton").addEventListener("click", startCamera);
+
+document.getElementById("cameraBackButton").addEventListener("click", () => {
+    // csak kamera bezárása, semmi más
+    stopCamera();
+});
 
 document.getElementById("finishButton").addEventListener("click", ()=> {
     if (scannedCodes.size < totalCount) {
