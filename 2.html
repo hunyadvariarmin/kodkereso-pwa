@@ -140,6 +140,8 @@ button:hover {
     border-right: 2px solid #FFD700;
     padding: 16px;
     box-sizing: border-box;
+    display: flex;              /* ÚJ: flex layout */
+    flex-direction: column;     /* ÚJ: oszlop */
 }
 #sideMenu h3 {
     margin: 0 0 12px 0;
@@ -162,6 +164,10 @@ button:hover {
 .menuItem:hover {
     background: rgba(255,215,0,0.15);
     transform: scale(1.02);
+}
+/* Frissít gomb le az aljára */
+#menuRefresh {
+    margin-top: auto;        /* ÚJ: lenyomja alulra */
 }
 
 /* Kézi bevitel modal */
@@ -234,7 +240,7 @@ button:hover {
     <h3>Menü</h3>
     <div id="menuOrders" class="menuItem">Rendelések</div>
     <div id="menuManual" class="menuItem">Kézi bevitel</div>
-    <div id="menuRefresh" class="menuItem">Frissít</div> <!-- ÚJ: csak 2-es túrára -->
+    <div id="menuRefresh" class="menuItem">Frissít</div>
   </div>
 </div>
 
@@ -305,8 +311,6 @@ function normalizeCode(str) {
         .replace(/[‐-–—−]/g,'-')
         .replace(/\\/g,'/')
         .replace(/[^A-Z0-9\-\/]/g,'');
-    // Ha a perjeles részt IS számolni akarjátok, hagyd így.
-    // Ha le akarod vágni, tedd vissza: if (s.includes("/")) s = s.split("/")[0];
     if (/^\d+\.0$/.test(s)) s = s.replace(/\.0$/,'');
     return s;
 }
@@ -365,160 +369,4 @@ async function loadExcel() {
         totalCount = allowedCodes.size;
         updateCounter();
     } catch(e){
-        console.error("Excel betöltési hiba:", e);
-    }
-}
-
-/* ===== Kamera vezérlés ===== */
-async function startCamera() {
-    const reader = document.getElementById("reader");
-    reader.style.display="block";
-    document.getElementById("overlay").style.display="none";
-    document.getElementById("cameraBack").style.display="block";  // kamera Vissza gomb látszik
-    if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-    await html5QrCode.start(
-        {facingMode:"environment"},
-        {fps:10, qrbox:null},
-        onScanSuccess
-    );
-}
-
-async function stopCamera() {
-    if(html5QrCode) {
-        await html5QrCode.stop().catch(()=>{});
-        html5QrCode.clear();
-        html5QrCode = null;
-    }
-    document.getElementById("reader").style.display="none";
-    document.getElementById("overlay").style.display="block";
-    document.getElementById("cameraBack").style.display="none";   // kamera Vissza gomb elrejtése
-}
-
-/* ===== Beolvasás callback (KAMERA – A oszlop) ===== */
-function onScanSuccess(decodedText) {
-    const k = normalizeCode(decodedText);
-
-    if (scannedCodes.has(k)) {
-        showAlert("Ezt a kódot már olvasta");
-        return; // kamera marad
-    }
-    if (!allowedCodes.has(k)) {
-        showAlert("NEM KELL IDE");
-        return; // kamera marad
-    }
-
-    // Jó kód a 2-es túrához:
-    scannedCodes.add(k);
-    sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
-    updateCounter();
-
-    // sikeres olvasás után álljunk le (ahogy kértétek)
-    stopCamera();
-}
-
-/* ===== MENÜ logika ===== */
-const menuBtn = document.getElementById('menuBtn');
-const menuOverlay = document.getElementById('menuOverlay');
-const manualOverlay = document.getElementById('manualOverlay');
-const manualInput = document.getElementById('manualInput');
-
-menuBtn.addEventListener('click', ()=> {
-    menuOverlay.style.display = 'block';
-});
-menuOverlay.addEventListener('click', (e)=>{
-    if (e.target === menuOverlay) menuOverlay.style.display = 'none';
-});
-
-// Rendelések
-document.getElementById('menuOrders').addEventListener('click', ()=>{
-    window.location.href = 'rendelesek.html';
-});
-
-// Kézi bevitel
-document.getElementById('menuManual').addEventListener('click', ()=>{
-    menuOverlay.style.display = 'none';
-    manualOverlay.style.display = 'block';
-    manualInput.value = "";
-    manualInput.focus();
-});
-
-// Frissít – csak 2-es túra adatai
-document.getElementById('menuRefresh').addEventListener('click', ()=>{
-    const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot ezen a túrán?");
-    if (!ok) return;
-
-    // csak a 2-es oldalhoz tartozó kulcsok
-    localStorage.removeItem(DONE_KEY);
-    sessionStorage.removeItem(SCANNED_KEY);
-
-    scannedCodes = new Set();
-    updateCounter();
-    showAlert("A túra adatai törölve");
-    menuOverlay.style.display = 'none';
-});
-
-/* ===== Kézi bevitel (D oszlop) ===== */
-function processManualCode(raw) {
-    const dCode = normalizeCode(raw);   // kézzel bevitt D kód
-
-    if (!dCode) {
-        showAlert("Üres kód!");
-        return;
-    }
-
-    const aList = manualMap.get(dCode);
-    if (!aList || aList.length === 0) {
-        // nincs ilyen D kód az aktuális túrában
-        showAlert("VEDD KI A TÚRÁBÓL!");
-        return;
-    }
-
-    // Keresünk olyan sort, amelynek az A oszlop kódja még nincs beolvasva
-    let aToSave = null;
-    for (const aCode of aList) {
-        if (!aCode) continue;                // ha valamiért üres az A
-        if (!scannedCodes.has(aCode)) {
-            aToSave = aCode;
-            break;
-        }
-    }
-
-    if (!aToSave) {
-        // Minden ehhez a D-hez tartozó csomag már be lett olvasva
-        // (akár kamerával, akár korábbi kézi bevitelekkel)
-        showAlert("Ezt a kódot már olvasta");
-        return;
-    }
-
-    // Jelöljük késznek ezt a sort: az A oszlop kódját mentjük, mint eddig
-    scannedCodes.add(aToSave);
-    sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
-    updateCounter();
-}
-
-/* ===== Gombok eseményei ===== */
-document.getElementById("scanButton").addEventListener("click", startCamera);
-
-document.getElementById("cameraBackButton").addEventListener("click", () => {
-    stopCamera();
-});
-
-document.getElementById("finishButton").addEventListener("click", ()=> {
-    if (scannedCodes.size < totalCount) {
-        sessionStorage.removeItem('2_scannedList');
-    } else {
-        localStorage.setItem('done_2', 'true');
-        window.location.href = "hd.html?done=1&code=2";
-    }
-});
-
-document.getElementById("backButton").addEventListener("click", () => {
-    window.location.href="hd.html";
-});
-
-/* Indítás */
-loadExcel();
-</script>
-
-</body>
-</html>
+        consol
