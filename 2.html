@@ -250,8 +250,8 @@ button:hover {
     padding-right: 4px;
 }
 .orderRow {
-    font-size: 18px;
-    margin: 4px 0;
+    font-size: 20px;
+    margin: 6px 0;
     color: red;           /* alap: piros */
     text-align: center;   /* középre igazítás */
     cursor: pointer;      /* kattintható */
@@ -289,20 +289,34 @@ button:hover {
 }
 #orderDetailBox h4 {
     margin: 6px 0 12px 0;
-    font-size: 22px;
+    font-size: 24px;
     text-align: center;
 }
 #orderDetailContent {
-    font-size: 18px;
     line-height: 1.6;
-    text-align: center;   /* középre igazított részletek */
+    text-align: center;   /* minden adat középre */
+}
+.detailH {
+    font-size: 28px;      /* H – legnagyobb */
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.detailD {
+    font-size: 24px;      /* D – kicsit kisebb, mint H, nagyobb, mint a többi */
+    margin-bottom: 6px;
+}
+.detailOther {
+    font-size: 20px;      /* E, F, G */
+    margin-bottom: 4px;
 }
 #orderDetailButtons {
     margin-top: 14px;
-    text-align: center;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
 }
 #orderDetailButtons button {
-    width: 50%;
+    width: 48%;
     padding: 10px 0;
     font-size: 18px;
 }
@@ -365,6 +379,7 @@ button:hover {
     <div id="orderDetailContent"></div>
     <div id="orderDetailButtons">
       <button id="orderDetailClose">Bezár</button>
+      <button id="orderDetailMark">KOCSIN VAN</button>
     </div>
   </div>
 </div>
@@ -406,7 +421,8 @@ let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
 let manualMap = new Map();   // D kód -> A kód(ok) listája
-let orderRows = [];          // minden sor D,E,F,G adatokkal
+let orderRows = [];          // minden sor H,D,E,F,G,A adatokkal
+let currentDetailRow = null; // éppen megnyitott rendelés
 
 /* Beolvasottak visszatöltése */
 (function(){
@@ -444,7 +460,7 @@ function updateCounter() {
         scannedCodes.size + "/" + totalCount;
 }
 
-/* ===== Excel betöltése + szűrés a 2-es túrára + D/E/F/G tárolás ===== */
+/* ===== Excel betöltése + szűrés a 2-es túrára + H/D/E/F/G tárolás ===== */
 async function loadExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -463,11 +479,12 @@ async function loadExcel() {
             const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
 
             if (tourVal === TOUR) {
-                const aVal = row[0];
-                const dVal = row[3];
-                const eValRaw = row[4];
-                const fValRaw = row[5];
-                const gValRaw = row[6];
+                const aVal    = row[0]; // A – csomagszám
+                const dVal    = row[3]; // D – szállítólevél
+                const eValRaw = row[4]; // E
+                const fValRaw = row[5]; // F
+                const gValRaw = row[6]; // G
+                const hValRaw = row[7]; // H – új adat
 
                 let aCode = null;
                 if (aVal != null && String(aVal).trim() !== "") {
@@ -492,12 +509,14 @@ async function loadExcel() {
                     const eVal = eValRaw != null ? String(eValRaw).trim() : "";
                     const fVal = fValRaw != null ? String(fValRaw).trim() : "";
                     const gVal = gValRaw != null ? String(gValRaw).trim() : "";
+                    const hVal = hValRaw != null ? String(hValRaw).trim() : "";
                     orderRows.push({
                         dCode: dCode,
                         aCode: aCode,
                         eVal: eVal,
                         fVal: fVal,
-                        gVal: gVal
+                        gVal: gVal,
+                        hVal: hVal
                     });
                 }
             }
@@ -558,14 +577,23 @@ function onScanSuccess(decodedText) {
 
 /* ===== Egy rendelés részleteinek megnyitása ===== */
 function openOrderDetail(row) {
+    currentDetailRow = row;
+
     const overlay = document.getElementById('orderDetailOverlay');
     const content = document.getElementById('orderDetailContent');
 
-    var html = "";
-    html += (row.dCode || "") + "<br>";
-    html += (row.eVal || "") + "<br>";
-    html += (row.fVal || "") + "<br>";
-    html += (row.gVal || "") + "<br>";
+    const h = row.hVal || "";
+    const d = row.dCode || "";
+    const e = row.eVal || "";
+    const f = row.fVal || "";
+    const g = row.gVal || "";
+
+    const html =
+        '<div class="detailH">' + h + '</div>' +
+        '<div class="detailD">' + d + '</div>' +
+        '<div class="detailOther">' + e + '</div>' +
+        '<div class="detailOther">' + f + '</div>' +
+        '<div class="detailOther">' + g + '</div>';
 
     content.innerHTML = html;
     overlay.style.display = "block";
@@ -577,8 +605,7 @@ function openOrdersOverlay() {
     const listDiv = document.getElementById('ordersList');
     listDiv.innerHTML = "";
 
-    // minden előfordulást külön sorba tesszük
-    const rows = orderRows.slice(); // másolat
+    const rows = orderRows.slice();
     rows.sort(function(r1, r2) {
         if (r1.dCode < r2.dCode) return -1;
         if (r1.dCode > r2.dCode) return 1;
@@ -641,6 +668,36 @@ document.getElementById('ordersClose').addEventListener('click', function(){
 
 // Egy rendelés részletei bezár
 document.getElementById('orderDetailClose').addEventListener('click', function(){
+    orderDetailOverlay.style.display = 'none';
+});
+
+/* "KOCSIN VAN" – mintha beolvastuk volna */
+document.getElementById('orderDetailMark').addEventListener('click', function(){
+    if (!currentDetailRow) return;
+
+    const aCode = currentDetailRow.aCode;
+    if (!aCode) {
+        showAlert("Ehhez a rendeléshez nincs csomagszám (A oszlop).");
+        return;
+    }
+
+    if (scannedCodes.has(aCode)) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+
+    const ok = confirm("Biztosan jelölöd, mintha be lett volna olvasva?");
+    if (!ok) return;
+
+    scannedCodes.add(aCode);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
+    updateCounter();
+
+    // rendeléslista frissítése, hogy zöldre váltson
+    if (document.getElementById('ordersOverlay').style.display === "block") {
+        openOrdersOverlay();
+    }
+
     orderDetailOverlay.style.display = 'none';
 });
 
