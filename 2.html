@@ -268,6 +268,7 @@ let allowedCodes = new Set();  // csak C==TOUR sorok A-oszlop kódjai
 let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
+let manualMap = new Map();     // D kód -> ahhoz tartozó A kód(ok) listája
 
 /* Beolvasottak visszatöltése */
 {
@@ -303,7 +304,7 @@ function updateCounter() {
     document.getElementById("centerResult").innerText = `${scannedCodes.size}/${totalCount}`;
 }
 
-/* ===== Excel betöltése + szűrés a 2-es túrára ===== */
+/* ===== Excel betöltése + szűrés a 2-es túrára + D oszlop map ===== */
 async function loadExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -313,16 +314,36 @@ async function loadExcel() {
         data = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // tömb a sorokkal
 
         allowedCodes.clear();
+        manualMap.clear();
+
         for (let i = 1; i < data.length; i++) {
             const row = data[i];
             const tourVal = row?.[2] != null ? String(row[2]).trim() : ""; // C oszlop
+
             if (tourVal === TOUR) {
-                const aVal = row?.[0];
+                const aVal = row?.[0]; // A oszlop – csomagszám (kamera)
+                const dVal = row?.[3]; // D oszlop – kézi bevitelhez használt kód
+
+                let aCode = null;
                 if (aVal != null && String(aVal).trim() !== "") {
-                    allowedCodes.add(normalizeCode(aVal));
+                    aCode = normalizeCode(aVal);
+                    if (aCode) {
+                        allowedCodes.add(aCode); // kamera által olvasható kód
+                    }
+                }
+
+                if (dVal != null && String(dVal).trim() !== "") {
+                    const dCode = normalizeCode(dVal);
+                    if (dCode) {
+                        if (!manualMap.has(dCode)) {
+                            manualMap.set(dCode, []);
+                        }
+                        manualMap.get(dCode).push(aCode);
+                    }
                 }
             }
         }
+
         totalCount = allowedCodes.size;
         updateCounter();
     } catch(e){
@@ -336,7 +357,11 @@ async function startCamera() {
     reader.style.display="block";
     document.getElementById("overlay").style.display="none";
     if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-    await html5QrCode.start({facingMode:"environment"}, {fps:10, qrbox:null}, onScanSuccess);
+    await html5QrCode.start(
+        {facingMode:"environment"},
+        {fps:10, qrbox:null},
+        onScanSuccess
+    );
 }
 
 async function stopCamera() {
@@ -349,7 +374,7 @@ async function stopCamera() {
     document.getElementById("overlay").style.display="block";
 }
 
-/* ===== Beolvasás callback ===== */
+/* ===== Beolvasás callback (KAMERA – A oszlop) ===== */
 function onScanSuccess(decodedText) {
     const k = normalizeCode(decodedText);
 
@@ -410,24 +435,41 @@ document.getElementById('manualOk').addEventListener('click', ()=>{
     manualOverlay.style.display = 'none';
 });
 
+/* ===== Kézi bevitel (D oszlop) ===== */
 function processManualCode(raw) {
-    const k = normalizeCode(raw);
+    const dCode = normalizeCode(raw);   // kézzel bevitt D kód
 
-    if (!k) {
+    if (!dCode) {
         showAlert("Üres kód!");
         return;
     }
-    if (scannedCodes.has(k)) {
-        showAlert("Ezt a kódot már olvasta");
-        return;
-    }
-    if (!allowedCodes.has(k)) {
+
+    const aList = manualMap.get(dCode);
+    if (!aList || aList.length === 0) {
+        // nincs ilyen D kód az aktuális túrában
         showAlert("VEDD KI A TÚRÁBÓL!");
         return;
     }
 
-    // jó kód manuálisan
-    scannedCodes.add(k);
+    // Keresünk olyan sort, amelynek az A oszlop kódja még nincs beolvasva
+    let aToSave = null;
+    for (const aCode of aList) {
+        if (!aCode) continue;                // ha valamiért üres az A
+        if (!scannedCodes.has(aCode)) {
+            aToSave = aCode;
+            break;
+        }
+    }
+
+    if (!aToSave) {
+        // Minden ehhez a D-hez tartozó csomag már be lett olvasva
+        // (akár kamerával, akár korábbi kézi bevitelekkel)
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+
+    // Jelöljük késznek ezt a sort: az A oszlop kódját mentjük, mint eddig
+    scannedCodes.add(aToSave);
     sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
     updateCounter();
 }
