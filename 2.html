@@ -151,9 +151,9 @@ button:hover {
 }
 .menuItem {
     width: 100%;
-    padding: 20px 0px;
+    padding: 18px 10px;
     margin-top: 10px;
-    font-size: 22px;
+    font-size: 18px;
     color: #FFD700;
     background: rgba(0,0,0,0.35);
     border: 2px solid #FFD700;
@@ -286,7 +286,6 @@ button:hover {
     padding: 18px;
     color: #FFD700;
     box-sizing: border-box;
-    text-align: left;
 }
 #orderDetailBox h4 {
     margin: 6px 0 12px 0;
@@ -296,6 +295,7 @@ button:hover {
 #orderDetailContent {
     font-size: 18px;
     line-height: 1.6;
+    text-align: center;   /* középre igazított részletek */
 }
 #orderDetailButtons {
     margin-top: 14px;
@@ -562,10 +562,10 @@ function openOrderDetail(row) {
     const content = document.getElementById('orderDetailContent');
 
     var html = "";
-    html += "D: " + (row.dCode || "") + "<br>";
-    html += "E: " + (row.eVal || "") + "<br>";
-    html += "F: " + (row.fVal || "") + "<br>";
-    html += "G: " + (row.gVal || "") + "<br>";
+    html += (row.dCode || "") + "<br>";
+    html += (row.eVal || "") + "<br>";
+    html += (row.fVal || "") + "<br>";
+    html += (row.gVal || "") + "<br>";
 
     content.innerHTML = html;
     overlay.style.display = "block";
