@@ -254,6 +254,7 @@ button:hover {
     margin: 4px 0;
     color: red;           /* alap: piros */
     text-align: center;   /* középre igazítás */
+    cursor: pointer;      /* kattintható */
 }
 .orderRow.scanned {
     color: #00ff00;       /* beolvasott: zöld */
@@ -262,6 +263,45 @@ button:hover {
     text-align: center;
 }
 #ordersButtons button {
+    width: 50%;
+    padding: 10px 0;
+    font-size: 18px;
+}
+
+/* Egy rendelés részletei modal */
+#orderDetailOverlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    z-index: 8;
+}
+#orderDetailBox {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: min(90%, 420px);
+    background: rgba(0,0,0,0.9);
+    border: 2px solid #FFD700;
+    border-radius: 14px;
+    padding: 18px;
+    color: #FFD700;
+    box-sizing: border-box;
+    text-align: left;
+}
+#orderDetailBox h4 {
+    margin: 6px 0 12px 0;
+    font-size: 22px;
+    text-align: center;
+}
+#orderDetailContent {
+    font-size: 18px;
+    line-height: 1.6;
+}
+#orderDetailButtons {
+    margin-top: 14px;
+    text-align: center;
+}
+#orderDetailButtons button {
     width: 50%;
     padding: 10px 0;
     font-size: 18px;
@@ -318,6 +358,17 @@ button:hover {
   </div>
 </div>
 
+<!-- Egy rendelés részletei modal -->
+<div id="orderDetailOverlay">
+  <div id="orderDetailBox">
+    <h4>Rendelés adatai</h4>
+    <div id="orderDetailContent"></div>
+    <div id="orderDetailButtons">
+      <button id="orderDetailClose">Bezár</button>
+    </div>
+  </div>
+</div>
+
 <div id="reader"></div>
 <div id="centerResult">0/0</div>
 
@@ -355,6 +406,7 @@ let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
 let manualMap = new Map();   // D kód -> A kód(ok) listája
+let orderRows = [];          // minden sor D,E,F,G adatokkal
 
 /* Beolvasottak visszatöltése */
 (function(){
@@ -392,7 +444,7 @@ function updateCounter() {
         scannedCodes.size + "/" + totalCount;
 }
 
-/* ===== Excel betöltése + szűrés a 2-es túrára + D oszlop map ===== */
+/* ===== Excel betöltése + szűrés a 2-es túrára + D/E/F/G tárolás ===== */
 async function loadExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -403,6 +455,7 @@ async function loadExcel() {
 
         allowedCodes.clear();
         manualMap.clear();
+        orderRows = [];
 
         for (let i = 1; i < data.length; i++) {
             const row = data[i] || [];
@@ -412,6 +465,9 @@ async function loadExcel() {
             if (tourVal === TOUR) {
                 const aVal = row[0];
                 const dVal = row[3];
+                const eValRaw = row[4];
+                const fValRaw = row[5];
+                const gValRaw = row[6];
 
                 let aCode = null;
                 if (aVal != null && String(aVal).trim() !== "") {
@@ -421,14 +477,28 @@ async function loadExcel() {
                     }
                 }
 
+                let dCode = null;
                 if (dVal != null && String(dVal).trim() !== "") {
-                    const dCode = normalizeCode(dVal);
+                    dCode = normalizeCode(dVal);
                     if (dCode) {
                         if (!manualMap.has(dCode)) {
                             manualMap.set(dCode, []);
                         }
                         manualMap.get(dCode).push(aCode);
                     }
+                }
+
+                if (dCode) {
+                    const eVal = eValRaw != null ? String(eValRaw).trim() : "";
+                    const fVal = fValRaw != null ? String(fValRaw).trim() : "";
+                    const gVal = gValRaw != null ? String(gValRaw).trim() : "";
+                    orderRows.push({
+                        dCode: dCode,
+                        aCode: aCode,
+                        eVal: eVal,
+                        fVal: fVal,
+                        gVal: gVal
+                    });
                 }
             }
         }
@@ -486,6 +556,21 @@ function onScanSuccess(decodedText) {
     stopCamera();
 }
 
+/* ===== Egy rendelés részleteinek megnyitása ===== */
+function openOrderDetail(row) {
+    const overlay = document.getElementById('orderDetailOverlay');
+    const content = document.getElementById('orderDetailContent');
+
+    var html = "";
+    html += "D: " + (row.dCode || "") + "<br>";
+    html += "E: " + (row.eVal || "") + "<br>";
+    html += "F: " + (row.fVal || "") + "<br>";
+    html += "G: " + (row.gVal || "") + "<br>";
+
+    content.innerHTML = html;
+    overlay.style.display = "block";
+}
+
 /* ===== Rendelések lista építése ===== */
 function openOrdersOverlay() {
     const overlay = document.getElementById('ordersOverlay');
@@ -493,17 +578,7 @@ function openOrdersOverlay() {
     listDiv.innerHTML = "";
 
     // minden előfordulást külön sorba tesszük
-    const rows = [];
-    manualMap.forEach(function(aList, dCode) {
-        for (let i = 0; i < aList.length; i++) {
-            rows.push({
-                dCode: dCode,
-                aCode: aList[i]
-            });
-        }
-    });
-
-    // rendezés szállítólevélszám szerint
+    const rows = orderRows.slice(); // másolat
     rows.sort(function(r1, r2) {
         if (r1.dCode < r2.dCode) return -1;
         if (r1.dCode > r2.dCode) return 1;
@@ -515,18 +590,24 @@ function openOrdersOverlay() {
         info.textContent = "Nincs rendelés az aktuális túrához.";
         listDiv.appendChild(info);
     } else {
-        rows.forEach(function(row){
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
             const rowDiv = document.createElement('div');
-            rowDiv.className = "orderRow";    // alap: piros
+            rowDiv.className = "orderRow";
             rowDiv.textContent = row.dCode;
 
-            // ha az ehhez a sorhoz tartozó A kód már be van olvasva -> zöld
             if (row.aCode && scannedCodes.has(row.aCode)) {
                 rowDiv.classList.add("scanned");
             }
 
+            rowDiv.addEventListener('click', (function(r){
+                return function() {
+                    openOrderDetail(r);
+                };
+            })(row));
+
             listDiv.appendChild(rowDiv);
-        });
+        }
     }
 
     overlay.style.display = "block";
@@ -538,6 +619,7 @@ const menuOverlay = document.getElementById('menuOverlay');
 const manualOverlay = document.getElementById('manualOverlay');
 const manualInput = document.getElementById('manualInput');
 const ordersOverlay = document.getElementById('ordersOverlay');
+const orderDetailOverlay = document.getElementById('orderDetailOverlay');
 
 menuBtn.addEventListener('click', function(){
     menuOverlay.style.display = 'block';
@@ -555,6 +637,11 @@ document.getElementById('menuOrders').addEventListener('click', function(){
 // Rendelések bezár
 document.getElementById('ordersClose').addEventListener('click', function(){
     ordersOverlay.style.display = 'none';
+});
+
+// Egy rendelés részletei bezár
+document.getElementById('orderDetailClose').addEventListener('click', function(){
+    orderDetailOverlay.style.display = 'none';
 });
 
 /* Kézi bevitel */
