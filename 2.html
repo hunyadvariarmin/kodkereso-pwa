@@ -140,8 +140,8 @@ button:hover {
     border-right: 2px solid #FFD700;
     padding: 16px;
     box-sizing: border-box;
-    display: flex;              /* ÚJ: flex layout */
-    flex-direction: column;     /* ÚJ: oszlop */
+    display: flex;
+    flex-direction: column;
 }
 #sideMenu h3 {
     margin: 0 0 12px 0;
@@ -151,7 +151,7 @@ button:hover {
 }
 .menuItem {
     width: 100%;
-    padding: 18px 10px;      /* magasabb gomb */
+    padding: 18px 10px;
     margin-top: 10px;
     font-size: 18px;
     color: #FFD700;
@@ -167,7 +167,7 @@ button:hover {
 }
 /* Frissít gomb le az aljára */
 #menuRefresh {
-    margin-top: auto;        /* ÚJ: lenyomja alulra */
+    margin-top: auto;
 }
 
 /* Kézi bevitel modal */
@@ -224,8 +224,8 @@ button:hover {
     transform: translateX(-50%);
     width: 60%;
     max-width: 300px;
-    z-index: 4;          /* a kameranézet fölé kerül */
-    display: none;       /* csak kamera módban látszik */
+    z-index: 4;
+    display: none;
 }
 </style>
 </head>
@@ -282,26 +282,29 @@ button:hover {
 <script>
 /* ===== Oldalspecifikus konstansok ===== */
 const TOUR = "2";
-const XLSX_URL    = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx"; // közös fájl
-const SCANNED_KEY = `${TOUR}_scannedList`;   // "2_scannedList"
-const DONE_KEY    = `done_${TOUR}`;          // "done_2"
+const XLSX_URL    = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+const SCANNED_KEY = TOUR + "_scannedList";
+const DONE_KEY    = "done_" + TOUR;
 
 /* ===== Állapot ===== */
-let data = [];                 // teljes tábla
-let allowedCodes = new Set();  // csak C==TOUR sorok A-oszlop kódjai
+let data = [];
+let allowedCodes = new Set();
 let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
-let manualMap = new Map();     // D kód -> ahhoz tartozó A kód(ok) listája
+let manualMap = new Map();
 
 /* Beolvasottak visszatöltése */
-{
+(function(){
     const saved = sessionStorage.getItem(SCANNED_KEY);
     if (saved) {
-        try { scannedCodes = new Set(JSON.parse(saved)); }
-        catch(e){ scannedCodes = new Set(); }
+        try {
+            scannedCodes = new Set(JSON.parse(saved));
+        } catch(e){
+            scannedCodes = new Set();
+        }
     }
-}
+})();
 
 /* ===== Segédfüggvények ===== */
 function normalizeCode(str) {
@@ -319,11 +322,12 @@ function showAlert(message) {
     const alertDiv = document.getElementById("alertMessage");
     alertDiv.innerText = message;
     alertDiv.style.display = "block";
-    setTimeout(() => { alertDiv.style.display = "none"; }, 2000);
+    setTimeout(function(){ alertDiv.style.display = "none"; }, 2000);
 }
 
 function updateCounter() {
-    document.getElementById("centerResult").innerText = `${scannedCodes.size}/${totalCount}`;
+    document.getElementById("centerResult").innerText =
+        scannedCodes.size + "/" + totalCount;
 }
 
 /* ===== Excel betöltése + szűrés a 2-es túrára + D oszlop map ===== */
@@ -333,24 +337,25 @@ async function loadExcel() {
         const buffer = await resp.arrayBuffer();
         const wb = XLSX.read(buffer, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // tömb a sorokkal
+        data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
         allowedCodes.clear();
         manualMap.clear();
 
         for (let i = 1; i < data.length; i++) {
-            const row = data[i];
-            const tourVal = row?.[2] != null ? String(row[2]).trim() : ""; // C oszlop
+            const row = data[i] || [];
+            const tourValRaw = row[2];
+            const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
 
             if (tourVal === TOUR) {
-                const aVal = row?.[0]; // A oszlop – csomagszám (kamera)
-                const dVal = row?.[3]; // D oszlop – kézi bevitelhez használt kód
+                const aVal = row[0];
+                const dVal = row[3];
 
                 let aCode = null;
                 if (aVal != null && String(aVal).trim() !== "") {
                     aCode = normalizeCode(aVal);
                     if (aCode) {
-                        allowedCodes.add(aCode); // kamera által olvasható kód
+                        allowedCodes.add(aCode);
                     }
                 }
 
@@ -389,7 +394,9 @@ async function startCamera() {
 
 async function stopCamera() {
     if(html5QrCode) {
-        await html5QrCode.stop().catch(()=>{});
+        try {
+            await html5QrCode.stop();
+        } catch(e){}
         html5QrCode.clear();
         html5QrCode = null;
     }
@@ -412,7 +419,7 @@ function onScanSuccess(decodedText) {
     }
 
     scannedCodes.add(k);
-    sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
     updateCounter();
     stopCamera();
 }
@@ -423,20 +430,20 @@ const menuOverlay = document.getElementById('menuOverlay');
 const manualOverlay = document.getElementById('manualOverlay');
 const manualInput = document.getElementById('manualInput');
 
-menuBtn.addEventListener('click', ()=> {
+menuBtn.addEventListener('click', function(){
     menuOverlay.style.display = 'block';
 });
-menuOverlay.addEventListener('click', (e)=>{
+menuOverlay.addEventListener('click', function(e){
     if (e.target === menuOverlay) menuOverlay.style.display = 'none';
 });
 
 // Rendelések
-document.getElementById('menuOrders').addEventListener('click', ()=>{
+document.getElementById('menuOrders').addEventListener('click', function(){
     window.location.href = 'rendelesek.html';
 });
 
 // Kézi bevitel
-document.getElementById('menuManual').addEventListener('click', ()=>{
+document.getElementById('menuManual').addEventListener('click', function(){
     menuOverlay.style.display = 'none';
     manualOverlay.style.display = 'block';
     manualInput.value = "";
@@ -444,7 +451,7 @@ document.getElementById('menuManual').addEventListener('click', ()=>{
 });
 
 // Frissít – csak 2-es túra adatai
-document.getElementById('menuRefresh').addEventListener('click', ()=>{
+document.getElementById('menuRefresh').addEventListener('click', function(){
     const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot ezen a túrán?");
     if (!ok) return;
 
@@ -473,7 +480,8 @@ function processManualCode(raw) {
     }
 
     let aToSave = null;
-    for (const aCode of aList) {
+    for (let i = 0; i < aList.length; i++) {
+        const aCode = aList[i];
         if (!aCode) continue;
         if (!scannedCodes.has(aCode)) {
             aToSave = aCode;
@@ -487,18 +495,28 @@ function processManualCode(raw) {
     }
 
     scannedCodes.add(aToSave);
-    sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
     updateCounter();
 }
+
+/* ===== Kézi bevitel gombok ===== */
+document.getElementById('manualCancel').addEventListener('click', function(){
+    manualOverlay.style.display = 'none';
+});
+document.getElementById('manualOk').addEventListener('click', function(){
+    const value = manualInput.value || "";
+    processManualCode(value);
+    manualOverlay.style.display = 'none';
+});
 
 /* ===== Gombok eseményei ===== */
 document.getElementById("scanButton").addEventListener("click", startCamera);
 
-document.getElementById("cameraBackButton").addEventListener("click", () => {
+document.getElementById("cameraBackButton").addEventListener("click", function(){
     stopCamera();
 });
 
-document.getElementById("finishButton").addEventListener("click", ()=> {
+document.getElementById("finishButton").addEventListener("click", function(){
     if (scannedCodes.size < totalCount) {
         sessionStorage.removeItem('2_scannedList');
     } else {
@@ -507,7 +525,7 @@ document.getElementById("finishButton").addEventListener("click", ()=> {
     }
 });
 
-document.getElementById("backButton").addEventListener("click", () => {
+document.getElementById("backButton").addEventListener("click", function(){
     window.location.href="hd.html";
 });
 
