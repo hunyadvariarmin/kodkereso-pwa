@@ -5,24 +5,361 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>11</title>
 <style>
-/* ... (ugyanaz a CSS mint az 1.html-ben) ... */
-html, body { margin:0; padding:0; height:100%; font-family: Arial, sans-serif; }
-body { background: url("icons/logo.png") no-repeat center center fixed; background-size: cover; color: white; position: relative; overflow: hidden; }
-#reader { position: fixed; top:0; left:0; width:100vw; height:100vh; object-fit: cover; z-index:3; display:none; background:black; }
-#centerResult { position: fixed; top: 6%; left: 50%; transform: translateX(-50%); font-size: 90px; font-weight: bold; color: #FFD700; text-align: center; z-index: 2; white-space: pre-line; }
-#overlay { position: fixed; bottom: 95px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 350px; text-align: center; z-index: 2; display: flex; justify-content: center; }
-button { width: 100%; padding: 15px; font-size: 22px; color: #FFD700; background: rgba(0,0,0,0.4); border: 2px solid #FFD700; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; }
-button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
-#bottomButtons { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 2; width: 80%; max-width: 400px; justify-content: center; }
-#bottomButtons button { width: 48%; padding: 14px 0; font-size: 20px; }
+html, body {
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family: Arial, sans-serif;
+    background: url("icons/logo.png") no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Kamera nézet */
+#reader {
+    position: fixed; top:0; left:0; width:100vw; height:100vh;
+    object-fit: cover; z-index:3; display:none; background:black;
+}
+
+/* Számláló */
+#centerResult {
+    position: fixed;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 90px;
+    font-weight: bold;
+    color: #FFD700;
+    text-align: center;
+    z-index: 2;
+    white-space: pre-line;
+}
+
+/* Felső gomb (Kód beolvasása) */
+#overlay {
+    position: fixed;
+    bottom: 95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 350px;
+    text-align: center;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+}
+
+/* Gombok stílusa */
+button {
+    width: 100%;
+    padding: 15px;
+    font-size: 22px;
+    color: #FFD700;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid #FFD700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+button:hover {
+    background: rgba(255,215,0,0.2);
+    transform: scale(1.05);
+}
+
+/* Alsó két gomb */
+#bottomButtons {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 2;
+    width: 80%;
+    max-width: 400px;
+    justify-content: center;
+}
+#bottomButtons button {
+    width: 48%;
+    padding: 14px 0;
+    font-size: 20px;
+}
+
+/* Kis tér a két gombcsoport között */
 #overlay { margin-bottom: 40px; }
-#modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 5; }
-.modalBox { background: rgba(0,0,0,0.85); border: 2px solid #FFD700; border-radius: 14px; padding: 24px 28px; max-width: 90%; text-align: center; }
-.modalMessage { color: #FFD700; font-size: 26px; line-height: 1.3; margin-bottom: 18px; }
-.modalActions button { width: auto; min-width: 140px; padding: 12px 20px; font-size: 20px; }
+
+/* Felugró üzenet (auto 2s) */
+#alertMessage {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #FFD700;
+    font-size: 20px;
+    border-radius: 12px;
+    display: none;
+    z-index: 4;
+    text-align: center;
+}
+
+/* ==== Menü gomb (bal felső sarok) ==== */
+#menuBtn {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 5;
+    width: auto;
+    padding: 10px 14px;
+    font-size: 22px;
+    color: #FFD700;
+    background: rgba(0,0,0,0.45);
+    border: 2px solid #FFD700;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Oldalsó menü + háttér */
+#menuOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    z-index: 6;
+}
+#sideMenu {
+    position: absolute;
+    top: 0; left: 0;
+    width: 78%;
+    max-width: 320px;
+    height: 100%;
+    background: rgba(0,0,0,0.75);
+    border-right: 2px solid #FFD700;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+#sideMenu h3 {
+    margin: 0 0 12px 0;
+    font-weight: bold;
+    color: #FFD700;
+    text-align: left;
+}
+.menuItem {
+    width: 100%;
+    padding: 20px 0px;
+    margin-top: 10px;
+    font-size: 22px;
+    color: #FFD700;
+    background: rgba(0,0,0,0.35);
+    border: 2px solid #FFD700;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+.menuItem:hover {
+    background: rgba(255,215,0,0.15);
+    transform: scale(1.02);
+}
+#menuRefresh { margin-top: auto; }
+
+/* Kézi bevitel modal */
+#manualOverlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    z-index: 7;
+}
+#manualBox {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: min(90%, 420px);
+    background: rgba(0,0,0,0.85);
+    border: 2px solid #FFD700;
+    border-radius: 14px;
+    padding: 18px;
+    color: #FFD700;
+    text-align: center;
+}
+#manualBox h4 { margin: 6px 0 12px 0; font-size: 22px; }
+#manualBox input {
+    width: 100%;
+    padding: 12px 10px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: 1px solid #FFD700;
+    outline: none;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    box-sizing: border-box;
+}
+#manualButtons {
+    margin-top: 14px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+#manualButtons button { width: 48%; padding: 12px 0; font-size: 18px; }
+
+/* Rendelések lista modal */
+#ordersOverlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    z-index: 7;
+}
+#ordersBox {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: min(90%, 420px);
+    max-height: 70vh;
+    background: rgba(0,0,0,0.85);
+    border: 2px solid #FFD700;
+    border-radius: 14px;
+    padding: 18px;
+    color: #FFD700;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+#ordersBox h4 {
+    margin: 6px 0 12px 0;
+    font-size: 22px;
+    text-align: center;
+}
+#ordersList {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    padding-right: 4px;
+}
+.orderRow {
+    font-size: 20px;
+    margin: 6px 0;
+    color: red;
+    text-align: center;
+    cursor: pointer;
+}
+.orderRow.scanned { color: #00ff00; }
+#ordersButtons { text-align: center; }
+#ordersButtons button { width: 50%; padding: 10px 0; font-size: 18px; }
+
+/* Egy rendelés részletei modal */
+#orderDetailOverlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    z-index: 8;
+}
+#orderDetailBox {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: min(90%, 420px);
+    background: rgba(0,0,0,0.9);
+    border: 2px solid #FFD700;
+    border-radius: 14px;
+    padding: 18px;
+    color: #FFD700;
+    box-sizing: border-box;
+}
+#orderDetailBox h4 {
+    margin: 6px 0 12px 0;
+    font-size: 24px;
+    text-align: center;
+}
+#orderDetailContent {
+    line-height: 1.6;
+    text-align: center;
+}
+.detailH {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.detailD {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+.detailOther {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+#orderDetailButtons {
+    margin-top: 14px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+#orderDetailButtons button {
+    width: 48%;
+    padding: 10px 0;
+    font-size: 18px;
+}
+
+/* Kamera nézethez alul Vissza gomb */
+#cameraBack {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 300px;
+    z-index: 4;
+    display: none;
+}
 </style>
 </head>
 <body>
+
+<button id="menuBtn" aria-label="Menü">☰</button>
+
+<div id="menuOverlay">
+  <div id="sideMenu">
+    <h3>Menü</h3>
+    <div id="menuOrders" class="menuItem">Rendelések</div>
+    <div id="menuManual" class="menuItem">Kézi bevitel</div>
+    <div id="menuRefresh" class="menuItem">Frissít</div>
+  </div>
+</div>
+
+<div id="manualOverlay">
+  <div id="manualBox">
+    <h4>Kézi bevitel</h4>
+    <input type="text" id="manualInput" placeholder="Írja be a kódot..." autocomplete="off">
+    <div id="manualButtons">
+      <button id="manualCancel">Mégse</button>
+      <button id="manualOk">Mentés</button>
+    </div>
+  </div>
+</div>
+
+<div id="ordersOverlay">
+  <div id="ordersBox">
+    <h4>Rendelések</h4>
+    <div id="ordersList"></div>
+    <div id="ordersButtons">
+      <button id="ordersClose">Bezár</button>
+    </div>
+  </div>
+</div>
+
+<div id="orderDetailOverlay">
+  <div id="orderDetailBox">
+    <h4>Rendelés adatai</h4>
+    <div id="orderDetailContent"></div>
+    <div id="orderDetailButtons">
+      <button id="orderDetailClose">Bezár</button>
+      <button id="orderDetailMark">KOCSIN VAN</button>
+    </div>
+  </div>
+</div>
 
 <div id="reader"></div>
 <div id="centerResult">0/0</div>
@@ -36,86 +373,369 @@ button:hover { background: rgba(255,215,0,0.2); transform: scale(1.05); }
     <button id="backButton">Vissza</button>
 </div>
 
-<div id="modalOverlay">
-  <div class="modalBox">
-    <div class="modalMessage" id="modalMessage"></div>
-    <div class="modalActions">
-      <button id="modalOk">OK</button>
-    </div>
-  </div>
+<div id="cameraBack">
+    <button id="cameraBackButton">Vissza</button>
 </div>
+
+<div id="alertMessage"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-const TOUR = "11";
-const XLSX_URL    = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
-const SCANNED_KEY = `${TOUR}_scannedList`;
-const DONE_KEY    = `done_${TOUR}`;
+const TOUR      = "11";
+const XLSX_URL  = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+const SCANNED_KEY = TOUR + "_scannedList";
+const DONE_KEY    = "done_" + TOUR;
 
 let data = [];
 let allowedCodes = new Set();
 let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
+let manualMap = new Map();
+let orderRows = [];
+let currentDetailRow = null;
 
-{
+(function(){
     const saved = sessionStorage.getItem(SCANNED_KEY);
-    if (saved) { try { scannedCodes = new Set(JSON.parse(saved)); } catch(e){} }
-}
-
-let scannerPaused = false;
-function pauseScanner(){ if (html5QrCode && typeof html5QrCode.pause==="function"){ html5QrCode.pause(true); scannerPaused=true; } }
-function resumeScanner(){ if(!html5QrCode) return; if (typeof html5QrCode.resume==="function") html5QrCode.resume(); else stopCamera().then(startCamera); scannerPaused=false; }
-function showModal(msg){ document.getElementById('modalMessage').innerText=msg; document.getElementById('modalOverlay').style.display='flex'; pauseScanner(); }
-function hideModal(){ document.getElementById('modalOverlay').style.display='none'; if (scannerPaused) resumeScanner(); }
-document.getElementById('modalOk').addEventListener('click', hideModal);
-
-function normalizeCode(str){ if(!str) return ""; let s=String(str).trim().toUpperCase().replace(/\s+/g,'').replace(/[‐-–—−]/g,'-').replace(/\\/g,'/').replace(/[^A-Z0-9\-\/]/g,''); if(/^\d+\.0$/.test(s)) s=s.replace(/\.0$/,''); return s; }
-function updateCounter(){ document.getElementById("centerResult").innerText = `${scannedCodes.size}/${totalCount}`; }
-
-async function loadExcel(){
-  try{
-    const resp = await fetch(XLSX_URL);
-    const buffer = await resp.arrayBuffer();
-    const wb = XLSX.read(buffer, { type: "array" });
-    const sheet = wb.Sheets[wb.SheetNames[0]];
-    data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    allowedCodes.clear();
-    for (let i=1;i<data.length;i++){
-      const row = data[i];
-      const tourVal = row?.[2]!=null ? String(row[2]).trim() : "";
-      if (tourVal===TOUR){
-        const aVal=row?.[0];
-        if (aVal!=null && String(aVal).trim()!==""){
-          allowedCodes.add(normalizeCode(aVal));
-        }
-      }
+    if (saved) {
+        try { scannedCodes = new Set(JSON.parse(saved)); }
+        catch(e){ scannedCodes = new Set(); }
     }
-    totalCount = allowedCodes.size;
+})();
+
+function normalizeCode(str) {
+    if(!str) return "";
+    let s = String(str).trim().toUpperCase()
+        .replace(/\s+/g,'')
+        .replace(/[‐-–—−]/g,'-')
+        .replace(/\\/g,'/')
+        .replace(/[^A-Z0-9\-\/]/g,'');
+    if (/^\d+\.0$/.test(s)) s = s.replace(/\.0$/,'');
+    return s;
+}
+
+function showAlert(message) {
+    const alertDiv = document.getElementById("alertMessage");
+    alertDiv.innerText = message;
+    alertDiv.style.display = "block";
+    setTimeout(function(){ alertDiv.style.display = "none"; }, 2000);
+}
+
+function updateCounter() {
+    document.getElementById("centerResult").innerText =
+        scannedCodes.size + "/" + totalCount;
+}
+
+async function loadExcel() {
+    try {
+        const resp = await fetch(XLSX_URL);
+        const buffer = await resp.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        allowedCodes.clear();
+        manualMap.clear();
+        orderRows = [];
+
+        for (let i = 1; i < data.length; i++) {
+            const row = data[i] || [];
+            const tourValRaw = row[2];
+            const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
+
+            if (tourVal === TOUR) {
+                const aVal    = row[0];
+                const dVal    = row[3];
+                const eValRaw = row[4];
+                const fValRaw = row[5];
+                const gValRaw = row[6];
+                const hValRaw = row[7];
+
+                let aCode = null;
+                if (aVal != null && String(aVal).trim() !== "") {
+                    aCode = normalizeCode(aVal);
+                    if (aCode) allowedCodes.add(aCode);
+                }
+
+                let dCode = null;
+                if (dVal != null && String(dVal).trim() !== "") {
+                    dCode = normalizeCode(dVal);
+                    if (dCode) {
+                        if (!manualMap.has(dCode)) {
+                            manualMap.set(dCode, []);
+                        }
+                        manualMap.get(dCode).push(aCode);
+                    }
+                }
+
+                if (dCode) {
+                    const eVal = eValRaw != null ? String(eValRaw).trim() : "";
+                    const fVal = fValRaw != null ? String(fValRaw).trim() : "";
+                    const gVal = gValRaw != null ? String(gValRaw).trim() : "";
+                    const hVal = hValRaw != null ? String(hValRaw).trim() : "";
+                    orderRows.push({
+                        dCode: dCode,
+                        aCode: aCode,
+                        eVal: eVal,
+                        fVal: fVal,
+                        gVal: gVal,
+                        hVal: hVal
+                    });
+                }
+            }
+        }
+
+        totalCount = allowedCodes.size;
+        updateCounter();
+    } catch(e){
+        console.error("Excel betöltési hiba:", e);
+    }
+}
+
+async function startCamera() {
+    const reader = document.getElementById("reader");
+    reader.style.display="block";
+    document.getElementById("overlay").style.display="none";
+    document.getElementById("cameraBack").style.display="block";
+    if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+    await html5QrCode.start(
+        {facingMode:"environment"},
+        {fps:10, qrbox:null},
+        onScanSuccess
+    );
+}
+
+async function stopCamera() {
+    if(html5QrCode) {
+        try { await html5QrCode.stop(); } catch(e){}
+        html5QrCode.clear();
+        html5QrCode = null;
+    }
+    document.getElementById("reader").style.display="none";
+    document.getElementById("overlay").style.display="block";
+    document.getElementById("cameraBack").style.display="none";
+}
+
+function onScanSuccess(decodedText) {
+    const k = normalizeCode(decodedText);
+
+    if (scannedCodes.has(k)) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+    if (!allowedCodes.has(k)) {
+        showAlert("VEDD KI A TÚRÁBÓL!");
+        return;
+    }
+
+    scannedCodes.add(k);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
     updateCounter();
-  }catch(e){ console.error("Excel betöltési hiba:", e); }
+    stopCamera();
 }
-async function startCamera(){ const r=document.getElementById("reader"); r.style.display="block"; document.getElementById("overlay").style.display="none"; if(!html5QrCode) html5QrCode=new Html5Qrcode("reader"); await html5QrCode.start({facingMode:"environment"},{fps:10, qrbox:null}, onScanSuccess); }
-async function stopCamera(){ if(html5QrCode){ await html5QrCode.stop().catch(()=>{}); html5QrCode.clear(); html5QrCode=null; } document.getElementById("reader").style.display="none"; document.getElementById("overlay").style.display="block"; }
-function onScanSuccess(decodedText){
-  const k=normalizeCode(decodedText);
-  if (scannedCodes.has(k)){ showModal("Ezt a csomagot már olvasta"); return; }
-  if (!allowedCodes.has(k)){ showModal("VEDD KI A TÚRÁBÓL!"); return; }
-  scannedCodes.add(k);
-  sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
-  updateCounter();
-  stopCamera();
+
+function openOrderDetail(row) {
+    currentDetailRow = row;
+
+    const overlay = document.getElementById('orderDetailOverlay');
+    const content = document.getElementById('orderDetailContent');
+
+    const h = row.hVal || "";
+    const d = row.dCode || "";
+    const e = row.eVal || "";
+    const f = row.fVal || "";
+    const g = row.gVal || "";
+
+    const html =
+        '<div class="detailH">' + h + '</div>' +
+        '<div class="detailD">' + d + '</div>' +
+        '<div class="detailOther">' + e + '</div>' +
+        '<div class="detailOther">' + f + '</div>' +
+        '<div class="detailOther">' + g + '</div>';
+
+    content.innerHTML = html;
+    overlay.style.display = "block";
 }
-document.getElementById("scanButton").addEventListener("click", startCamera);
-document.getElementById("finishButton").addEventListener("click", ()=>{
-  if (scannedCodes.size < totalCount){ sessionStorage.removeItem(SCANNED_KEY); }
-  else { localStorage.setItem(DONE_KEY,'true'); window.location.href="hd.html?done=1&code="+TOUR; return; }
-  window.location.href="hd.html?done=1&code="+TOUR;
+
+function openOrdersOverlay() {
+    const overlay = document.getElementById('ordersOverlay');
+    const listDiv = document.getElementById('ordersList');
+    listDiv.innerHTML = "";
+
+    const rows = orderRows.slice();
+    rows.sort(function(r1, r2) {
+        if (r1.dCode < r2.dCode) return -1;
+        if (r1.dCode > r2.dCode) return 1;
+        return 0;
+    });
+
+    if (rows.length === 0) {
+        const info = document.createElement('div');
+        info.textContent = "Nincs rendelés az aktuális túrához.";
+        listDiv.appendChild(info);
+    } else {
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const rowDiv = document.createElement('div');
+            rowDiv.className = "orderRow";
+            rowDiv.textContent = row.dCode;
+
+            if (row.aCode && scannedCodes.has(row.aCode)) {
+                rowDiv.classList.add("scanned");
+            }
+
+            rowDiv.addEventListener('click', (function(r){
+                return function() { openOrderDetail(r); };
+            })(row));
+
+            listDiv.appendChild(rowDiv);
+        }
+    }
+
+    overlay.style.display = "block";
+}
+
+/* Menü logika */
+const menuBtn = document.getElementById('menuBtn');
+const menuOverlay = document.getElementById('menuOverlay');
+const manualOverlay = document.getElementById('manualOverlay');
+const manualInput = document.getElementById('manualInput');
+const ordersOverlay = document.getElementById('ordersOverlay');
+const orderDetailOverlay = document.getElementById('orderDetailOverlay');
+
+menuBtn.addEventListener('click', function(){
+    menuOverlay.style.display = 'block';
 });
-document.getElementById("backButton").addEventListener("click", ()=>{ window.location.href="hd.html"; });
+menuOverlay.addEventListener('click', function(e){
+    if (e.target === menuOverlay) menuOverlay.style.display = 'none';
+});
+
+document.getElementById('menuOrders').addEventListener('click', function(){
+    menuOverlay.style.display = 'none';
+    openOrdersOverlay();
+});
+document.getElementById('ordersClose').addEventListener('click', function(){
+    ordersOverlay.style.display = 'none';
+});
+
+document.getElementById('orderDetailClose').addEventListener('click', function(){
+    orderDetailOverlay.style.display = 'none';
+});
+
+document.getElementById('orderDetailMark').addEventListener('click', function(){
+    if (!currentDetailRow) return;
+
+    const aCode = currentDetailRow.aCode;
+    if (!aCode) {
+        showAlert("Ehhez a rendeléshez nincs csomagszám (A oszlop).");
+        return;
+    }
+
+    if (scannedCodes.has(aCode)) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+
+    const ok = confirm("Biztosan jelölöd, mintha be lett volna olvasva?");
+    if (!ok) return;
+
+    scannedCodes.add(aCode);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
+    updateCounter();
+
+    if (document.getElementById('ordersOverlay').style.display === "block") {
+        openOrdersOverlay();
+    }
+
+    orderDetailOverlay.style.display = 'none';
+});
+
+document.getElementById('menuManual').addEventListener('click', function(){
+    menuOverlay.style.display = 'none';
+    manualOverlay.style.display = 'block';
+    manualInput.value = "";
+    manualInput.focus();
+});
+
+document.getElementById('menuRefresh').addEventListener('click', function(){
+    const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot ezen a túrán?");
+    if (!ok) return;
+
+    localStorage.removeItem(DONE_KEY);
+    sessionStorage.removeItem(SCANNED_KEY);
+
+    scannedCodes = new Set();
+    updateCounter();
+    showAlert("A túra adatai törölve");
+    menuOverlay.style.display = 'none';
+});
+
+/* Kézi bevitel */
+function processManualCode(raw) {
+    const dCode = normalizeCode(raw);
+
+    if (!dCode) {
+        showAlert("Üres kód!");
+        return;
+    }
+
+    const aList = manualMap.get(dCode);
+    if (!aList || aList.length === 0) {
+        showAlert("VEDD KI A TÚRÁBÓL!");
+        return;
+    }
+
+    let aToSave = null;
+    for (let i = 0; i < aList.length; i++) {
+        const aCode = aList[i];
+        if (!aCode) continue;
+        if (!scannedCodes.has(aCode)) {
+            aToSave = aCode;
+            break;
+        }
+    }
+
+    if (!aToSave) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+
+    scannedCodes.add(aToSave);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
+    updateCounter();
+}
+
+document.getElementById('manualCancel').addEventListener('click', function(){
+    manualOverlay.style.display = 'none';
+});
+document.getElementById('manualOk').addEventListener('click', function(){
+    const value = manualInput.value || "";
+    processManualCode(value);
+    manualOverlay.style.display = 'none';
+});
+
+/* Gombok */
+document.getElementById("scanButton").addEventListener("click", startCamera);
+
+document.getElementById("cameraBackButton").addEventListener("click", function(){
+    stopCamera();
+});
+
+document.getElementById("finishButton").addEventListener("click", function(){
+    if (scannedCodes.size < totalCount) {
+        sessionStorage.removeItem('11_scannedList');
+    } else {
+        localStorage.setItem('done_11', 'true');
+        window.location.href = "hd.html?done=1&code=11";
+    }
+});
+
+document.getElementById("backButton").addEventListener("click", function(){
+    window.location.href="hd.html";
+});
+
 loadExcel();
 </script>
 
