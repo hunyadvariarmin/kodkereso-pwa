@@ -252,12 +252,12 @@ button:hover {
 .orderRow {
     font-size: 20px;
     margin: 6px 0;
-    color: red;           /* alap: piros */
-    text-align: center;   /* középre igazítás */
-    cursor: pointer;      /* kattintható */
+    color: red;           
+    text-align: center;   
+    cursor: pointer;      
 }
 .orderRow.scanned {
-    color: #00ff00;       /* beolvasott: zöld */
+    color: #00ff00;       
 }
 #ordersButtons {
     text-align: center;
@@ -294,19 +294,19 @@ button:hover {
 }
 #orderDetailContent {
     line-height: 1.6;
-    text-align: center;   /* minden adat középre */
+    text-align: center;
 }
 .detailH {
-    font-size: 28px;      /* H – legnagyobb */
+    font-size: 28px;
     font-weight: bold;
     margin-bottom: 8px;
 }
 .detailD {
-    font-size: 24px;      /* D – kicsit kisebb, mint H, nagyobb, mint a többi */
+    font-size: 24px;
     margin-bottom: 6px;
 }
 .detailOther {
-    font-size: 20px;      /* E, F, G */
+    font-size: 20px;
     margin-bottom: 4px;
 }
 #orderDetailButtons {
@@ -556,6 +556,31 @@ async function stopCamera() {
     document.getElementById("cameraBack").style.display="none";
 }
 
+/* ========= ÚJ: fallback ellenőrzés az Excel alapján ========= */
+function isCodeAllowedForTour(k) {
+    // ha már tudjuk, hogy jó, akkor nem kell keresni
+    if (allowedCodes.has(k)) return true;
+
+    // végigmegyünk az egész táblán, csak az aktuális túrát nézzük
+    for (let i = 1; i < data.length; i++) {
+        const row = data[i] || [];
+        const tourValRaw = row[2];
+        const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
+        if (tourVal !== TOUR) continue;
+
+        const aVal = row[0];
+        if (aVal == null || String(aVal).trim() === "") continue;
+
+        const aCode = normalizeCode(aVal);
+        if (aCode === k) {
+            // megtaláltuk → eltesszük az allowedCodes-ba is
+            allowedCodes.add(aCode);
+            return true;
+        }
+    }
+    return false;
+}
+
 /* ===== Beolvasás callback (KAMERA – A oszlop) ===== */
 function onScanSuccess(decodedText) {
     const k = normalizeCode(decodedText);
@@ -564,7 +589,9 @@ function onScanSuccess(decodedText) {
         showAlert("Ezt a kódot már olvasta");
         return;
     }
-    if (!allowedCodes.has(k)) {
+
+    // ÚJ: Excel-alapú ellenőrzés, nem csak allowedCodes
+    if (!isCodeAllowedForTour(k)) {
         showAlert("NEM KELL IDE");
         return;
     }
@@ -693,7 +720,6 @@ document.getElementById('orderDetailMark').addEventListener('click', function(){
     sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
     updateCounter();
 
-    // rendeléslista frissítése, hogy zöldre váltson
     if (document.getElementById('ordersOverlay').style.display === "block") {
         openOrdersOverlay();
     }
