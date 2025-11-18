@@ -106,7 +106,7 @@ button:hover {
     text-align: center;
 }
 
-/* ==== Menü gomb (bal felső sarok) ==== */
+/* Menü gomb */
 #menuBtn {
     position: fixed;
     top: 12px;
@@ -186,7 +186,10 @@ button:hover {
     color: #FFD700;
     text-align: center;
 }
-#manualBox h4 { margin: 6px 0 12px 0; font-size: 22px; }
+#manualBox h4 {
+    margin: 6px 0 12px 0;
+    font-size: 22px;
+}
 #manualBox input {
     width: 100%;
     padding: 12px 10px;
@@ -204,7 +207,11 @@ button:hover {
     gap: 12px;
     justify-content: center;
 }
-#manualButtons button { width: 48%; padding: 12px 0; font-size: 18px; }
+#manualButtons button {
+    width: 48%;
+    padding: 12px 0;
+    font-size: 18px;
+}
 
 /* Rendelések lista modal */
 #ordersOverlay {
@@ -246,9 +253,17 @@ button:hover {
     text-align: center;
     cursor: pointer;
 }
-.orderRow.scanned { color: #00ff00; }
-#ordersButtons { text-align: center; }
-#ordersButtons button { width: 50%; padding: 10px 0; font-size: 18px; }
+.orderRow.scanned {
+    color: #00ff00;
+}
+#ordersButtons {
+    text-align: center;
+}
+#ordersButtons button {
+    width: 50%;
+    padding: 10px 0;
+    font-size: 18px;
+}
 
 /* Egy rendelés részletei modal */
 #orderDetailOverlay {
@@ -383,7 +398,7 @@ button:hover {
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-const TOUR      = "38";
+const TOUR = "38";
 const XLSX_URL  = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
 const SCANNED_KEY = TOUR + "_scannedList";
 const DONE_KEY    = "done_" + TOUR;
@@ -393,8 +408,8 @@ let allowedCodes = new Set();
 let html5QrCode;
 let totalCount = 0;
 let scannedCodes = new Set();
-let manualMap = new Map();
-let orderRows = [];
+let manualMap = new Map();   // D -> [A...]
+let orderRows = [];          // H,D,E,F,G,A
 let currentDetailRow = null;
 
 (function(){
@@ -420,7 +435,7 @@ function showAlert(message) {
     const alertDiv = document.getElementById("alertMessage");
     alertDiv.innerText = message;
     alertDiv.style.display = "block";
-    setTimeout(function(){ alertDiv.style.display = "none"; }, 2000);
+    setTimeout(() => { alertDiv.style.display = "none"; }, 2000);
 }
 
 function updateCounter() {
@@ -428,6 +443,7 @@ function updateCounter() {
         scannedCodes.size + "/" + totalCount;
 }
 
+/* Excel betöltés */
 async function loadExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -494,6 +510,7 @@ async function loadExcel() {
     }
 }
 
+/* Kamera */
 async function startCamera() {
     const reader = document.getElementById("reader");
     reader.style.display="block";
@@ -518,6 +535,29 @@ async function stopCamera() {
     document.getElementById("cameraBack").style.display="none";
 }
 
+/* Fallback ellenőrzés Excel alapján (A oszlop) */
+function isCodeAllowedForTour(k) {
+    if (allowedCodes.has(k)) return true;
+
+    for (let i = 1; i < data.length; i++) {
+        const row = data[i] || [];
+        const tourValRaw = row[2];
+        const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
+        if (tourVal !== TOUR) continue;
+
+        const aVal = row[0];
+        if (aVal == null || String(aVal).trim() === "") continue;
+
+        const aCode = normalizeCode(aVal);
+        if (aCode === k) {
+            allowedCodes.add(aCode);
+            return true;
+        }
+    }
+    return false;
+}
+
+/* Kamera callback – A oszlop */
 function onScanSuccess(decodedText) {
     const k = normalizeCode(decodedText);
 
@@ -525,8 +565,9 @@ function onScanSuccess(decodedText) {
         showAlert("Ezt a kódot már olvasta");
         return;
     }
-    if (!allowedCodes.has(k)) {
-        showAlert("VEDD KI A TÚRÁBÓL!");
+
+    if (!isCodeAllowedForTour(k)) {
+        showAlert("NEM KELL IDE");
         return;
     }
 
@@ -536,6 +577,7 @@ function onScanSuccess(decodedText) {
     stopCamera();
 }
 
+/* Részletek modal */
 function openOrderDetail(row) {
     currentDetailRow = row;
 
@@ -559,25 +601,21 @@ function openOrderDetail(row) {
     overlay.style.display = "block";
 }
 
+/* Rendeléslista */
 function openOrdersOverlay() {
     const overlay = document.getElementById('ordersOverlay');
     const listDiv = document.getElementById('ordersList');
     listDiv.innerHTML = "";
 
     const rows = orderRows.slice();
-    rows.sort(function(r1, r2) {
-        if (r1.dCode < r2.dCode) return -1;
-        if (r1.dCode > r2.dCode) return 1;
-        return 0;
-    });
+    rows.sort((r1, r2) => r1.dCode.localeCompare(r2.dCode));
 
     if (rows.length === 0) {
         const info = document.createElement('div');
         info.textContent = "Nincs rendelés az aktuális túrához.";
         listDiv.appendChild(info);
     } else {
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
+        rows.forEach(row => {
             const rowDiv = document.createElement('div');
             rowDiv.className = "orderRow";
             rowDiv.textContent = row.dCode;
@@ -586,12 +624,9 @@ function openOrdersOverlay() {
                 rowDiv.classList.add("scanned");
             }
 
-            rowDiv.addEventListener('click', (function(r){
-                return function() { openOrderDetail(r); };
-            })(row));
-
+            rowDiv.addEventListener('click', () => openOrderDetail(row));
             listDiv.appendChild(rowDiv);
-        }
+        });
     }
 
     overlay.style.display = "block";
@@ -599,32 +634,30 @@ function openOrdersOverlay() {
 
 /* Menü logika */
 const menuBtn = document.getElementById('menuBtn');
-const menuOverlay = document.getElementById('menuOverlay');
-const manualOverlay = document.getElementById('manualOverlay');
+const menuOverlayDiv = document.getElementById('menuOverlay');
 const manualInput = document.getElementById('manualInput');
-const ordersOverlay = document.getElementById('ordersOverlay');
-const orderDetailOverlay = document.getElementById('orderDetailOverlay');
 
-menuBtn.addEventListener('click', function(){
-    menuOverlay.style.display = 'block';
+menuBtn.addEventListener('click', () => {
+    menuOverlayDiv.style.display = 'block';
 });
-menuOverlay.addEventListener('click', function(e){
-    if (e.target === menuOverlay) menuOverlay.style.display = 'none';
+menuOverlayDiv.addEventListener('click', (e) => {
+    if (e.target === menuOverlayDiv) menuOverlayDiv.style.display = 'none';
 });
 
-document.getElementById('menuOrders').addEventListener('click', function(){
-    menuOverlay.style.display = 'none';
+document.getElementById('menuOrders').addEventListener('click', () => {
+    menuOverlayDiv.style.display = 'none';
     openOrdersOverlay();
 });
-document.getElementById('ordersClose').addEventListener('click', function(){
-    ordersOverlay.style.display = 'none';
+document.getElementById('ordersClose').addEventListener('click', () => {
+    document.getElementById('ordersOverlay').style.display = 'none';
 });
 
-document.getElementById('orderDetailClose').addEventListener('click', function(){
-    orderDetailOverlay.style.display = 'none';
+document.getElementById('orderDetailClose').addEventListener('click', () => {
+    document.getElementById('orderDetailOverlay').style.display = 'none';
 });
 
-document.getElementById('orderDetailMark').addEventListener('click', function(){
+/* KOCSIN VAN */
+document.getElementById('orderDetailMark').addEventListener('click', () => {
     if (!currentDetailRow) return;
 
     const aCode = currentDetailRow.aCode;
@@ -649,17 +682,18 @@ document.getElementById('orderDetailMark').addEventListener('click', function(){
         openOrdersOverlay();
     }
 
-    orderDetailOverlay.style.display = 'none';
+    document.getElementById('orderDetailOverlay').style.display = 'none';
 });
 
-document.getElementById('menuManual').addEventListener('click', function(){
-    menuOverlay.style.display = 'none';
-    manualOverlay.style.display = 'block';
+/* Kézi bevitel */
+document.getElementById('menuManual').addEventListener('click', () => {
+    menuOverlayDiv.style.display = 'none';
+    document.getElementById('manualOverlay').style.display = 'block';
     manualInput.value = "";
     manualInput.focus();
 });
 
-document.getElementById('menuRefresh').addEventListener('click', function(){
+document.getElementById('menuRefresh').addEventListener('click', () => {
     const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot ezen a túrán?");
     if (!ok) return;
 
@@ -669,10 +703,9 @@ document.getElementById('menuRefresh').addEventListener('click', function(){
     scannedCodes = new Set();
     updateCounter();
     showAlert("A túra adatai törölve");
-    menuOverlay.style.display = 'none';
+    menuOverlayDiv.style.display = 'none';
 });
 
-/* Kézi bevitel */
 function processManualCode(raw) {
     const dCode = normalizeCode(raw);
 
@@ -707,23 +740,23 @@ function processManualCode(raw) {
     updateCounter();
 }
 
-document.getElementById('manualCancel').addEventListener('click', function(){
-    manualOverlay.style.display = 'none';
+document.getElementById('manualCancel').addEventListener('click', () => {
+    document.getElementById('manualOverlay').style.display = 'none';
 });
-document.getElementById('manualOk').addEventListener('click', function(){
+document.getElementById('manualOk').addEventListener('click', () => {
     const value = manualInput.value || "";
     processManualCode(value);
-    manualOverlay.style.display = 'none';
+    document.getElementById('manualOverlay').style.display = 'none';
 });
 
-/* Gombok */
+/* Fő gombok */
 document.getElementById("scanButton").addEventListener("click", startCamera);
 
-document.getElementById("cameraBackButton").addEventListener("click", function(){
+document.getElementById("cameraBackButton").addEventListener("click", () => {
     stopCamera();
 });
 
-document.getElementById("finishButton").addEventListener("click", function(){
+document.getElementById("finishButton").addEventListener("click", () => {
     if (scannedCodes.size < totalCount) {
         sessionStorage.removeItem('38_scannedList');
     } else {
@@ -732,7 +765,7 @@ document.getElementById("finishButton").addEventListener("click", function(){
     }
 });
 
-document.getElementById("backButton").addEventListener("click", function(){
+document.getElementById("backButton").addEventListener("click", () => {
     window.location.href="hd.html";
 });
 
