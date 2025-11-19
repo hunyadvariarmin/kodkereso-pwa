@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>36</title>
+<!-- A CSS teljesen ugyanaz, mint a 32.html-ben – másold át onnan változtatás nélkül -->
+<style>
+/* IDE MÁSOLD BE a 32.html-ben lévő <style> teljes tartalmát MÓDOSÍTÁS NÉLKÜL */
+</style>
+</head>
+<body>
+
+<!-- A HTML szerkezet is pont ugyanaz, mint a 32.html-ben – másold át onnan: -->
+
+<button id="menuBtn" aria-label="Menü">☰</button>
+
+<div id="menuOverlay">
+  <div id="sideMenu">
+    <h3>Menü</h3>
+    <div id="menuOrders" class="menuItem">Rendelések</div>
+    <div id="menuManual" class="menuItem">Kézi bevitel</div>
+    <div id="menuRefresh" class="menuItem">Frissít</div>
+  </div>
+</div>
+
+<div id="manualOverlay">
+  <div id="manualBox">
+    <h4>Kézi bevitel</h4>
+    <input type="text" id="manualInput" placeholder="Írja be a kódot..." autocomplete="off">
+    <div id="manualButtons">
+      <button id="manualCancel">Mégse</button>
+      <button id="manualOk">Mentés</button>
+    </div>
+  </div>
+</div>
+
+<div id="ordersOverlay">
+  <div id="ordersBox">
+    <h4>Rendelések</h4>
+    <div id="ordersList"></div>
+    <div id="ordersButtons">
+      <button id="ordersClose">Bezár</button>
+    </div>
+  </div>
+</div>
+
+<div id="orderDetailOverlay">
+  <div id="orderDetailBox">
+    <h4>Rendelés adatai</h4>
+    <div id="orderDetailContent"></div>
+    <div id="orderDetailButtons">
+      <button id="orderDetailClose">Bezár</button>
+      <button id="orderDetailMark">KOCSIN VAN</button>
+    </div>
+  </div>
+</div>
+
+<div id="reader"></div>
+<div id="centerResult">0/0</div>
+
+<div id="overlay">
+    <button id="scanButton">Kód beolvasása</button>
+</div>
+
+<div id="bottomButtons">
+    <button id="finishButton">Árukiadás befejezése</button>
+    <button id="backButton">Vissza</button>
+</div>
+
+<div id="cameraBack">
+    <button id="cameraBackButton">Vissza</button>
+</div>
+
+<div id="alertMessage"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+const TOUR = "36";
+const XLSX_URL  = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+const SCANNED_KEY = TOUR + "_scannedList";
+const DONE_KEY    = "done_" + TOUR;
+
+let data = [];
+let allowedCodes = new Set();
+let html5QrCode;
+let totalCount = 0;
+let scannedCodes = new Set();
+let manualMap = new Map();   // D -> [A...]
+let orderRows = [];          // H,D,E,F,G,A
+let currentDetailRow = null;
+
+(function(){
+    const saved = sessionStorage.getItem(SCANNED_KEY);
+    if (saved) {
+        try { scannedCodes = new Set(JSON.parse(saved)); }
+        catch(e){ scannedCodes = new Set(); }
+    }
+})();
+
+function normalizeCode(str) {
+    if(!str) return "";
+    let s = String(str).trim().toUpperCase()
+        .replace(/\s+/g,'')
+        .replace(/[‐-–—−]/g,'-')
+        .replace(/\\/g,'/')
+        .replace(/[^A-Z0-9\-\/]/g,'');
+    if (/^\d+\.0$/.test(s)) s = s.replace(/\.0$/,'');
+    return s;
+}
+
+function showAlert(message) {
+    const alertDiv = document.getElementById("alertMessage");
+    alertDiv.innerText = message;
+    alertDiv.style.display = "block";
+    setTimeout(() => { alertDiv.style.display = "none"; }, 2000);
+}
+
+function updateCounter() {
+    document.getElementById("centerResult").innerText =
+        scannedCodes.size + "/" + totalCount;
+}
+
+/* Excel betöltés */
+async function loadExcel() {
+    try {
+        const resp = await fetch(XLSX_URL);
+        const buffer = await resp.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        allowedCodes.clear();
+        manualMap.clear();
+        orderRows = [];
+
+        for (let i = 1; i < data.length; i++) {
+            const row = data[i] || [];
+            const tourValRaw = row[2];
+            const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
+
+            if (tourVal === TOUR) {
+                const aVal    = row[0];
+                const dVal    = row[3];
+                const eValRaw = row[4];
+                const fValRaw = row[5];
+                const gValRaw = row[6];
+                const hValRaw = row[7];
+
+                let aCode = null;
+                if (aVal != null && String(aVal).trim() !== "") {
+                    aCode = normalizeCode(aVal);
+                    if (aCode) allowedCodes.add(aCode);
+                }
+
+                let dCode = null;
+                if (dVal != null && String(dVal).trim() !== "") {
+                    dCode = normalizeCode(dVal);
+                    if (dCode) {
+                        if (!manualMap.has(dCode)) {
+                            manualMap.set(dCode, []);
+                        }
+                        manualMap.get(dCode).push(aCode);
+                    }
+                }
+
+                if (dCode) {
+                    const eVal = eValRaw != null ? String(eValRaw).trim() : "";
+                    const fVal = fValRaw != null ? String(fValRaw).trim() : "";
+                    const gVal = gValRaw != null ? String(gValRaw).trim() : "";
+                    const hVal = hValRaw != null ? String(hValRaw).trim() : "";
+                    orderRows.push({
+                        dCode: dCode,
+                        aCode: aCode,
+                        eVal: eVal,
+                        fVal: fVal,
+                        gVal: gVal,
+                        hVal: hVal
+                    });
+                }
+            }
+        }
+
+        totalCount = allowedCodes.size;
+        updateCounter();
+    } catch(e){
+        console.error("Excel betöltési hiba:", e);
+    }
+}
+
+/* Kamera */
+async function startCamera() {
+    const reader = document.getElementById("reader");
+    reader.style.display="block";
+    document.getElementById("overlay").style.display="none";
+    document.getElementById("cameraBack").style.display="block";
+    if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+    await html5QrCode.start(
+        {facingMode:"environment"},
+        {fps:10, qrbox:null},
+        onScanSuccess
+    );
+}
+
+async function stopCamera() {
+    if(html5QrCode) {
+        try { await html5QrCode.stop(); } catch(e){}
+        html5QrCode.clear();
+        html5QrCode = null;
+    }
+    document.getElementById("reader").style.display="none";
+    document.getElementById("overlay").style.display="block";
+    document.getElementById("cameraBack").style.display="none";
+}
+
+/* Fallback ellenőrzés Excel alapján (A oszlop) */
+function isCodeAllowedForTour(k) {
+    if (allowedCodes.has(k)) return true;
+
+    for (let i = 1; i < data.length; i++) {
+        const row = data[i] || [];
+        const tourValRaw = row[2];
+        const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
+        if (tourVal !== TOUR) continue;
+
+        const aVal = row[0];
+        if (aVal == null || String(aVal).trim() === "") continue;
+
+        const aCode = normalizeCode(aVal);
+        if (aCode === k) {
+            allowedCodes.add(aCode);
+            return true;
+        }
+    }
+    return false;
+}
+
+/* Kamera callback – A oszlop */
+function onScanSuccess(decodedText) {
+    const k = normalizeCode(decodedText);
+
+    if (scannedCodes.has(k)) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+
+    if (!isCodeAllowedForTour(k)) {
+        showAlert("NEM KELL IDE");
+        return;
+    }
+
+    scannedCodes.add(k);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
+    updateCounter();
+    stopCamera();
+}
+
+/* Részletek modal */
+function openOrderDetail(row) {
+    currentDetailRow = row;
+
+    const overlay = document.getElementById('orderDetailOverlay');
+    const content = document.getElementById('orderDetailContent');
+
+    const h = row.hVal || "";
+    const d = row.dCode || "";
+    const e = row.eVal || "";
+    const f = row.fVal || "";
+    const g = row.gVal || "";
+
+    const html =
+        '<div class="detailH">' + h + '</div>' +
+        '<div class="detailD">' + d + '</div>' +
+        '<div class="detailOther">' + e + '</div>' +
+        '<div class="detailOther">' + f + '</div>' +
+        '<div class="detailOther">' + g + '</div>';
+
+    content.innerHTML = html;
+    overlay.style.display = "block";
+}
+
+/* Rendeléslista */
+function openOrdersOverlay() {
+    const overlay = document.getElementById('ordersOverlay');
+    const listDiv = document.getElementById('ordersList');
+    listDiv.innerHTML = "";
+
+    const rows = orderRows.slice();
+    rows.sort((r1, r2) => r1.dCode.localeCompare(r2.dCode));
+
+    if (rows.length === 0) {
+        const info = document.createElement('div');
+        info.textContent = "Nincs rendelés az aktuális túrához.";
+        listDiv.appendChild(info);
+    } else {
+        rows.forEach(row => {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = "orderRow";
+            rowDiv.textContent = row.dCode;
+
+            if (row.aCode && scannedCodes.has(row.aCode)) {
+                rowDiv.classList.add("scanned");
+            }
+
+            rowDiv.addEventListener('click', () => openOrderDetail(row));
+            listDiv.appendChild(rowDiv);
+        });
+    }
+
+    overlay.style.display = "block";
+}
+
+/* Menü logika */
+const menuBtn = document.getElementById('menuBtn');
+const menuOverlayDiv = document.getElementById('menuOverlay');
+const manualInput = document.getElementById('manualInput');
+
+menuBtn.addEventListener('click', () => {
+    menuOverlayDiv.style.display = 'block';
+});
+menuOverlayDiv.addEventListener('click', (e) => {
+    if (e.target === menuOverlayDiv) menuOverlayDiv.style.display = 'none';
+});
+
+document.getElementById('menuOrders').addEventListener('click', () => {
+    menuOverlayDiv.style.display = 'none';
+    openOrdersOverlay();
+});
+document.getElementById('ordersClose').addEventListener('click', () => {
+    document.getElementById('ordersOverlay').style.display = 'none';
+});
+
+document.getElementById('orderDetailClose').addEventListener('click', () => {
+    document.getElementById('orderDetailOverlay').style.display = 'none';
+});
+
+/* KOCSIN VAN */
+document.getElementById('orderDetailMark').addEventListener('click', () => {
+    if (!currentDetailRow) return;
+
+    const aCode = currentDetailRow.aCode;
+    if (!aCode) {
+        showAlert("Ehhez a rendeléshez nincs csomagszám (A oszlop).");
+        return;
+    }
+
+    if (scannedCodes.has(aCode)) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+
+    const ok = confirm("Biztosan jelölöd, mintha be lett volna olvasva?");
+    if (!ok) return;
+
+    scannedCodes.add(aCode);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
+    updateCounter();
+
+    if (document.getElementById('ordersOverlay').style.display === "block") {
+        openOrdersOverlay();
+    }
+
+    document.getElementById('orderDetailOverlay').style.display = 'none';
+});
+
+/* Kézi bevitel */
+document.getElementById('menuManual').addEventListener('click', () => {
+    menuOverlayDiv.style.display = 'none';
+    document.getElementById('manualOverlay').style.display = 'block';
+    manualInput.value = "";
+    manualInput.focus();
+});
+
+document.getElementById('menuRefresh').addEventListener('click', () => {
+    const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot ezen a túrán?");
+    if (!ok) return;
+
+    localStorage.removeItem(DONE_KEY);
+    sessionStorage.removeItem(SCANNED_KEY);
+
+    scannedCodes = new Set();
+    updateCounter();
+    showAlert("A túra adatai törölve");
+    menuOverlayDiv.style.display = 'none';
+});
+
+function processManualCode(raw) {
+    const dCode = normalizeCode(raw);
+
+    if (!dCode) {
+        showAlert("Üres kód!");
+        return;
+    }
+
+    const aList = manualMap.get(dCode);
+    if (!aList || aList.length === 0) {
+        showAlert("VEDD KI A TÚRÁBÓL!");
+        return;
+    }
+
+    let aToSave = null;
+    for (let i = 0; i < aList.length; i++) {
+        const aCode = aList[i];
+        if (!aCode) continue;
+        if (!scannedCodes.has(aCode)) {
+            aToSave = aCode;
+            break;
+        }
+    }
+
+    if (!aToSave) {
+        showAlert("Ezt a kódot már olvasta");
+        return;
+    }
+
+    scannedCodes.add(aToSave);
+    sessionStorage.setItem(SCANNED_KEY, JSON.stringify(Array.from(scannedCodes)));
+    updateCounter();
+}
+
+document.getElementById('manualCancel').addEventListener('click', () => {
+    document.getElementById('manualOverlay').style.display = 'none';
+});
+document.getElementById('manualOk').addEventListener('click', () => {
+    const value = manualInput.value || "";
+    processManualCode(value);
+    document.getElementById('manualOverlay').style.display = 'none';
+});
+
+/* Fő gombok */
+document.getElementById("scanButton").addEventListener("click", startCamera);
+
+document.getElementById("cameraBackButton").addEventListener("click", () => {
+    stopCamera();
+});
+
+document.getElementById("finishButton").addEventListener("click", () => {
+    if (scannedCodes.size < totalCount) {
+        sessionStorage.removeItem('36_scannedList');
+    } else {
+        localStorage.setItem('done_36', 'true');
+        window.location.href = "hd.html?done=1&code=36";
+    }
+});
+
+document.getElementById("backButton").addEventListener("click", () => {
+    window.location.href="hd.html";
+});
+
+loadExcel();
+</script>
+
+</body>
+</html>
