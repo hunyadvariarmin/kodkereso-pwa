@@ -45,6 +45,12 @@ button:hover {
     transform: scale(1.05);
 }
 
+/* Ideiglenes kisebb gombok a 32 és 36 kódhoz */
+button.temp-small {
+    padding:12px;
+    font-size:18px;
+}
+
 /* Alsó gombsor: Vissza + Frissít */
 #bottomActions {
     position:absolute;
@@ -77,6 +83,9 @@ button:hover {
     <button data-code="38" onclick="window.location.href='38.html'">38</button>
     <button data-code="24" onclick="window.location.href='24.html'">24</button>
     <button data-code="25" onclick="window.location.href='25.html'">25</button>
+    <!-- ÚJ: kisebb, ideiglenes 32-es és 36-os gomb egymás mellett -->
+    <button data-code="32" onclick="window.location.href='32.html'" class="temp-small">32</button>
+    <button data-code="36" onclick="window.location.href='36.html'" class="temp-small">36</button>
     <button data-code="2"  onclick="window.location.href='2.html'">2</button>
 </div>
 
@@ -96,7 +105,9 @@ const DONE_MAP = {
     "38": "done_38",
     "24": "done_24",
     "25": "done_25",
-    "2":  "done_2"
+    "2":  "done_2",
+    "32": "done_32",  // ÚJ
+    "36": "done_36"   // ÚJ
 };
 
 // a szám oldalak sessionStorage kulcsai (beolvasott kódok listája)
@@ -109,7 +120,9 @@ const SCAN_KEYS = [
     "38_scannedList",
     "24_scannedList",
     "25_scannedList",
-    "2_scannedList"
+    "2_scannedList",
+    "32_scannedList", // ÚJ
+    "36_scannedList"  // ÚJ
 ];
 
 // eredeti gombstílus visszaállítása
