@@ -94,7 +94,13 @@ button.temp-small {
     <button id="refreshButton">Frissít</button>
 </div>
 
+<!-- XLSX könyvtár az Excel beolvasásához -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 <script>
+// Excel fájl helye
+const XLSX_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+
 // melyik gombhoz melyik localStorage kulcs tartozik (zöld jelölés)
 const DONE_MAP = {
     "1":  "done_1",
@@ -125,7 +131,7 @@ const SCAN_KEYS = [
     "36_scannedList"
 ];
 
-// DINAMIKUS gombok: csak akkor látszanak, ha van beolvasott adat
+// DINAMIKUS gombok: csak akkor látszanak, ha az Excelben van ilyen túra a C oszlopban
 // (1, 11, 32, 36)
 const DYNAMIC_CODES = ["1", "11", "32", "36"];
 
@@ -155,38 +161,52 @@ function applyDoneStyles() {
     });
 }
 
-// dinamikus gombok elrejtése, ha nincs beolvasott adat
-function updateDynamicButtonsVisibility() {
-    DYNAMIC_CODES.forEach(code => {
-        const btn = document.querySelector(`button[data-code="${code}"]`);
-        if (!btn) return;
+// Excel alapján frissítjük a dinamikus gombok láthatóságát
+async function updateDynamicButtonsVisibilityFromExcel() {
+    try {
+        const resp = await fetch(XLSX_URL);
+        const buffer = await resp.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-        const key = code + "_scannedList";
-        const saved = sessionStorage.getItem(key);
+        const toursFound = new Set();
 
-        if (!saved) {
-            btn.style.display = "none";
-            return;
-        }
-
-        try {
-            const arr = JSON.parse(saved);
-            if (!Array.isArray(arr) || arr.length === 0) {
-                btn.style.display = "none";
-            } else {
-                // van beolvasott adat -> jelenjen meg
-                btn.style.display = "";
+        // C oszlop = index 2
+        for (let i = 1; i < data.length; i++) {
+            const row = data[i] || [];
+            const val = row[2];
+            if (val != null && String(val).trim() !== "") {
+                toursFound.add(String(val).trim());
             }
-        } catch(e) {
-            btn.style.display = "none";
         }
-    });
+
+        DYNAMIC_CODES.forEach(code => {
+            const btn = document.querySelector(`button[data-code="${code}"]`);
+            if (!btn) return;
+
+            if (toursFound.has(code)) {
+                // van legalább egy sor ebben a túrában → jelenjen meg
+                btn.style.display = "";
+            } else {
+                // nincs adat az Excelben erre a túrára → tűnjön el
+                btn.style.display = "none";
+            }
+        });
+    } catch (e) {
+        console.error("Excel betöltési hiba a HD oldalon:", e);
+        // Ha bármi gond van az Excel-lel, inkább ne tüntessük el a gombokat:
+        DYNAMIC_CODES.forEach(code => {
+            const btn = document.querySelector(`button[data-code="${code}"]`);
+            if (btn) btn.style.display = "";
+        });
+    }
 }
 
 // oldal betöltésekor
 window.addEventListener("DOMContentLoaded", () => {
     applyDoneStyles();
-    updateDynamicButtonsVisibility();
+    updateDynamicButtonsVisibilityFromExcel();
 
     // Vissza gomb -> Árukiadás oldal
     document.getElementById("backButton").addEventListener("click", () => {
@@ -209,7 +229,9 @@ window.addEventListener("DOMContentLoaded", () => {
         });
 
         applyDoneStyles();
-        updateDynamicButtonsVisibility(); // dinamikus gombok tűnjenek el
+        // Excel nem változik a Frissít gombtól, ezért a láthatóság logikája ugyanaz marad,
+        // de ha biztosra akarsz menni, újra is hívhatod:
+        // updateDynamicButtonsVisibilityFromExcel();
     });
 });
 </script>
