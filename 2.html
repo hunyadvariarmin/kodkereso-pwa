@@ -17,6 +17,18 @@ html, body {
     overflow: hidden;
 }
 
+/* Felső túra felirat */
+#tourTitle {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: bold;
+    color: #FFD700;
+    z-index: 4;
+}
+
 /* Kamera nézet */
 #reader {
     position: fixed; top:0; left:0; width:100vw; height:100vh;
@@ -95,9 +107,8 @@ button:hover {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.6);
-    display: none;           /* alapból rejtve */
-    z-index: 9;
     display: none;
+    z-index: 9;
     align-items: center;
     justify-content: center;
 }
@@ -178,7 +189,7 @@ button:hover {
     cursor: pointer;
 }
 .menuItem:hover {
-    background: rgba(255,215,0,0.15);
+    background: rgba(255,2150,0,0.15);
     transform: scale(1.02);
 }
 /* Frissít gomb le az aljára */
@@ -355,6 +366,9 @@ button:hover {
 <!-- Menü gomb -->
 <button id="menuBtn" aria-label="Menü">☰</button>
 
+<!-- Felső túra felirat -->
+<div id="tourTitle"></div>
+
 <!-- Oldalsó menü -->
 <div id="menuOverlay">
   <div id="sideMenu">
@@ -380,7 +394,7 @@ button:hover {
 <!-- Rendelések lista modal -->
 <div id="ordersOverlay">
   <div id="ordersBox">
-    <h4>Rendelések</h4>
+    <h4 id="ordersTitle">Rendelések</h4>
     <div id="ordersList"></div>
     <div id="ordersButtons">
       <button id="ordersClose">Bezár</button>
@@ -391,7 +405,7 @@ button:hover {
 <!-- Egy rendelés részletei modal -->
 <div id="orderDetailOverlay">
   <div id="orderDetailBox">
-    <h4>Rendelés adatai</h4>
+    <h4 id="orderDetailTitle">Rendelés adatai</h4>
     <div id="orderDetailContent"></div>
     <div id="orderDetailButtons">
       <button id="orderDetailClose">Bezár</button>
@@ -431,6 +445,7 @@ button:hover {
 <script>
 /* ===== Oldalspecifikus konstansok ===== */
 const TOUR = "2";
+const TOUR_LABEL = TOUR + "-es túra";  // pl.: "2-es túra"
 const XLSX_URL    = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
 const SCANNED_KEY = TOUR + "_scannedList";
 const DONE_KEY    = "done_" + TOUR;
@@ -444,6 +459,9 @@ let scannedCodes = new Set();
 let manualMap = new Map();   // D kód -> A kód(ok) listája
 let orderRows = [];          // minden sor H,D,E,F,G,A adatokkal
 let currentDetailRow = null; // éppen megnyitott rendelés
+
+/* Felső túrafelirat beállítása */
+document.getElementById("tourTitle").innerText = TOUR_LABEL;
 
 /* Beolvasottak visszatöltése */
 (function(){
@@ -614,6 +632,10 @@ function openOrderDetail(row) {
     const overlay = document.getElementById('orderDetailOverlay');
     const content = document.getElementById('orderDetailContent');
 
+    // cím frissítése: melyik túra + szöveg
+    document.getElementById('orderDetailTitle').textContent =
+        TOUR_LABEL + " - Rendelés adatai";
+
     const h = row.hVal || "";
     const d = row.dCode || "";
     const e = row.eVal || "";
@@ -636,6 +658,10 @@ function openOrdersOverlay() {
     const overlay = document.getElementById('ordersOverlay');
     const listDiv = document.getElementById('ordersList');
     listDiv.innerHTML = "";
+
+    // cím frissítése: melyik túra + szöveg
+    document.getElementById('ordersTitle').textContent =
+        TOUR_LABEL + " - Rendelések";
 
     const rows = orderRows.slice();
     rows.sort(function(r1, r2) {
