@@ -83,7 +83,7 @@ button.temp-small {
     <button data-code="38" onclick="window.location.href='38.html'">38</button>
     <button data-code="24" onclick="window.location.href='24.html'">24</button>
     <button data-code="25" onclick="window.location.href='25.html'">25</button>
-    <!-- ÚJ: kisebb, ideiglenes 32-es és 36-os gomb egymás mellett -->
+    <!-- 32 és 36: kisebb gombok -->
     <button data-code="32" onclick="window.location.href='32.html'" class="temp-small">32</button>
     <button data-code="36" onclick="window.location.href='36.html'" class="temp-small">36</button>
     <button data-code="2"  onclick="window.location.href='2.html'">2</button>
@@ -106,8 +106,8 @@ const DONE_MAP = {
     "24": "done_24",
     "25": "done_25",
     "2":  "done_2",
-    "32": "done_32",  // ÚJ
-    "36": "done_36"   // ÚJ
+    "32": "done_32",
+    "36": "done_36"
 };
 
 // a szám oldalak sessionStorage kulcsai (beolvasott kódok listája)
@@ -121,9 +121,13 @@ const SCAN_KEYS = [
     "24_scannedList",
     "25_scannedList",
     "2_scannedList",
-    "32_scannedList", // ÚJ
-    "36_scannedList"  // ÚJ
+    "32_scannedList",
+    "36_scannedList"
 ];
+
+// DINAMIKUS gombok: csak akkor látszanak, ha van beolvasott adat
+// (1, 11, 32, 36)
+const DYNAMIC_CODES = ["1", "11", "32", "36"];
 
 // eredeti gombstílus visszaállítása
 function resetButtonStyles() {
@@ -151,9 +155,38 @@ function applyDoneStyles() {
     });
 }
 
+// dinamikus gombok elrejtése, ha nincs beolvasott adat
+function updateDynamicButtonsVisibility() {
+    DYNAMIC_CODES.forEach(code => {
+        const btn = document.querySelector(`button[data-code="${code}"]`);
+        if (!btn) return;
+
+        const key = code + "_scannedList";
+        const saved = sessionStorage.getItem(key);
+
+        if (!saved) {
+            btn.style.display = "none";
+            return;
+        }
+
+        try {
+            const arr = JSON.parse(saved);
+            if (!Array.isArray(arr) || arr.length === 0) {
+                btn.style.display = "none";
+            } else {
+                // van beolvasott adat -> jelenjen meg
+                btn.style.display = "";
+            }
+        } catch(e) {
+            btn.style.display = "none";
+        }
+    });
+}
+
 // oldal betöltésekor
 window.addEventListener("DOMContentLoaded", () => {
     applyDoneStyles();
+    updateDynamicButtonsVisibility();
 
     // Vissza gomb -> Árukiadás oldal
     document.getElementById("backButton").addEventListener("click", () => {
@@ -176,6 +209,7 @@ window.addEventListener("DOMContentLoaded", () => {
         });
 
         applyDoneStyles();
+        updateDynamicButtonsVisibility(); // dinamikus gombok tűnjenek el
     });
 });
 </script>
