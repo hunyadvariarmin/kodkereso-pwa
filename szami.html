@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Szami</title>
+<title>Számít túrák</title>
 <style>
 html, body {
     margin:0;
@@ -45,7 +45,7 @@ button:hover {
     transform: scale(1.05);
 }
 
-/* Ideiglenes kisebb gombokhoz */
+/* Ideiglenes kisebb gombok (1000, 2, 4, 0, 7, 9, 10, 101) */
 button.temp-small {
     padding:12px;
     font-size:18px;
@@ -75,7 +75,40 @@ button.temp-small {
 <body>
 
 <div id="buttonsContainer">
-    <!-- A gombokat JS fogja dinamikusan létrehozni -->
+    <!-- KISEBB gombok -->
+    <button data-code="SZ-1000" class="temp-small" onclick="window.location.href='SZ-1000.html'">SZ-1000</button>
+    <button data-code="SZ-2"    class="temp-small" onclick="window.location.href='SZ-2.html'">SZ-2</button>
+    <button data-code="SZ-4"    class="temp-small" onclick="window.location.href='SZ-4.html'">SZ-4</button>
+    <button data-code="SZ-0"    class="temp-small" onclick="window.location.href='SZ-0.html'">SZ-0</button>
+    <button data-code="SZ-7"    class="temp-small" onclick="window.location.href='SZ-7.html'">SZ-7</button>
+    <button data-code="SZ-9"    class="temp-small" onclick="window.location.href='SZ-9.html'>SZ-9</button>
+    <button data-code="SZ-10"   class="temp-small" onclick="window.location.href='SZ-10.html'">SZ-10</button>
+    <button data-code="SZ-101"  class="temp-small" onclick="window.location.href='SZ-101.html'">SZ-101</button>
+
+    <!-- NORMÁL gombok -->
+    <button data-code="SZ-1"   onclick="window.location.href='SZ-1.html'">SZ-1</button>
+    <button data-code="SZ-5"   onclick="window.location.href='SZ-5.html'">SZ-5</button>
+    <button data-code="SZ-12"  onclick="window.location.href='SZ-12.html'">SZ-12</button>
+    <button data-code="SZ-14"  onclick="window.location.href='SZ-14.html'">SZ-14</button>
+    <button data-code="SZ-15"  onclick="window.location.href='SZ-15.html'">SZ-15</button>
+    <button data-code="SZ-18"  onclick="window.location.href='SZ-18.html'">SZ-18</button>
+    <button data-code="SZ-19"  onclick="window.location.href='SZ-19.html'">SZ-19</button>
+    <button data-code="SZ-20"  onclick="window.location.href='SZ-20.html'">SZ-20</button>
+    <button data-code="SZ-21"  onclick="window.location.href='SZ-21.html'">SZ-21</button>
+    <button data-code="SZ-22"  onclick="window.location.href='SZ-22.html'">SZ-22</button>
+    <button data-code="SZ-23"  onclick="window.location.href='SZ-23.html'">SZ-23</button>
+    <button data-code="SZ-25"  onclick="window.location.href='SZ-25.html'">SZ-25</button>
+    <button data-code="SZ-27"  onclick="window.location.href='SZ-27.html'">SZ-27</button>
+    <button data-code="SZ-28"  onclick="window.location.href='SZ-28.html'">SZ-28</button>
+    <button data-code="SZ-29"  onclick="window.location.href='SZ-29.html'">SZ-29</button>
+    <button data-code="SZ-30"  onclick="window.location.href='SZ-30.html'">SZ-30</button>
+    <button data-code="SZ-32"  onclick="window.location.href='SZ-32.html'">SZ-32</button>
+    <button data-code="SZ-33"  onclick="window.location.href='SZ-33.html'">SZ-33</button>
+    <button data-code="SZ-34"  onclick="window.location.href='SZ-34.html'">SZ-34</button>
+    <button data-code="SZ-36"  onclick="window.location.href='SZ-36.html'">SZ-36</button>
+    <button data-code="SZ-37"  onclick="window.location.href='SZ-37.html'">SZ-37</button>
+    <button data-code="SZ-38"  onclick="window.location.href='SZ-38.html'">SZ-38</button>
+    <button data-code="SZ-135" onclick="window.location.href='SZ-135.html'">SZ-135</button>
 </div>
 
 <div id="bottomActions">
@@ -83,77 +116,50 @@ button.temp-small {
     <button id="refreshButton">Frissít</button>
 </div>
 
-<script>
-// Kisebb (ideiglenes) gombok kódjai
-const SMALL_CODES = ["1000","2","4","0","7","9","10","101"];
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-// Normál méretű gombok kódjai
-const NORMAL_CODES = [
-    "1","5","9","12","14","15","18","19","20","21","22","23",
-    "25","27","28","29","30","32","33","34","36","37","38","135"
+<script>
+// Excel fájl
+const XLSX_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+
+// DONE jelölések – SZ oldalak helyi kulcsai (a SZ-*.html-ben így állítottuk be: done_SZ-x)
+const DONE_KEYS = [
+  "done_SZ-1000","done_SZ-2","done_SZ-4","done_SZ-0","done_SZ-7","done_SZ-9",
+  "done_SZ-10","done_SZ-101","done_SZ-1","done_SZ-5","done_SZ-12","done_SZ-14",
+  "done_SZ-15","done_SZ-18","done_SZ-19","done_SZ-20","done_SZ-21","done_SZ-22",
+  "done_SZ-23","done_SZ-25","done_SZ-27","done_SZ-28","done_SZ-29","done_SZ-30",
+  "done_SZ-32","done_SZ-33","done_SZ-34","done_SZ-36","done_SZ-37","done_SZ-38",
+  "done_SZ-135"
 ];
 
-// Összes egyedi kód
-const ALL_CODES = Array.from(new Set([...SMALL_CODES, ...NORMAL_CODES]));
+// Scanned kulcsok törléshez (a SZ-*.html oldalakon: TOUR_ID + "_scannedList")
+const SCAN_KEYS = [
+  "SZ-1000_scannedList","SZ-2_scannedList","SZ-4_scannedList","SZ-0_scannedList",
+  "SZ-7_scannedList","SZ-9_scannedList","SZ-10_scannedList","SZ-101_scannedList",
+  "SZ-1_scannedList","SZ-5_scannedList","SZ-12_scannedList","SZ-14_scannedList",
+  "SZ-15_scannedList","SZ-18_scannedList","SZ-19_scannedList","SZ-20_scannedList",
+  "SZ-21_scannedList","SZ-22_scannedList","SZ-23_scannedList","SZ-25_scannedList",
+  "SZ-27_scannedList","SZ-28_scannedList","SZ-29_scannedList","SZ-30_scannedList",
+  "SZ-32_scannedList","SZ-33_scannedList","SZ-34_scannedList","SZ-36_scannedList",
+  "SZ-37_scannedList","SZ-38_scannedList","SZ-135_scannedList"
+];
 
-// melyik gombhoz melyik localStorage kulcs tartozik (zöld jelölés)
-const DONE_MAP = {
-    "1000": "done_1000",
-    "2":    "done_2",
-    "4":    "done_4",
-    "0":    "done_0",
-    "7":    "done_7",
-    "9":    "done_9",
-    "10":   "done_10",
-    "101":  "done_101",
-
-    "1":   "done_1",
-    "5":   "done_5",
-    "12":  "done_12",
-    "14":  "done_14",
-    "15":  "done_15",
-    "18":  "done_18",
-    "19":  "done_19",
-    "20":  "done_20",
-    "21":  "done_21",
-    "22":  "done_22",
-    "23":  "done_23",
-    "25":  "done_25",
-    "27":  "done_27",
-    "28":  "done_28",
-    "29":  "done_29",
-    "30":  "done_30",
-    "32":  "done_32",
-    "33":  "done_33",
-    "34":  "done_34",
-    "36":  "done_36",
-    "37":  "done_37",
-    "38":  "done_38",
-    "135": "done_135"
-};
-
-// a szám oldalak sessionStorage kulcsai (beolvasott kódok listája)
-const SCAN_KEYS = ALL_CODES.map(code => code + "_scannedList");
-
-// eredeti gombstílus visszaállítása
-function resetButtonStyles() {
+/* Zöld jelölés (DONE) */
+function applyDoneStyles() {
     const buttons = document.querySelectorAll('#buttonsContainer button');
     buttons.forEach(btn => {
         btn.style.backgroundColor = "rgba(0,0,0,0.4)";
         btn.style.borderColor = "#FFD700";
         btn.style.color = "#FFD700";
     });
-}
 
-// zöld jelölések alkalmazása
-function applyDoneStyles() {
-    resetButtonStyles();
-
-    Object.entries(DONE_MAP).forEach(([label, key]) => {
+    DONE_KEYS.forEach(key => {
         if (localStorage.getItem(key) === "true") {
-            const btn = document.querySelector(`button[data-code="${label}"]`);
+            // key pl. done_SZ-2 -> kinyerjük a kódot: SZ-2
+            const code = key.replace("done_","");
+            const btn = document.querySelector(`button[data-code="${code}"]`);
             if (btn) {
-                btn.style.backgroundColor = "rgba(0,128,0,0.7)"; // zöld háttér
+                btn.style.backgroundColor = "rgba(0,128,0,0.7)";
                 btn.style.borderColor = "#00ff00";
                 btn.style.color = "#ffffff";
             }
@@ -161,70 +167,83 @@ function applyDoneStyles() {
     });
 }
 
-// Gombok dinamikus létrehozása – csak azoknak, ahol van beolvasott adat
-function buildButtons() {
-    const container = document.getElementById("buttonsContainer");
-    container.innerHTML = ""; // biztos ami biztos, ürítjük
+/* Excel alapján: csak azok az SZ-gombok látszanak, amikhez van SZ-8xx sor a C oszlopban */
+async function updateButtonsVisibilityFromExcel() {
+    try {
+        const resp = await fetch(XLSX_URL);
+        const buffer = await resp.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    ALL_CODES.forEach(code => {
-        const key = code + "_scannedList";
-        const saved = sessionStorage.getItem(key);
-        if (!saved) return; // nincs ilyen kulcs -> nincs gomb
+        const toursFound = new Set();
 
-        let arr;
-        try {
-            arr = JSON.parse(saved);
-        } catch(e){
-            return; // hibás adat -> inkább ne jelenjen meg
+        // C oszlop (index 2) – C-ben vannak a túrakódok (pl. "SZ-802")
+        for (let i = 1; i < data.length; i++) {
+            const row = data[i] || [];
+            const val = row[2];
+            if (val != null && String(val).trim() !== "") {
+                const norm = String(val).trim().toUpperCase();
+                toursFound.add(norm);
+            }
         }
 
-        if (!Array.isArray(arr) || arr.length === 0) return; // üres lista -> ne legyen gomb
+        const buttons = document.querySelectorAll('#buttonsContainer button');
+        buttons.forEach(btn => {
+            const code = btn.getAttribute("data-code"); // pl. "SZ-2"
+            if (!code) return;
 
-        const btn = document.createElement("button");
-        btn.dataset.code = code;
-        btn.textContent = code;
+            // Kivesszük az alap számot: "SZ-2" -> 2
+            const upper = code.toUpperCase();
+            const basePart = upper.replace("SZ-",""); // pl. "2"
+            const baseNum = parseInt(basePart, 10);
 
-        if (SMALL_CODES.includes(code)) {
-            btn.classList.add("temp-small");
-        }
+            if (isNaN(baseNum)) {
+                // ha nem számmal végződik, akkor nem számolunk hozzá 800-at
+                btn.style.display = "none";
+                return;
+            }
 
-        btn.addEventListener("click", () => {
-            window.location.href = code + ".html";
+            // Excelben keresett kód: SZ-(800 + baseNum), pl. 2 -> "SZ-802"
+            const excelTour = "SZ-" + (800 + baseNum);
+            const excelTourUpper = excelTour.toUpperCase();
+
+            if (toursFound.has(excelTourUpper)) {
+                btn.style.display = "";
+            } else {
+                btn.style.display = "none";
+            }
         });
 
-        container.appendChild(btn);
-    });
+    } catch (e) {
+        console.error("Excel betöltési hiba a Szami oldalon:", e);
+        // Ha hiba van, inkább mutassuk az összes gombot
+        const buttons = document.querySelectorAll('#buttonsContainer button');
+        buttons.forEach(btn => {
+            btn.style.display = "";
+        });
+    }
 }
 
-// oldal betöltésekor
 window.addEventListener("DOMContentLoaded", () => {
-    // csak azokhoz csinál gombot, ahol van beolvasott adat
-    buildButtons();
-    // utána zöldre színezzük, ha done_... true
     applyDoneStyles();
+    updateButtonsVisibilityFromExcel();
 
-    // Vissza gomb -> Árukiadás oldal
     document.getElementById("backButton").addEventListener("click", () => {
         window.location.href = "arukiadas.html";
     });
 
-    // Frissít gomb -> megerősítés + minden done_* és *_scannedList törlése + gombok eltüntetése
     document.getElementById("refreshButton").addEventListener("click", () => {
         const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot?");
         if (!ok) return;
 
-        // zöld jelölések törlése
-        Object.values(DONE_MAP).forEach(key => {
-            localStorage.removeItem(key);
-        });
+        DONE_KEYS.forEach(k => localStorage.removeItem(k));
+        SCAN_KEYS.forEach(k => sessionStorage.removeItem(k));
 
-        // beolvasott listák törlése
-        SCAN_KEYS.forEach(k => {
-            sessionStorage.removeItem(k);
-        });
-
-        // gombok törlése a felületről
-        document.getElementById("buttonsContainer").innerHTML = "";
+        applyDoneStyles();
+        // Excel tartalma nem változik, ezért a láthatóság továbbra is az Excelen alapul
+        // Ha mégis akarod újraszámoltatni: 
+        // updateButtonsVisibilityFromExcel();
     });
 });
 </script>
