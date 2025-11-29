@@ -538,14 +538,18 @@ async function loadExcel() {
                 let aCode = null;
                 if (aVal != null && String(aVal).trim() !== "") {
                     aCode = normalizeCode(aVal);
-                    if (aCode) allowedCodes.add(aCode);
+                    if (aCode) {
+                        allowedCodes.add(aCode);
+                    }
                 }
 
                 let dCode = null;
                 if (dVal != null && String(dVal).trim() !== "") {
                     dCode = normalizeCode(dVal);
                     if (dCode) {
-                        if (!manualMap.has(dCode)) manualMap.set(dCode, []);
+                        if (!manualMap.has(dCode)) {
+                            manualMap.set(dCode, []);
+                        }
                         manualMap.get(dCode).push(aCode);
                     }
                 }
@@ -555,24 +559,26 @@ async function loadExcel() {
                     const fVal = fValRaw != null ? String(fValRaw).trim() : "";
                     const gVal = gValRaw != null ? String(gValRaw).trim() : "";
                     const hVal = hValRaw != null ? String(hValRaw).trim() : "";
-                    orderRows.push({ dCode, aCode, eVal, fVal, gVal, hVal });
+                    orderRows.push({
+                        dCode: dCode,
+                        aCode: aCode,
+                        eVal: eVal,
+                        fVal: fVal,
+                        gVal: gVal,
+                        hVal: hVal
+                    });
                 }
             }
         }
 
-        // ✨ ÚJ RÉSZ: takarítsuk ki a régi / más túrából maradt kódokat
-        scannedCodes = new Set(
-            [...scannedCodes].filter(code => allowedCodes.has(code))
-        );
-        sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
-
-        // innentől csak az adott túrához tartozó kódok számítanak bele
+        // RÉGI verzió – csak ez marad a végén
         totalCount = allowedCodes.size;
         updateCounter();
     } catch(e){
         console.error("Excel betöltési hiba:", e);
     }
 }
+
 
 
 /* ===== Kamera vezérlés ===== */
