@@ -560,12 +560,6 @@ async function loadExcel() {
             }
         }
 
-        // ✨ ÚJ RÉSZ: takarítsuk ki a régi / más túrából maradt kódokat
-        scannedCodes = new Set(
-            [...scannedCodes].filter(code => allowedCodes.has(code))
-        );
-        sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
-
         // innentől csak az adott túrához tartozó kódok számítanak bele
         totalCount = allowedCodes.size;
         updateCounter();
