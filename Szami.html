@@ -169,7 +169,7 @@ function applyDoneStyles() {
     });
 }
 
-/* Excel alapján: SZ-kódok rugalmasság – SZ-1, SZ-801, SZ-901 stb. */
+/* Excel alapján: csak azok az SZ-gombok látszanak, amikhez van SZ-8xx sor a C oszlopban */
 async function updateButtonsVisibilityFromExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -178,42 +178,36 @@ async function updateButtonsVisibilityFromExcel() {
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-        // Összegyűjtjük az összes "alap" SZ-kódot: SZ-1, SZ-2, ..., SZ-101 stb.
-        // úgy, hogy:
-        //  - ha C-ben SZ-1 van, az SZ-1
-        //  - ha C-ben SZ-801 van, az is SZ-1 (801-800)
-        const excelBaseTours = new Set();
+        const toursFound = new Set();
 
+        // C oszlop (index 2)
         for (let i = 1; i < data.length; i++) {
             const row = data[i] || [];
             const val = row[2];
-            if (val == null) continue;
-
-            const norm = String(val).trim().toUpperCase();
-            if (!norm.startsWith("SZ-")) continue;
-
-            const numStr = norm.slice(3); // "801", "1", "901" stb.
-            const num = parseInt(numStr, 10);
-            if (isNaN(num)) continue;
-
-            let baseNum = num;
-            // Ha 800 felett van, akkor 800-at levonunk (SZ-801 -> SZ-1, SZ-901 -> SZ-101)
-            if (baseNum >= 800) {
-                baseNum = baseNum - 800;
+            if (val != null && String(val).trim() !== "") {
+                const norm = String(val).trim().toUpperCase();
+                toursFound.add(norm);
             }
-
-            const baseCode = "SZ-" + baseNum; // pl. SZ-1, SZ-35, SZ-101
-            excelBaseTours.add(baseCode.toUpperCase());
         }
 
         const buttons = document.querySelectorAll('#buttonsContainer button');
         buttons.forEach(btn => {
-            const code = btn.getAttribute("data-code"); // pl. "SZ-101"
+            const code = btn.getAttribute("data-code"); // pl. "SZ-2"
             if (!code) return;
 
-            const upperCode = code.toUpperCase();
+            const upper = code.toUpperCase();
+            const basePart = upper.replace("SZ-",""); // "2"
+            const baseNum = parseInt(basePart, 10);
 
-            if (excelBaseTours.has(upperCode)) {
+            if (isNaN(baseNum)) {
+                btn.style.display = "none";
+                return;
+            }
+
+            const excelTour = "SZ-" + (800 + baseNum);   // pl. SZ-802
+            const excelTourUpper = excelTour.toUpperCase();
+
+            if (toursFound.has(excelTourUpper)) {
                 btn.style.display = "";
             } else {
                 btn.style.display = "none";
@@ -222,7 +216,7 @@ async function updateButtonsVisibilityFromExcel() {
 
     } catch (e) {
         console.error("Excel betöltési hiba a Szami oldalon:", e);
-        // Hiba esetén inkább mutassuk az összes gombot
+        // Ha hiba van, inkább mutassuk az összes gombot
         const buttons = document.querySelectorAll('#buttonsContainer button');
         buttons.forEach(btn => {
             btn.style.display = "";
@@ -246,6 +240,8 @@ window.addEventListener("DOMContentLoaded", () => {
         SCAN_KEYS.forEach(k => sessionStorage.removeItem(k));
 
         applyDoneStyles();
+        // Excel nem változik a Frissít-től, ezért nem kell újraszámolni a láthatóságot
+        // Ha mégis akarod, hívhatod: updateButtonsVisibilityFromExcel();
     });
 });
 </script>
