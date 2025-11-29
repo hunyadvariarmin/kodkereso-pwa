@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Szami túrák</title>
+<title>Számít túrák</title>
 <style>
 html, body {
     margin:0;
@@ -108,11 +108,10 @@ button.temp-small {
     <button data-code="SZ-32"  onclick="window.location.href='SZ-32.html'">SZ-32</button>
     <button data-code="SZ-33"  onclick="window.location.href='SZ-33.html'">SZ-33</button>
     <button data-code="SZ-34"  onclick="window.location.href='SZ-34.html'">SZ-34</button>
-    <button data-code="SZ-35"  onclick="window.location.href='SZ-35.html'">SZ-35</button>
     <button data-code="SZ-36"  onclick="window.location.href='SZ-36.html'">SZ-36</button>
     <button data-code="SZ-37"  onclick="window.location.href='SZ-37.html'">SZ-37</button>
     <button data-code="SZ-38"  onclick="window.location.href='SZ-38.html'">SZ-38</button>
-    <button data-code="SZ-40"  onclick="window.location.href='SZ-40.html'">SZ-40</button>
+    <button data-code="SZ-135" onclick="window.location.href='SZ-135.html'">SZ-135</button>
 </div>
 
 <div id="bottomActions">
@@ -132,8 +131,8 @@ const DONE_KEYS = [
   "done_SZ-10","done_SZ-101","done_SZ-1","done_SZ-5","done_SZ-12","done_SZ-14",
   "done_SZ-15","done_SZ-18","done_SZ-19","done_SZ-20","done_SZ-21","done_SZ-22",
   "done_SZ-23","done_SZ-25","done_SZ-27","done_SZ-28","done_SZ-29","done_SZ-30",
-  "done_SZ-32","done_SZ-33","done_SZ-34","done_SZ-35","done_SZ-36","done_SZ-37",
-  "done_SZ-38","done_SZ-40"
+  "done_SZ-32","done_SZ-33","done_SZ-34","done_SZ-36","done_SZ-37","done_SZ-38",
+  "done_SZ-135"
 ];
 
 // Scanned kulcsok – a SZ-*.html oldalakban: TOUR_ID + "_scannedList"
@@ -144,8 +143,8 @@ const SCAN_KEYS = [
   "SZ-15_scannedList","SZ-18_scannedList","SZ-19_scannedList","SZ-20_scannedList",
   "SZ-21_scannedList","SZ-22_scannedList","SZ-23_scannedList","SZ-25_scannedList",
   "SZ-27_scannedList","SZ-28_scannedList","SZ-29_scannedList","SZ-30_scannedList",
-  "SZ-32_scannedList","SZ-33_scannedList","SZ-34_scannedList","SZ-35_scannedList",
-  "SZ-36_scannedList","SZ-37_scannedList","SZ-38_scannedList","SZ-40_scannedList"
+  "SZ-32_scannedList","SZ-33_scannedList","SZ-34_scannedList","SZ-36_scannedList",
+  "SZ-37_scannedList","SZ-38_scannedList","SZ-135_scannedList"
 ];
 
 /* Zöld jelölés (DONE) */
@@ -170,7 +169,7 @@ function applyDoneStyles() {
     });
 }
 
-/* Excel alapján: SZ-kódok rugalmasság – SZ-1, SZ-801, SZ-8101 stb. */
+/* Excel alapján: SZ-kódok rugalmasság – SZ-1, SZ-801, SZ-901 stb. */
 async function updateButtonsVisibilityFromExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -179,10 +178,10 @@ async function updateButtonsVisibilityFromExcel() {
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-        // Összegyűjtjük az "alap" SZ-kódokat:
-        //  - ha C-ben SZ-1        -> SZ-1
-        //  - ha C-ben SZ-801      -> SZ-1        (801-800)
-        //  - ha C-ben SZ-8101     -> SZ-101      (utolsó 3 számjegy: 101)
+        // Összegyűjtjük az összes "alap" SZ-kódot: SZ-1, SZ-2, ..., SZ-101 stb.
+        // úgy, hogy:
+        //  - ha C-ben SZ-1 van, az SZ-1
+        //  - ha C-ben SZ-801 van, az is SZ-1 (801-800)
         const excelBaseTours = new Set();
 
         for (let i = 1; i < data.length; i++) {
@@ -193,23 +192,17 @@ async function updateButtonsVisibilityFromExcel() {
             const norm = String(val).trim().toUpperCase();
             if (!norm.startsWith("SZ-")) continue;
 
-            const numStr = norm.slice(3); // pl. "1", "801", "8101"
+            const numStr = norm.slice(3); // "801", "1", "901" stb.
             const num = parseInt(numStr, 10);
             if (isNaN(num)) continue;
 
-            let baseNum;
-
-            if (numStr.length > 3) {
-                // pl. "8101" -> utolsó 3 számjegy: "101"
-                baseNum = parseInt(numStr.slice(-3), 10);
-            } else if (num >= 800) {
-                // pl. 801 -> 1, 835 -> 35
-                baseNum = num - 800;
-            } else {
-                baseNum = num;
+            let baseNum = num;
+            // Ha 800 felett van, akkor 800-at levonunk (SZ-801 -> SZ-1, SZ-901 -> SZ-101)
+            if (baseNum >= 800) {
+                baseNum = baseNum - 800;
             }
 
-            const baseCode = "SZ-" + baseNum;
+            const baseCode = "SZ-" + baseNum; // pl. SZ-1, SZ-35, SZ-101
             excelBaseTours.add(baseCode.toUpperCase());
         }
 
