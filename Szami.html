@@ -108,10 +108,11 @@ button.temp-small {
     <button data-code="SZ-32"  onclick="window.location.href='SZ-32.html'">SZ-32</button>
     <button data-code="SZ-33"  onclick="window.location.href='SZ-33.html'">SZ-33</button>
     <button data-code="SZ-34"  onclick="window.location.href='SZ-34.html'">SZ-34</button>
+    <button data-code="SZ-35"  onclick="window.location.href='SZ-35.html'">SZ-35</button>
     <button data-code="SZ-36"  onclick="window.location.href='SZ-36.html'">SZ-36</button>
     <button data-code="SZ-37"  onclick="window.location.href='SZ-37.html'">SZ-37</button>
     <button data-code="SZ-38"  onclick="window.location.href='SZ-38.html'">SZ-38</button>
-    <button data-code="SZ-135" onclick="window.location.href='SZ-135.html'">SZ-135</button>
+    <button data-code="SZ-40"  onclick="window.location.href='SZ-40.html'">SZ-40</button>
 </div>
 
 <div id="bottomActions">
@@ -119,20 +120,15 @@ button.temp-small {
     <button id="refreshButton">Frissít</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
 <script>
-// Excel fájl
-const XLSX_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
-
 // DONE jelölések – a SZ-*.html oldalakban: done_SZ-...
 const DONE_KEYS = [
   "done_SZ-1000","done_SZ-2","done_SZ-4","done_SZ-0","done_SZ-7","done_SZ-9",
   "done_SZ-10","done_SZ-101","done_SZ-1","done_SZ-5","done_SZ-12","done_SZ-14",
   "done_SZ-15","done_SZ-18","done_SZ-19","done_SZ-20","done_SZ-21","done_SZ-22",
   "done_SZ-23","done_SZ-25","done_SZ-27","done_SZ-28","done_SZ-29","done_SZ-30",
-  "done_SZ-32","done_SZ-33","done_SZ-34","done_SZ-36","done_SZ-37","done_SZ-38",
-  "done_SZ-135"
+  "done_SZ-32","done_SZ-33","done_SZ-34","done_SZ-35","done_SZ-36","done_SZ-37",
+  "done_SZ-38","done_SZ-40"
 ];
 
 // Scanned kulcsok – a SZ-*.html oldalakban: TOUR_ID + "_scannedList"
@@ -143,8 +139,8 @@ const SCAN_KEYS = [
   "SZ-15_scannedList","SZ-18_scannedList","SZ-19_scannedList","SZ-20_scannedList",
   "SZ-21_scannedList","SZ-22_scannedList","SZ-23_scannedList","SZ-25_scannedList",
   "SZ-27_scannedList","SZ-28_scannedList","SZ-29_scannedList","SZ-30_scannedList",
-  "SZ-32_scannedList","SZ-33_scannedList","SZ-34_scannedList","SZ-36_scannedList",
-  "SZ-37_scannedList","SZ-38_scannedList","SZ-135_scannedList"
+  "SZ-32_scannedList","SZ-33_scannedList","SZ-34_scannedList","SZ-35_scannedList",
+  "SZ-36_scannedList","SZ-37_scannedList","SZ-38_scannedList","SZ-40_scannedList"
 ];
 
 /* Zöld jelölés (DONE) */
@@ -169,64 +165,8 @@ function applyDoneStyles() {
     });
 }
 
-/* Excel alapján: csak azok az SZ-gombok látszanak, amikhez van SZ-8xx sor a C oszlopban */
-async function updateButtonsVisibilityFromExcel() {
-    try {
-        const resp = await fetch(XLSX_URL);
-        const buffer = await resp.arrayBuffer();
-        const wb = XLSX.read(buffer, { type: "array" });
-        const sheet = wb.Sheets[wb.SheetNames[0]];
-        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-        const toursFound = new Set();
-
-        // C oszlop (index 2)
-        for (let i = 1; i < data.length; i++) {
-            const row = data[i] || [];
-            const val = row[2];
-            if (val != null && String(val).trim() !== "") {
-                const norm = String(val).trim().toUpperCase();
-                toursFound.add(norm);
-            }
-        }
-
-        const buttons = document.querySelectorAll('#buttonsContainer button');
-        buttons.forEach(btn => {
-            const code = btn.getAttribute("data-code"); // pl. "SZ-2"
-            if (!code) return;
-
-            const upper = code.toUpperCase();
-            const basePart = upper.replace("SZ-",""); // "2"
-            const baseNum = parseInt(basePart, 10);
-
-            if (isNaN(baseNum)) {
-                btn.style.display = "none";
-                return;
-            }
-
-            const excelTour = "SZ-" + (800 + baseNum);   // pl. SZ-802
-            const excelTourUpper = excelTour.toUpperCase();
-
-            if (toursFound.has(excelTourUpper)) {
-                btn.style.display = "";
-            } else {
-                btn.style.display = "none";
-            }
-        });
-
-    } catch (e) {
-        console.error("Excel betöltési hiba a Szami oldalon:", e);
-        // Ha hiba van, inkább mutassuk az összes gombot
-        const buttons = document.querySelectorAll('#buttonsContainer button');
-        buttons.forEach(btn => {
-            btn.style.display = "";
-        });
-    }
-}
-
 window.addEventListener("DOMContentLoaded", () => {
     applyDoneStyles();
-    updateButtonsVisibilityFromExcel();
 
     document.getElementById("backButton").addEventListener("click", () => {
         window.location.href = "arukiadas.html";
@@ -240,8 +180,6 @@ window.addEventListener("DOMContentLoaded", () => {
         SCAN_KEYS.forEach(k => sessionStorage.removeItem(k));
 
         applyDoneStyles();
-        // Excel nem változik a Frissít-től, ezért nem kell újraszámolni a láthatóságot
-        // Ha mégis akarod, hívhatod: updateButtonsVisibilityFromExcel();
     });
 });
 </script>
