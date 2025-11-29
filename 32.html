@@ -510,7 +510,6 @@ function updateCounter() {
         scannedCodes.size + "/" + totalCount;
 }
 
-/* ===== Excel betöltése + szűrés a 2-es túrára + H/D/E/F/G tárolás ===== */
 async function loadExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -529,28 +528,24 @@ async function loadExcel() {
             const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
 
             if (tourVal === TOUR) {
-                const aVal    = row[0]; // A – csomagszám
-                const dVal    = row[3]; // D – szállítólevél
-                const eValRaw = row[4]; // E
-                const fValRaw = row[5]; // F
-                const gValRaw = row[6]; // G
-                const hValRaw = row[7]; // H – új adat
+                const aVal    = row[0];
+                const dVal    = row[3];
+                const eValRaw = row[4];
+                const fValRaw = row[5];
+                const gValRaw = row[6];
+                const hValRaw = row[7];
 
                 let aCode = null;
                 if (aVal != null && String(aVal).trim() !== "") {
                     aCode = normalizeCode(aVal);
-                    if (aCode) {
-                        allowedCodes.add(aCode);
-                    }
+                    if (aCode) allowedCodes.add(aCode);
                 }
 
                 let dCode = null;
                 if (dVal != null && String(dVal).trim() !== "") {
                     dCode = normalizeCode(dVal);
                     if (dCode) {
-                        if (!manualMap.has(dCode)) {
-                            manualMap.set(dCode, []);
-                        }
+                        if (!manualMap.has(dCode)) manualMap.set(dCode, []);
                         manualMap.get(dCode).push(aCode);
                     }
                 }
@@ -560,24 +555,25 @@ async function loadExcel() {
                     const fVal = fValRaw != null ? String(fValRaw).trim() : "";
                     const gVal = gValRaw != null ? String(gValRaw).trim() : "";
                     const hVal = hValRaw != null ? String(hValRaw).trim() : "";
-                    orderRows.push({
-                        dCode: dCode,
-                        aCode: aCode,
-                        eVal: eVal,
-                        fVal: fVal,
-                        gVal: gVal,
-                        hVal: hVal
-                    });
+                    orderRows.push({ dCode, aCode, eVal, fVal, gVal, hVal });
                 }
             }
         }
 
+        // ✨ ÚJ RÉSZ: takarítsuk ki a régi / más túrából maradt kódokat
+        scannedCodes = new Set(
+            [...scannedCodes].filter(code => allowedCodes.has(code))
+        );
+        sessionStorage.setItem(SCANNED_KEY, JSON.stringify([...scannedCodes]));
+
+        // innentől csak az adott túrához tartozó kódok számítanak bele
         totalCount = allowedCodes.size;
         updateCounter();
     } catch(e){
         console.error("Excel betöltési hiba:", e);
     }
 }
+
 
 /* ===== Kamera vezérlés ===== */
 async function startCamera() {
