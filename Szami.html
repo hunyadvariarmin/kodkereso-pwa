@@ -120,6 +120,7 @@ button.temp-small {
     <button id="refreshButton">Frissít</button>
 </div>
 
+<!-- XLSX a táblázat olvasásához -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script>
@@ -170,7 +171,12 @@ function applyDoneStyles() {
     });
 }
 
-/* Excel alapján: SZ-kódok rugalmasság – SZ-1, SZ-801, SZ-8101 stb. */
+/* Csak azok a gombok látszanak, amelyekre van túra az Excel C oszlopában
+   - ha C-ben SZ-2 -> SZ-2 gomb
+   - ha C-ben SZ-802 -> SZ-2 gomb
+   - ha C-ben SZ-835 -> SZ-35 gomb
+   - ha C-ben SZ-8101 -> SZ-101 gomb (utolsó 3 számjegy: 101)
+*/
 async function updateButtonsVisibilityFromExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -179,45 +185,45 @@ async function updateButtonsVisibilityFromExcel() {
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-        // Összegyűjtjük az "alap" SZ-kódokat:
-        //  - ha C-ben SZ-1        -> SZ-1
-        //  - ha C-ben SZ-801      -> SZ-1        (801-800)
-        //  - ha C-ben SZ-8101     -> SZ-101      (utolsó 3 számjegy: 101)
+        // Excel-ben ténylegesen létező "alap SZ-kódok"
         const excelBaseTours = new Set();
 
         for (let i = 1; i < data.length; i++) {
             const row = data[i] || [];
-            const val = row[2];
+            const val = row[2];  // C oszlop – túrakód
             if (val == null) continue;
 
             const norm = String(val).trim().toUpperCase();
-            if (!norm.startsWith("SZ-")) continue;
+            if (!norm.startsWith("SZ-")) continue;   // csak az SZ-... érdekes
 
-            const numStr = norm.slice(3); // pl. "1", "801", "8101"
-            const num = parseInt(numStr, 10);
-            if (isNaN(num)) continue;
+            const numStr = norm.slice(3);           // "2", "802", "8101", stb.
+            if (!/^\d+$/.test(numStr)) continue;    // ha nem csak szám, ugorjuk
 
             let baseNum;
 
             if (numStr.length > 3) {
                 // pl. "8101" -> utolsó 3 számjegy: "101"
                 baseNum = parseInt(numStr.slice(-3), 10);
-            } else if (num >= 800) {
-                // pl. 801 -> 1, 835 -> 35
-                baseNum = num - 800;
             } else {
-                baseNum = num;
+                const num = parseInt(numStr, 10);
+                if (num >= 800) {
+                    // pl. 802 -> 2, 835 -> 35
+                    baseNum = num - 800;
+                } else {
+                    // pl. 2 -> 2, 35 -> 35
+                    baseNum = num;
+                }
             }
 
-            const baseCode = "SZ-" + baseNum;
+            const baseCode = "SZ-" + baseNum;       // pl. "SZ-2", "SZ-35", "SZ-101"
             excelBaseTours.add(baseCode.toUpperCase());
         }
 
+        // Gombok elrejtése / megjelenítése
         const buttons = document.querySelectorAll('#buttonsContainer button');
         buttons.forEach(btn => {
-            const code = btn.getAttribute("data-code"); // pl. "SZ-101"
+            const code = btn.getAttribute("data-code"); // pl. "SZ-2"
             if (!code) return;
-
             const upperCode = code.toUpperCase();
 
             if (excelBaseTours.has(upperCode)) {
@@ -229,7 +235,7 @@ async function updateButtonsVisibilityFromExcel() {
 
     } catch (e) {
         console.error("Excel betöltési hiba a Szami oldalon:", e);
-        // Hiba esetén inkább mutassuk az összes gombot
+        // Ha bármilyen hiba van, inkább mutassunk minden gombot:
         const buttons = document.querySelectorAll('#buttonsContainer button');
         buttons.forEach(btn => {
             btn.style.display = "";
