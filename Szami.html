@@ -114,6 +114,7 @@ button.temp-small {
     <button data-code="SZ-38"  onclick="window.location.href='SZ-38.html'">SZ-38</button>
     <button data-code="SZ-40"  onclick="window.location.href='SZ-40.html'">SZ-40</button>
     <button data-code="SZ-45"  onclick="window.location.href='SZ-45.html'">SZ-45</button>
+    <button data-code="SZ-60"  onclick="window.location.href='SZ-60.html'">SZ-60</button>
 </div>
 
 <div id="bottomActions">
@@ -135,7 +136,7 @@ const DONE_KEYS = [
   "done_SZ-15","done_SZ-18","done_SZ-19","done_SZ-20","done_SZ-21","done_SZ-22",
   "done_SZ-23","done_SZ-25","done_SZ-27","done_SZ-28","done_SZ-29","done_SZ-30",
   "done_SZ-32","done_SZ-33","done_SZ-34","done_SZ-35","done_SZ-36","done_SZ-37",
-  "done_SZ-38","done_SZ-40","done_SZ-45"
+  "done_SZ-38","done_SZ-40","done_SZ-45","done_SZ-60"
 ];
 
 // Scanned kulcsok – a SZ-*.html oldalakban: TOUR_ID + "_scannedList"
@@ -148,7 +149,7 @@ const SCAN_KEYS = [
   "SZ-27_scannedList","SZ-28_scannedList","SZ-29_scannedList","SZ-30_scannedList",
   "SZ-32_scannedList","SZ-33_scannedList","SZ-34_scannedList","SZ-35_scannedList",
   "SZ-36_scannedList","SZ-37_scannedList","SZ-38_scannedList","SZ-40_scannedList",
-  "SZ-45_scannedList"
+  "SZ-45_scannedList","SZ-60_scannedList"
 ];
 
 /* Zöld jelölés (DONE) */
@@ -178,6 +179,7 @@ function applyDoneStyles() {
    - ha C-ben SZ-802    -> SZ-2 gomb  (802-800)
    - ha C-ben SZ-835    -> SZ-35 gomb (835-800)
    - ha C-ben SZ-8101   -> SZ-101 gomb (8101-8000)
+   - ha C-ben SZ-860    -> SZ-60 gomb (860-800)
 */
 async function updateButtonsVisibilityFromExcel() {
     let excelBaseTours = new Set();
@@ -210,14 +212,14 @@ async function updateButtonsVisibilityFromExcel() {
                 // pl. 8101 -> 101
                 baseNum = rawNum - 8000;
             } else if (rawNum >= 800) {
-                // pl. 802 -> 2, 835 -> 35
+                // pl. 802 -> 2, 835 -> 35, 860 -> 60
                 baseNum = rawNum - 800;
             } else {
                 // pl. 2 -> 2, 35 -> 35
                 baseNum = rawNum;
             }
 
-            const baseCode = "SZ-" + baseNum;          // pl. "SZ-2", "SZ-35", "SZ-101"
+            const baseCode = "SZ-" + baseNum;          // pl. "SZ-2", "SZ-35", "SZ-101", "SZ-60"
             excelBaseTours.add(baseCode.toUpperCase());
         }
 
@@ -227,7 +229,7 @@ async function updateButtonsVisibilityFromExcel() {
         return;
     }
 
-    // Ha valamiért nem találtunk egyetlen SZ túrát sem, NE rejtsünk el semmit.
+    // Ha nem találtunk egyetlen SZ túrát sem, NE rejtsünk el semmit.
     if (excelBaseTours.size === 0) {
         console.warn("Nem találtam SZ túrákat az Excelben – minden gomb marad látható.");
         return;
