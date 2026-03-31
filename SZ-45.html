@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SZ-45</title>
+<title>SZ-54</title>
 <style>
 html, body {
     margin:0;
@@ -433,10 +433,10 @@ button:hover {
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-/* ===== SZ-45 beállítások ===== */
-const BASE_NUM   = 45;
-const TOUR_ID    = "SZ-" + BASE_NUM;      // "SZ-45"
-const EXCEL_TOUR = "SZ-845";             // C oszlopban ezt keressük
+/* ===== SZ-54 beállítások ===== */
+const BASE_NUM   = 54;
+const TOUR_ID    = "SZ-" + BASE_NUM;      // "SZ-54"
+const EXCEL_TOUR = "SZ-854";             // C oszlopban ezt keressük
 const TOUR_LABEL = TOUR_ID + " túra";
 
 const XLSX_URL    = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
@@ -496,7 +496,7 @@ function updateCounter() {
         scannedCodes.size + "/" + totalCount;
 }
 
-/* Excel betöltése – csak SZ-845 sorok */
+/* Excel betöltése – csak SZ-854 sorok */
 async function loadExcel() {
     try {
         const resp = await fetch(XLSX_URL);
