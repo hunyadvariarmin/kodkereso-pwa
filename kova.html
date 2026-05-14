@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kova túrák</title>
+<style>
+html, body {
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+                url("icons/logo.png") no-repeat center center fixed;
+    background-size: cover;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:center;
+    position:relative;
+    color:white;
+}
+
+/* Gombok rácsa – 3 oszlop */
+#buttonsContainer {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top:60px;
+    z-index:1;
+    width: 100%;
+    max-width: 520px;
+    padding: 0 16px;
+}
+
+button {
+    padding:14px;
+    font-size:20px;
+    color:#FFD700;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid #FFD700;
+    border-radius:12px;
+    cursor:pointer;
+    transition: all 0.3s ease;
+}
+button:hover {
+    background: rgba(255,215,0,0.2);
+    transform: scale(1.05);
+}
+
+/* Kisebb gombok (ideiglenes) */
+button.temp-small {
+    padding:10px;
+    font-size:16px;
+}
+
+/* Alsó gombsor: Vissza + Frissít */
+#bottomActions {
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform: translateX(-50%);
+    display:flex;
+    gap:20px;
+    z-index:1;
+    width:80%;
+    max-width:400px;
+    justify-content:center;
+}
+
+#bottomActions button {
+    width:48%;
+    padding:12px 0;
+    font-size:18px;
+}
+</style>
+</head>
+<body>
+
+<div id="buttonsContainer">
+    <!-- NORMÁL gombok -->
+    <button data-code="K-2"   onclick="window.location.href='K-2.html'">K-2</button>
+    <button data-code="K-3"   onclick="window.location.href='K-3.html'">K-3</button>
+    <button data-code="K-4"   onclick="window.location.href='K-4.html'">K-4</button>
+    <button data-code="K-5"   onclick="window.location.href='K-5.html'">K-5</button>
+    <button data-code="K-6"   onclick="window.location.href='K-6.html'">K-6</button>
+    <button data-code="K-7"   onclick="window.location.href='K-7.html'">K-7</button>
+    <button data-code="K-8"   onclick="window.location.href='K-8.html'">K-8</button>
+    <button data-code="K-9"   onclick="window.location.href='K-9.html'">K-9</button>
+    <button data-code="K-10"   onclick="window.location.href='K-10.html'">K-10</button>
+    <button data-code="K-11"   onclick="window.location.href='K-11.html'">K-11</button>
+    <button data-code="K-12"   onclick="window.location.href='K-12.html'">K-12</button>
+    <button data-code="K-15"   onclick="window.location.href='K-15.html'">K-15</button>
+    <button data-code="K-17"   onclick="window.location.href='K-17.html'">K-17</button>
+    <button data-code="K-18"   onclick="window.location.href='K-18.html'">K-18</button>
+    <button data-code="K-20"   onclick="window.location.href='K-20.html'">K-20</button>
+    <button data-code="K-21"   onclick="window.location.href='K-21.html'">K-21</button>
+    <button data-code="K-22"   onclick="window.location.href='K-22.html'">K-22</button>
+    <button data-code="K-23"   onclick="window.location.href='K-23.html'">K-23</button>
+    <button data-code="K-29"   onclick="window.location.href='K-29.html'">K-29</button>
+    <button data-code="K-30"   onclick="window.location.href='K-30.html'">K-30</button>
+    <button data-code="K-31"   onclick="window.location.href='K-31.html'">K-31</button>
+    <button data-code="K-32"   onclick="window.location.href='K-32.html'">K-32</button>
+    <button data-code="K-33"   onclick="window.location.href='K-33.html'">K-33</button>
+    <button data-code="K-39"   onclick="window.location.href='K-39.html'">K-39</button>
+    <button data-code="K-41"   onclick="window.location.href='K-41.html'">K-41</button>
+    <button data-code="K-42"   onclick="window.location.href='K-42.html'">K-42</button>
+    <button data-code="K-43"   onclick="window.location.href='K-43.html'">K-43</button>
+    <button data-code="K-44"   onclick="window.location.href='K-44.html'">K-44</button>
+    <button data-code="K-51"   onclick="window.location.href='K-51.html'">K-51</button>
+    <button data-code="K-52"   onclick="window.location.href='K-52.html'">K-52</button>
+    <button data-code="K-53"   onclick="window.location.href='K-53.html'">K-53</button>
+    <button data-code="K-61"   onclick="window.location.href='K-61.html'">K-61</button>
+    <button data-code="K-62"   onclick="window.location.href='K-62.html'">K-62</button>
+    <button data-code="K-63"   onclick="window.location.href='K-63.html'">K-63</button>
+    <button data-code="K-71"   onclick="window.location.href='K-71.html'">K-71</button>
+    <button data-code="K-72"   onclick="window.location.href='K-72.html'">K-72</button>
+    <button data-code="K-73"   onclick="window.location.href='K-73.html'">K-73</button>
+    <button data-code="K-74"   onclick="window.location.href='K-74.html'">K-74</button>
+    <button data-code="K-75"   onclick="window.location.href='K-75.html'">K-75</button>
+    <button data-code="K-81"   onclick="window.location.href='K-81.html'">K-81</button>
+    <button data-code="K-82"   onclick="window.location.href='K-82.html'">K-82</button>
+    <button data-code="K-83"   onclick="window.location.href='K-83.html'">K-83</button>
+    <button data-code="K-84"   onclick="window.location.href='K-84.html'">K-84</button>
+    <button data-code="K-91"   onclick="window.location.href='K-91.html'">K-91</button>
+    <button data-code="K-92"   onclick="window.location.href='K-92.html'">K-92</button>
+    <button data-code="K-98"   onclick="window.location.href='K-98.html'">K-98</button>
+    <button data-code="K-99"   onclick="window.location.href='K-99.html'">K-99</button>
+    <button data-code="K-110"   onclick="window.location.href='K-110.html'">K-110</button>
+    <button data-code="K-111"   onclick="window.location.href='K-111.html'">K-111</button>
+</div>
+
+<div id="bottomActions">
+    <button id="backButton">Vissza</button>
+    <button id="refreshButton">Frissít</button>
+</div>
+
+<!-- XLSX a táblázat olvasásához -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script>
+// Excel fájl
+const XLSX_URL = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+
+// DONE jelölések – a SZ-*.html oldalakban: done_SZ-...
+const DONE_KEYS = [
+ "done_K-2","done_K-3","done_K-4","done_K-5","done_K-6","done_K-7",
+"done_K-8","done_K-9","done_K-10","done_K-11","done_K-12","done_K-15",
+"done_K-17","done_K-18","done_K-20","done_K-21","done_K-22","done_K-23",
+"done_K-29","done_K-30","done_K-31","done_K-32","done_K-33","done_K-39",
+"done_K-41","done_K-42","done_K-43","done_K-44","done_K-51","done_K-52",
+"done_K-53","done_K-61","done_K-62","done_K-63","done_K-71","done_K-72",
+"done_K-73","done_K-74","done_K-75","done_K-81","done_K-82","done_K-83",
+"done_K-84","done_K-91","done_K-92","done_K-98","done_K-99","done_K-110",
+"done_K-111"
+];
+
+// Scanned kulcsok – a SZ-*.html oldalakban: TOUR_ID + "_scannedList"
+const SCAN_KEYS = [
+ "K-2_scannedList","K-3_scannedList","K-4_scannedList","K-5_scannedList",
+"K-6_scannedList","K-7_scannedList","K-8_scannedList","K-9_scannedList",
+"K-10_scannedList","K-11_scannedList","K-12_scannedList","K-15_scannedList",
+"K-17_scannedList","K-18_scannedList","K-20_scannedList","K-21_scannedList",
+"K-22_scannedList","K-23_scannedList","K-29_scannedList","K-30_scannedList",
+"K-31_scannedList","K-32_scannedList","K-33_scannedList","K-39_scannedList",
+"K-41_scannedList","K-42_scannedList","K-43_scannedList","K-44_scannedList",
+"K-51_scannedList","K-52_scannedList","K-53_scannedList","K-61_scannedList",
+"K-62_scannedList","K-63_scannedList","K-71_scannedList","K-72_scannedList",
+"K-73_scannedList","K-74_scannedList","K-75_scannedList","K-81_scannedList",
+"K-82_scannedList","K-83_scannedList","K-84_scannedList","K-91_scannedList",
+"K-92_scannedList","K-98_scannedList","K-99_scannedList","K-110_scannedList",
+"K-111_scannedList"
+];
+
+/* Zöld jelölés (DONE) */
+function applyDoneStyles() {
+    const buttons = document.querySelectorAll('#buttonsContainer button');
+    buttons.forEach(btn => {
+        btn.style.backgroundColor = "rgba(0,0,0,0.4)";
+        btn.style.borderColor = "#FFD700";
+        btn.style.color = "#FFD700";
+    });
+
+    DONE_KEYS.forEach(key => {
+        if (localStorage.getItem(key) === "true") {
+            const code = key.replace("done_",""); // pl. done_SZ-2 -> SZ-2
+            const btn = document.querySelector(`button[data-code="${code}"]`);
+            if (btn) {
+                btn.style.backgroundColor = "rgba(0,128,0,0.7)";
+                btn.style.borderColor = "#00ff00";
+                btn.style.color = "#ffffff";
+            }
+        }
+    });
+}
+
+/* Csak azok a gombok látszanak, amelyekre van túra az Excel C oszlopában
+   - ha C-ben SZ-2      -> SZ-2 gomb
+   - ha C-ben SZ-802    -> SZ-2 gomb  (802-800)
+   - ha C-ben SZ-835    -> SZ-35 gomb (835-800)
+   - ha C-ben SZ-8101   -> SZ-101 gomb (8101-8000)
+   - ha C-ben SZ-860    -> SZ-60 gomb (860-800)
+*/
+async function updateButtonsVisibilityFromExcel() {
+    let excelBaseTours = new Set();
+
+    try {
+        const resp = await fetch(XLSX_URL);
+        const buffer = await resp.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        for (let i = 1; i < data.length; i++) {
+            const row = data[i] || [];
+            const val = row[2]; // C oszlop
+            if (val == null) continue;
+
+            let norm = String(val).trim().toUpperCase();
+
+            // MOST MÁR K- TÚRÁKAT KERESÜNK
+            if (!norm.startsWith("K-")) continue;
+
+            norm = norm.replace(/\s+/g, "");
+
+            // pl K-918 -> 918
+            const numStr = norm.slice(2);
+
+            if (!/^\d+$/.test(numStr)) continue;
+
+            const rawNum = parseInt(numStr, 10);
+            if (isNaN(rawNum)) continue;
+
+            let baseNum;
+
+            // 9101 -> 101
+            if (rawNum >= 9000) {
+                baseNum = rawNum - 9000;
+            }
+            // 918 -> 18
+            // 961 -> 61
+            else if (rawNum >= 900) {
+                baseNum = rawNum - 900;
+            }
+            // sima K-18 -> 18
+            else {
+                baseNum = rawNum;
+            }
+
+            // pl K-18
+            const baseCode = "K-" + baseNum;
+
+            excelBaseTours.add(baseCode.toUpperCase());
+        }
+
+    } catch (e) {
+        console.error("Excel betöltési hiba:", e);
+        return;
+    }
+
+    // ha nincs találat, marad minden látható
+    if (excelBaseTours.size === 0) {
+        console.warn("Nem találtam K túrákat az Excelben.");
+        return;
+    }
+
+    const buttons = document.querySelectorAll('#buttonsContainer button');
+
+    buttons.forEach(btn => {
+        const code = btn.getAttribute("data-code");
+        if (!code) return;
+
+        if (excelBaseTours.has(code.toUpperCase())) {
+            btn.style.display = "";
+        } else {
+            btn.style.display = "none";
+        }
+    });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    applyDoneStyles();
+    updateButtonsVisibilityFromExcel();
+
+    document.getElementById("backButton").addEventListener("click", () => {
+        window.location.href = "arukiadas.html";
+    });
+
+    document.getElementById("refreshButton").addEventListener("click", () => {
+        const ok = confirm("Biztosan törlöd az összes jelölést és beolvasott kódot?");
+        if (!ok) return;
+
+        DONE_KEYS.forEach(k => localStorage.removeItem(k));
+        SCAN_KEYS.forEach(k => sessionStorage.removeItem(k));
+
+        applyDoneStyles();
+    });
+});
+</script>
+
+</body>
+</html>
