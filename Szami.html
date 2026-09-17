@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -7,6 +6,7 @@
 <title>Számít túrák</title>
 
 <style>
+
 html, body {
     margin:0;
     padding:0;
@@ -404,6 +404,7 @@ button.temp-small {
     color:white;
     font-weight:bold;
 }
+
 </style>
 </head>
 
@@ -573,6 +574,7 @@ button.temp-small {
                 autocomplete="off"
                 autocapitalize="characters"
                 spellcheck="false"
+                inputmode="none"
                 placeholder="Olvasd be a kódot..."
             >
 
@@ -582,11 +584,11 @@ button.temp-small {
         <!-- MÓDVÁLTÓ GOMBOK -->
         <div id="massModeButtons">
 
-            <button id="switchManualButton">
+            <button id="switchManualButton" type="button">
                 VÁLTÁS KÉZI BEVITELRE
             </button>
 
-            <button id="switchCameraButton">
+            <button id="switchCameraButton" type="button">
                 VÁLTÁS KAMERÁRA
             </button>
 
@@ -618,7 +620,7 @@ button.temp-small {
         </div>
 
 
-        <button id="closeMassCheck">
+        <button id="closeMassCheck" type="button">
             BEZÁRÁS
         </button>
 
@@ -792,6 +794,21 @@ function applyDoneStyles() {
 
 async function updateButtonsVisibilityFromExcel() {
 
+    const buttons =
+        document.querySelectorAll(
+            "#buttonsContainer button"
+        );
+
+    /*
+     * Excel betöltéséig minden SZ gomb rejtve.
+     * Csak azok jelennek meg, amelyek tényleg
+     * szerepelnek az Excelben.
+     */
+    buttons.forEach(btn => {
+        btn.style.display = "none";
+    });
+
+
     let excelBaseTours =
         new Set();
 
@@ -925,12 +942,6 @@ async function updateButtonsVisibilityFromExcel() {
     }
 
 
-    const buttons =
-        document.querySelectorAll(
-            "#buttonsContainer button"
-        );
-
-
     buttons.forEach(btn => {
 
         const code =
@@ -1058,6 +1069,17 @@ window.addEventListener(
 
     let massRecentlyScanned =
         new Set();
+
+    /*
+     * Scannerhez tartozó kézi bevitel
+     */
+    let manualScanTimer = null;
+
+    let manualScannerBuffer = "";
+
+    let manualScannerLastKeyTime = 0;
+
+    let manualScannerProcessing = false;
 
 
     /* =========================
@@ -2063,7 +2085,7 @@ window.addEventListener(
 
 
     /* =========================
-       KÉZI BEVITEL AKTIVÁLÁSA
+       KÉZI MÓD VÁLTÁS
        ========================= */
 
     async function switchToManual() {
@@ -2109,6 +2131,15 @@ window.addEventListener(
 
         input.value = "";
 
+        manualScannerBuffer = "";
+
+        manualScannerLastKeyTime = 0;
+
+        if (manualScanTimer) {
+            clearTimeout(manualScanTimer);
+            manualScanTimer = null;
+        }
+
         input.focus();
     }
 
@@ -2118,6 +2149,24 @@ window.addEventListener(
        ========================= */
 
     async function switchToCamera() {
+
+        if (manualScanTimer) {
+
+            clearTimeout(
+                manualScanTimer
+            );
+
+            manualScanTimer =
+                null;
+        }
+
+
+        manualScannerBuffer =
+            "";
+
+        manualScannerLastKeyTime =
+            0;
+
 
         document.getElementById(
             "manualInputArea"
@@ -2154,8 +2203,86 @@ window.addEventListener(
 
 
     /* =========================
-       KÉZI KÓD BEVITELE
+       KÉZI / CSIPOGÓS BEVITEL
        ========================= */
+
+    function finishManualScannerCode(
+        value
+    ) {
+
+        if (
+            manualScannerProcessing
+        )
+            return;
+
+
+        const code =
+            massNormalizeCode(
+                value
+            );
+
+
+        if (!code)
+            return;
+
+
+        manualScannerProcessing =
+            true;
+
+
+        if (manualScanTimer) {
+
+            clearTimeout(
+                manualScanTimer
+            );
+
+            manualScanTimer =
+                null;
+        }
+
+
+        manualScannerBuffer =
+            "";
+
+
+        const input =
+            document.getElementById(
+                "manualCodeInput"
+            );
+
+
+        input.value =
+            "";
+
+
+        processMassCode(
+            code
+        );
+
+
+        /*
+         * Nagyon fontos:
+         * a scanner minden kód után
+         * automatikusan visszakapja
+         * a fókuszt.
+         */
+
+        setTimeout(
+            function () {
+
+                manualScannerProcessing =
+                    false;
+
+                input.value =
+                    "";
+
+                input.focus();
+
+            },
+            20
+        );
+    }
+
 
     function setupManualInput() {
 
@@ -2165,57 +2292,246 @@ window.addEventListener(
             );
 
 
+        /*
+         * Normál scanner:
+         * karakterek + ENTER
+         */
         input.addEventListener(
             "keydown",
             function (event) {
 
                 if (
-                    event.key !== "Enter"
-                )
-                    return;
+                    event.key === "Enter" ||
+                    event.key === "Tab"
+                ) {
 
+                    event.preventDefault();
+                    event.stopPropagation();
 
-                event.preventDefault();
-
-
-                const code =
-                    input.value.trim();
-
-
-                input.value = "";
-
-
-                if (code) {
-
-                    processMassCode(
-                        code
+                    finishManualScannerCode(
+                        input.value
                     );
+
+                    return;
                 }
-
-
-                /*
-                 * Nagyon fontos:
-                 * a vonalkódolvasó ENTER után
-                 * azonnal visszakapja a fókuszt.
-                 */
-
-                setTimeout(
-                    function () {
-
-                        input.focus();
-
-                    },
-                    20
-                );
             }
         );
 
 
         /*
-         * Ha a scanner valamiért nem küld
-         * ENTER-t, akkor a mező akkor is
-         * használható marad.
+         * Ha a scanner NEM küld ENTER-t,
+         * a gyors karakterbevitelt is
+         * automatikusan lezárjuk.
          */
+        input.addEventListener(
+            "input",
+            function () {
+
+                if (
+                    manualScannerProcessing
+                )
+                    return;
+
+
+                if (manualScanTimer) {
+
+                    clearTimeout(
+                        manualScanTimer
+                    );
+                }
+
+
+                const value =
+                    input.value;
+
+
+                if (!value)
+                    return;
+
+
+                manualScanTimer =
+                    setTimeout(
+                        function () {
+
+                            manualScanTimer =
+                                null;
+
+                            const current =
+                                input.value;
+
+                            if (
+                                current.trim()
+                            ) {
+
+                                finishManualScannerCode(
+                                    current
+                                );
+                            }
+
+                        },
+                        180
+                    );
+            }
+        );
+
+
+        /*
+         * Ha a scanner fókusz nélkül kezd
+         * gépelni, globálisan is elkapjuk.
+         *
+         * Ha az inputban van a fókusz,
+         * akkor az input saját kezelése
+         * végzi a munkát, így nincs dupla kód.
+         */
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                const manualArea =
+                    document.getElementById(
+                        "manualInputArea"
+                    );
+
+
+                if (
+                    !manualArea ||
+                    manualArea.style.display === "none"
+                ) {
+
+                    return;
+                }
+
+
+                if (
+                    event.target === input
+                ) {
+
+                    return;
+                }
+
+
+                if (
+                    event.key === "Enter" ||
+                    event.key === "Tab"
+                ) {
+
+                    event.preventDefault();
+
+                    if (
+                        manualScannerBuffer
+                    ) {
+
+                        finishManualScannerCode(
+                            manualScannerBuffer
+                        );
+                    }
+
+                    input.focus();
+
+                    return;
+                }
+
+
+                if (
+                    event.key.length !== 1
+                ) {
+
+                    return;
+                }
+
+
+                const now =
+                    Date.now();
+
+
+                /*
+                 * Ha két karakter között túl sok
+                 * idő telt el, új scanner-kód indul.
+                 */
+                if (
+                    manualScannerLastKeyTime &&
+                    now -
+                    manualScannerLastKeyTime >
+                    500
+                ) {
+
+                    manualScannerBuffer =
+                        "";
+                }
+
+
+                manualScannerLastKeyTime =
+                    now;
+
+
+                manualScannerBuffer +=
+                    event.key;
+
+
+                input.focus();
+
+
+                if (manualScanTimer) {
+
+                    clearTimeout(
+                        manualScanTimer
+                    );
+                }
+
+
+                manualScanTimer =
+                    setTimeout(
+                        function () {
+
+                            manualScanTimer =
+                                null;
+
+                            if (
+                                manualScannerBuffer
+                            ) {
+
+                                finishManualScannerCode(
+                                    manualScannerBuffer
+                                );
+                            }
+
+                        },
+                        180
+                    );
+            }
+        );
+
+
+        /*
+         * Ha valami miatt a mező elveszíti
+         * a fókuszt, kézi módban visszaadjuk.
+         */
+        document.addEventListener(
+            "click",
+            function () {
+
+                const manualArea =
+                    document.getElementById(
+                        "manualInputArea"
+                    );
+
+
+                if (
+                    manualArea &&
+                    manualArea.style.display !== "none"
+                ) {
+
+                    setTimeout(
+                        function () {
+
+                            input.focus();
+
+                        },
+                        50
+                    );
+                }
+            }
+        );
     }
 
 
@@ -2245,6 +2561,29 @@ window.addEventListener(
 
         massRecentlyScanned =
             new Set();
+
+
+        manualScannerBuffer =
+            "";
+
+
+        manualScannerLastKeyTime =
+            0;
+
+
+        manualScannerProcessing =
+            false;
+
+
+        if (manualScanTimer) {
+
+            clearTimeout(
+                manualScanTimer
+            );
+
+            manualScanTimer =
+                null;
+        }
 
 
         /*
@@ -2277,7 +2616,8 @@ window.addEventListener(
 
         document.getElementById(
             "manualCodeInput"
-        ).value = "";
+        ).value =
+            "";
 
 
         massUpdateSummary();
@@ -2324,6 +2664,27 @@ window.addEventListener(
 
     async function closeMassCheck() {
 
+        if (manualScanTimer) {
+
+            clearTimeout(
+                manualScanTimer
+            );
+
+            manualScanTimer =
+                null;
+        }
+
+
+        manualScannerBuffer =
+            "";
+
+        manualScannerLastKeyTime =
+            0;
+
+        manualScannerProcessing =
+            false;
+
+
         await stopMassScanner();
 
 
@@ -2365,7 +2726,8 @@ window.addEventListener(
 
         document.getElementById(
             "manualCodeInput"
-        ).value = "";
+        ).value =
+            "";
     }
 
 
@@ -2391,6 +2753,7 @@ window.addEventListener(
                     "massCheckButton"
                 );
 
+
             if (massButton) {
 
                 massButton.addEventListener(
@@ -2413,15 +2776,16 @@ window.addEventListener(
                     "switchManualButton"
                 );
 
+
             if (manualButton) {
 
                 manualButton.addEventListener(
                     "click",
-                    function (event) {
+                    async function (event) {
 
                         event.preventDefault();
 
-                        switchToManual();
+                        await switchToManual();
                     }
                 );
             }
@@ -2435,15 +2799,16 @@ window.addEventListener(
                     "switchCameraButton"
                 );
 
+
             if (cameraButton) {
 
                 cameraButton.addEventListener(
                     "click",
-                    function (event) {
+                    async function (event) {
 
                         event.preventDefault();
 
-                        switchToCamera();
+                        await switchToCamera();
                     }
                 );
             }
@@ -2457,18 +2822,20 @@ window.addEventListener(
                     "closeMassCheck"
                 );
 
+
             if (closeButton) {
 
                 closeButton.addEventListener(
                     "click",
-                    function (event) {
+                    async function (event) {
 
                         event.preventDefault();
 
-                        closeMassCheck();
+                        await closeMassCheck();
                     }
                 );
             }
+
         }
     );
 
@@ -2478,5 +2845,3 @@ window.addEventListener(
 
 </body>
 </html>
-```
-
