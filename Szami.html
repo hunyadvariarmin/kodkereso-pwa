@@ -7,225 +7,258 @@
 
 <style>
 html, body {
-    margin:0;
-    padding:0;
-    height:100%;
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
     font-family: Arial, sans-serif;
-    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-                url("icons/logo.png") no-repeat center center fixed;
+    background:
+        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+        url("icons/logo.png") no-repeat center center fixed;
     background-size: cover;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:center;
-    position:relative;
-    color:white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    color: white;
 }
 
-/* ============================================================
-   EREDETI TÚRA GOMBOK
-   ============================================================ */
-
+/* Gombok rácsa – 4 oszlop */
 #buttonsContainer {
-    display:grid;
+    display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap:16px;
-    margin-top:60px;
-    z-index:1;
-    width:100%;
-    max-width:520px;
-    padding:0 16px 180px 16px;
-    box-sizing:border-box;
+    gap: 16px;
+    margin-top: 60px;
+    z-index: 1;
+    width: 100%;
+    max-width: 720px;
+    padding: 0 16px 180px 16px;
+    box-sizing: border-box;
 }
 
 button {
-    padding:14px;
-    font-size:20px;
-    color:#FFD700;
-    background:rgba(0,0,0,0.4);
-    border:2px solid #FFD700;
-    border-radius:12px;
-    cursor:pointer;
-    transition:all 0.3s ease;
+    padding: 14px;
+    font-size: 20px;
+    color: #FFD700;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid #FFD700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 button:hover {
-    background:rgba(255,215,0,0.2);
-    transform:scale(1.05);
+    background: rgba(255,215,0,0.2);
+    transform: scale(1.05);
 }
 
 button.temp-small {
-    padding:10px;
-    font-size:16px;
+    padding: 10px;
+    font-size: 16px;
 }
 
-/* ============================================================
-   ALSÓ GOMBSOR
-   ============================================================ */
-
+/* Alsó gombsor */
 #bottomActions {
-    position:fixed;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    z-index:10;
-    width:90%;
-    max-width:400px;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+    width: 90%;
+    max-width: 400px;
 }
 
 #bottomActions button {
-    width:100%;
-    padding:12px 0;
-    font-size:18px;
+    width: 100%;
+    padding: 12px 0;
+    font-size: 18px;
 }
 
-/* ============================================================
-   TÖMEGES ELLENŐRZÉS – ÚJ FUNKCIÓ
-   ============================================================ */
-
+/* Tömeges ellenőrzés gomb */
 #massCheckButton {
-    color:#ffffff;
-    background:rgba(0,90,160,0.85);
-    border-color:#00aaff;
-    font-weight:bold;
+    color: #ffffff;
+    background: rgba(0,90,160,0.85);
+    border-color: #00aaff;
+    font-weight: bold;
 }
 
 #massCheckButton:hover {
-    background:rgba(0,130,220,0.9);
+    background: rgba(0,130,220,0.9);
 }
 
-/* ============================================================
-   TÖMEGES ELLENŐRZÉS MODAL
-   ============================================================ */
-
+/* Tömeges ellenőrzés ablak */
 #massCheckModal {
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.92);
-    z-index:1000;
-    overflow-y:auto;
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 1000;
+    overflow-y: auto;
 }
 
 #massCheckContent {
-    width:100%;
-    max-width:600px;
-    margin:0 auto;
-    min-height:100%;
-    box-sizing:border-box;
-    padding:15px;
-    display:flex;
-    flex-direction:column;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100%;
+    box-sizing: border-box;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
 #massCheckTitle {
-    text-align:center;
-    color:#FFD700;
-    font-size:25px;
-    margin:5px 0 12px 0;
+    text-align: center;
+    color: #FFD700;
+    font-size: 25px;
+    margin: 5px 0 12px 0;
 }
 
+/*
+ * KAMERA
+ *
+ * Fontos:
+ * A html5-qrcode alapértelmezett qrbox keretét
+ * nem használjuk.
+ *
+ * Így csak a kamera képe jelenik meg.
+ */
 #reader {
-    width:100%;
-    max-width:600px;
-    margin:0 auto;
-    border-radius:12px;
-    overflow:hidden;
-    background:#111;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #111;
+}
+
+/* A html5-qrcode esetleges belső elemei */
+#reader > div {
+    width: 100% !important;
+}
+
+#reader video {
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+    object-fit: cover;
+}
+
+/* Ha a könyvtár mégis létrehozna scan-region elemet,
+   annak keretét és hátterét eltüntetjük. */
+#reader__scan_region {
+    background: transparent !important;
+}
+
+#reader__scan_region > img {
+    display: none !important;
+}
+
+#reader__dashboard_section_csr {
+    background: transparent !important;
 }
 
 /* Állapot */
-
 #scanStatus {
-    margin-top:12px;
-    padding:14px;
-    border-radius:10px;
-    text-align:center;
-    font-size:19px;
-    font-weight:bold;
-    background:rgba(255,255,255,0.1);
-    min-height:25px;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 19px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.1);
+    min-height: 25px;
 }
 
 .status-success {
-    color:#00ff66;
-    border:2px solid #00aa44;
-    background:rgba(0,128,0,0.25) !important;
+    color: #00ff66;
+    border: 2px solid #00aa44;
+    background: rgba(0,128,0,0.25) !important;
 }
 
 .status-error {
-    color:#ff5555;
-    border:2px solid #cc2222;
-    background:rgba(150,0,0,0.25) !important;
+    color: #ff5555;
+    border: 2px solid #cc2222;
+    background: rgba(150,0,0,0.25) !important;
 }
 
 .status-info {
-    color:#FFD700;
-    border:2px solid #aa8800;
+    color: #FFD700;
+    border: 2px solid #aa8800;
 }
 
 /* Összesítés */
-
 #massSummary {
-    margin-top:12px;
-    padding:12px;
-    background:rgba(255,255,255,0.08);
-    border-radius:10px;
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
 }
 
 #massSummary h3 {
-    margin:0 0 8px 0;
-    color:#FFD700;
-    text-align:center;
+    margin: 0 0 8px 0;
+    color: #FFD700;
+    text-align: center;
 }
 
 .summaryRow {
-    display:flex;
-    justify-content:space-between;
-    padding:6px 8px;
-    border-bottom:1px solid rgba(255,255,255,0.15);
-    font-size:17px;
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    font-size: 17px;
 }
 
 .summaryRow:last-child {
-    border-bottom:none;
+    border-bottom: none;
 }
 
 .summaryTour {
-    color:#FFD700;
-    font-weight:bold;
+    color: #FFD700;
+    font-weight: bold;
 }
 
 .summaryCount {
-    color:#00ff66;
-    font-weight:bold;
+    color: #00ff66;
+    font-weight: bold;
 }
 
 /* Bezárás */
-
 #closeMassCheck {
-    margin-top:15px;
-    background:rgba(160,0,0,0.8);
-    border-color:#ff4444;
-    color:white;
-    font-weight:bold;
+    margin-top: 15px;
+    background: rgba(160,0,0,0.8);
+    border-color: #ff4444;
+    color: white;
+    font-weight: bold;
 }
 
 #massTotal {
-    text-align:center;
-    margin-top:8px;
-    font-size:18px;
-    color:#ffffff;
+    text-align: center;
+    margin-top: 8px;
+    font-size: 18px;
+    color: #ffffff;
 }
 
-/* Telefonon 2 oszlop */
-
-@media (max-width:600px) {
+/* Telefonon maradjon használható */
+@media (max-width: 600px) {
     #buttonsContainer {
-        grid-template-columns:repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    #buttonsContainer button {
+        padding: 10px 4px;
+        font-size: 14px;
+    }
+
+    button.temp-small {
+        padding: 8px 4px;
+        font-size: 13px;
     }
 }
 </style>
@@ -233,213 +266,202 @@ button.temp-small {
 
 <body>
 
-<!-- ============================================================
-     EREDETI SZ TÚRA GOMBOK
-     ============================================================ -->
-
 <div id="buttonsContainer">
 
-<button data-code="SZ-0" class="temp-small"
-    onclick="window.location.href='SZ-0.html'">SZ-0</button>
+    <button data-code="SZ-0" class="temp-small"
+        onclick="window.location.href='SZ-0.html'">SZ-0</button>
 
-<button data-code="SZ-1"
-    onclick="window.location.href='SZ-1.html'">SZ-1</button>
+    <button data-code="SZ-1"
+        onclick="window.location.href='SZ-1.html'">SZ-1</button>
 
-<button data-code="SZ-2" class="temp-small"
-    onclick="window.location.href='SZ-2.html'">SZ-2</button>
+    <button data-code="SZ-2" class="temp-small"
+        onclick="window.location.href='SZ-2.html'">SZ-2</button>
 
-<button data-code="SZ-3"
-    onclick="window.location.href='SZ-3.html'">SZ-3</button>
+    <button data-code="SZ-3"
+        onclick="window.location.href='SZ-3.html'">SZ-3</button>
 
-<button data-code="SZ-4" class="temp-small"
-    onclick="window.location.href='SZ-4.html'">SZ-4</button>
+    <button data-code="SZ-4" class="temp-small"
+        onclick="window.location.href='SZ-4.html'">SZ-4</button>
 
-<button data-code="SZ-5"
-    onclick="window.location.href='SZ-5.html'">SZ-5</button>
+    <button data-code="SZ-5"
+        onclick="window.location.href='SZ-5.html'">SZ-5</button>
 
-<button data-code="SZ-7" class="temp-small"
-    onclick="window.location.href='SZ-7.html'">SZ-7</button>
+    <button data-code="SZ-7" class="temp-small"
+        onclick="window.location.href='SZ-7.html'">SZ-7</button>
 
-<button data-code="SZ-9" class="temp-small"
-    onclick="window.location.href='SZ-9.html'">SZ-9</button>
+    <button data-code="SZ-9" class="temp-small"
+        onclick="window.location.href='SZ-9.html'">SZ-9</button>
 
-<button data-code="SZ-10"
-    onclick="window.location.href='SZ-10.html'">SZ-10</button>
+    <button data-code="SZ-10" class="temp-small"
+        onclick="window.location.href='SZ-10.html'">SZ-10</button>
 
-<button data-code="SZ-12"
-    onclick="window.location.href='SZ-12.html'">SZ-12</button>
+    <button data-code="SZ-12"
+        onclick="window.location.href='SZ-12.html'">SZ-12</button>
 
-<button data-code="SZ-14"
-    onclick="window.location.href='SZ-14.html'">SZ-14</button>
+    <button data-code="SZ-14"
+        onclick="window.location.href='SZ-14.html'">SZ-14</button>
 
-<button data-code="SZ-15"
-    onclick="window.location.href='SZ-15.html'">SZ-15</button>
+    <button data-code="SZ-15"
+        onclick="window.location.href='SZ-15.html'">SZ-15</button>
 
-<button data-code="SZ-18"
-    onclick="window.location.href='SZ-18.html'">SZ-18</button>
+    <button data-code="SZ-18"
+        onclick="window.location.href='SZ-18.html'">SZ-18</button>
 
-<button data-code="SZ-19"
-    onclick="window.location.href='SZ-19.html'">SZ-19</button>
+    <button data-code="SZ-19"
+        onclick="window.location.href='SZ-19.html'">SZ-19</button>
 
-<button data-code="SZ-20"
-    onclick="window.location.href='SZ-20.html'">SZ-20</button>
+    <button data-code="SZ-20"
+        onclick="window.location.href='SZ-20.html'">SZ-20</button>
 
-<button data-code="SZ-21"
-    onclick="window.location.href='SZ-21.html'">SZ-21</button>
+    <button data-code="SZ-21"
+        onclick="window.location.href='SZ-21.html'">SZ-21</button>
 
-<button data-code="SZ-22"
-    onclick="window.location.href='SZ-22.html'">SZ-22</button>
+    <button data-code="SZ-22"
+        onclick="window.location.href='SZ-22.html'">SZ-22</button>
 
-<button data-code="SZ-23"
-    onclick="window.location.href='SZ-23.html'">SZ-23</button>
+    <button data-code="SZ-23"
+        onclick="window.location.href='SZ-23.html'">SZ-23</button>
 
-<button data-code="SZ-25"
-    onclick="window.location.href='SZ-25.html'">SZ-25</button>
+    <button data-code="SZ-25"
+        onclick="window.location.href='SZ-25.html'">SZ-25</button>
 
-<button data-code="SZ-26"
-    onclick="window.location.href='SZ-26.html'">SZ-26</button>
+    <button data-code="SZ-26"
+        onclick="window.location.href='SZ-26.html'">SZ-26</button>
 
-<button data-code="SZ-27"
-    onclick="window.location.href='SZ-27.html'">SZ-27</button>
+    <button data-code="SZ-27"
+        onclick="window.location.href='SZ-27.html'">SZ-27</button>
 
-<button data-code="SZ-28"
-    onclick="window.location.href='SZ-28.html'">SZ-28</button>
+    <button data-code="SZ-28"
+        onclick="window.location.href='SZ-28.html'">SZ-28</button>
 
-<button data-code="SZ-29"
-    onclick="window.location.href='SZ-29.html'">SZ-29</button>
+    <button data-code="SZ-29"
+        onclick="window.location.href='SZ-29.html'">SZ-29</button>
 
-<button data-code="SZ-30"
-    onclick="window.location.href='SZ-30.html'">SZ-30</button>
+    <button data-code="SZ-30"
+        onclick="window.location.href='SZ-30.html'">SZ-30</button>
 
-<button data-code="SZ-32"
-    onclick="window.location.href='SZ-32.html'">SZ-32</button>
+    <button data-code="SZ-32"
+        onclick="window.location.href='SZ-32.html'">SZ-32</button>
 
-<button data-code="SZ-33"
-    onclick="window.location.href='SZ-33.html'">SZ-33</button>
+    <button data-code="SZ-33"
+        onclick="window.location.href='SZ-33.html'">SZ-33</button>
 
-<button data-code="SZ-34"
-    onclick="window.location.href='SZ-34.html'">SZ-34</button>
+    <button data-code="SZ-34"
+        onclick="window.location.href='SZ-34.html'">SZ-34</button>
 
-<button data-code="SZ-35"
-    onclick="window.location.href='SZ-35.html'">SZ-35</button>
+    <button data-code="SZ-35"
+        onclick="window.location.href='SZ-35.html'">SZ-35</button>
 
-<button data-code="SZ-36"
-    onclick="window.location.href='SZ-36.html'">SZ-36</button>
+    <button data-code="SZ-36"
+        onclick="window.location.href='SZ-36.html'">SZ-36</button>
 
-<button data-code="SZ-37"
-    onclick="window.location.href='SZ-37.html'">SZ-37</button>
+    <button data-code="SZ-37"
+        onclick="window.location.href='SZ-37.html'">SZ-37</button>
 
-<button data-code="SZ-38"
-    onclick="window.location.href='SZ-38.html'">SZ-38</button>
+    <button data-code="SZ-38"
+        onclick="window.location.href='SZ-38.html'">SZ-38</button>
 
-<button data-code="SZ-40"
-    onclick="window.location.href='SZ-40.html'">SZ-40</button>
+    <button data-code="SZ-40"
+        onclick="window.location.href='SZ-40.html'">SZ-40</button>
 
-<button data-code="SZ-50"
-    onclick="window.location.href='SZ-50.html'">SZ-50</button>
+    <button data-code="SZ-50"
+        onclick="window.location.href='SZ-50.html'">SZ-50</button>
 
-<button data-code="SZ-54"
-    onclick="window.location.href='SZ-54.html'">SZ-54</button>
+    <button data-code="SZ-54"
+        onclick="window.location.href='SZ-54.html'">SZ-54</button>
 
-<button data-code="SZ-60"
-    onclick="window.location.href='SZ-60.html'">SZ-60</button>
+    <button data-code="SZ-60"
+        onclick="window.location.href='SZ-60.html'">SZ-60</button>
 
-<button data-code="SZ-70"
-    onclick="window.location.href='SZ-70.html'">SZ-70</button>
+    <button data-code="SZ-70"
+        onclick="window.location.href='SZ-70.html'">SZ-70</button>
 
-<button data-code="SZ-101" class="temp-small"
-    onclick="window.location.href='SZ-101.html'">SZ-101</button>
+    <button data-code="SZ-101" class="temp-small"
+        onclick="window.location.href='SZ-101.html'">SZ-101</button>
 
-<button data-code="SZ-1000" class="temp-small"
-    onclick="window.location.href='SZ-1000.html'">SZ-1000</button>
+    <button data-code="SZ-1000" class="temp-small"
+        onclick="window.location.href='SZ-1000.html'">SZ-1000</button>
 
 </div>
-
-
-<!-- ============================================================
-     ALSÓ GOMBOK
-     ============================================================ -->
 
 <div id="bottomActions">
 
-<button id="massCheckButton">
-    📦 TÖMEGES ELLENŐRZÉS
-</button>
+    <button id="massCheckButton">
+        📷 TÖMEGES ELLENŐRZÉS
+    </button>
 
-<button id="backButton">
-    Vissza
-</button>
+    <button id="backButton">
+        Vissza
+    </button>
 
-<button id="refreshButton">
-    Frissít
-</button>
+    <button id="refreshButton">
+        Frissít
+    </button>
 
 </div>
 
 
-<!-- ============================================================
-     TÖMEGES ELLENŐRZÉS ABLAK
-     ============================================================ -->
+<!-- Tömeges ellenőrzés -->
 
 <div id="massCheckModal">
 
-<div id="massCheckContent">
+    <div id="massCheckContent">
 
-<div id="massCheckTitle">
-    📦 TÖMEGES ELLENŐRZÉS
+        <div id="massCheckTitle">
+            📷 TÖMEGES ELLENŐRZÉS
+        </div>
+
+        <div id="reader"></div>
+
+        <div id="scanStatus" class="status-info">
+            Kamera indítása...
+        </div>
+
+        <div id="massTotal">
+            Ellenőrizve:
+            <span id="massTotalCount">0</span>
+            db
+        </div>
+
+        <div id="massSummary">
+
+            <h3>📦 Túrák összesítése</h3>
+
+            <div id="summaryList">
+                Nincs még beolvasott kód.
+            </div>
+
+        </div>
+
+        <button id="closeMassCheck">
+            ✕ BEZÁRÁS
+        </button>
+
+    </div>
+
 </div>
 
-<div id="reader"></div>
 
-<div id="scanStatus" class="status-info">
-    Kamera indítása...
-</div>
-
-<div id="massTotal">
-    Ellenőrizve:
-    <span id="massTotalCount">0</span>
-    db
-</div>
-
-<div id="massSummary">
-
-<h3>📊 Túrák összesítése</h3>
-
-<div id="summaryList">
-    Nincs még beolvasott kód.
-</div>
-
-</div>
-
-<button id="closeMassCheck">
-    ✖ BEZÁRÁS
-</button>
-
-</div>
-
-</div>
-
-
-<!-- XLSX -->
+<!-- XLSX a táblázat olvasásához -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<!-- QR / BARCODE olvasó -->
+<!-- QR olvasó -->
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
 
 <script>
 
-/* ============================================================
-   EREDETI / KÖZÖS BEÁLLÍTÁSOK
-   ============================================================ */
+// ============================================================
+// ALAPBEÁLLÍTÁSOK
+// ============================================================
 
 const XLSX_URL =
     "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
 
 
-/* ============================================================
-   DONE JELÖLÉSEK
-   ============================================================ */
+// ============================================================
+// DONE JELÖLÉSEK
+// ============================================================
 
 const DONE_KEYS = [
     "done_SZ-1000",
@@ -483,42 +505,40 @@ const DONE_KEYS = [
 ];
 
 
-/* ============================================================
-   SCAN KULCS
-   ============================================================ */
+// ============================================================
+// SCAN KULCS SEGÉD
+// ============================================================
 
 function getScanKey(tour) {
     return tour + "_scannedList";
 }
 
 
-/* ============================================================
-   KÓD NORMALIZÁLÁSA
-   ============================================================ */
+// ============================================================
+// KÓD NORMALIZÁLÁSA
+// ============================================================
 
 function normalizeCode(value) {
 
-    if (value == null) {
-        return "";
-    }
+    if (value == null) return "";
 
     return String(value)
         .trim()
         .toUpperCase()
         .replace(/\s+/g, "")
-        .replace(/[–—]/g, "-");
+        .replace(/[‐-‒–—―]/g, "-");
 }
 
 
-/* ============================================================
-   EXCEL TÚRA ÁTALAKÍTÁSA
-   SZ-2   → SZ-2
-   SZ-802 → SZ-2
-   SZ-823 → SZ-23
-   SZ-835 → SZ-35
-   SZ-860 → SZ-60
-   SZ-8101 → SZ-101
-   ============================================================ */
+// ============================================================
+// EXCEL TÚRA ÁTALAKÍTÁSA
+//
+// SZ-2   -> SZ-2
+// SZ-802 -> SZ-2
+// SZ-835 -> SZ-35
+// SZ-860 -> SZ-60
+// SZ-8101 -> SZ-101
+// ============================================================
 
 function convertExcelTour(value) {
 
@@ -556,37 +576,126 @@ function convertExcelTour(value) {
 }
 
 
-/* ============================================================
-   SCAN ADATOK
-   ============================================================ */
+// ============================================================
+// EXCEL ADATOK
+// ============================================================
 
-const SCAN_KEYS = DONE_KEYS.map(key =>
-    key.replace("done_", "") + "_scannedList"
-);
+let massExcelData = null;
 
 
-/* ============================================================
-   EREDETI ZÖLDÍTÉS
-   ============================================================ */
+// ============================================================
+// EXCEL BETÖLTÉSE
+//
+// A = QR / csomagkód
+// C = túrakód
+// ============================================================
+
+async function loadMassExcelData() {
+
+    if (massExcelData !== null) {
+        return massExcelData;
+    }
+
+    const response = await fetch(XLSX_URL);
+
+    if (!response.ok) {
+        throw new Error(
+            "Nem sikerült betölteni az Excel fájlt."
+        );
+    }
+
+    const buffer = await response.arrayBuffer();
+
+    const workbook = XLSX.read(buffer, {
+        type: "array"
+    });
+
+    const sheet =
+        workbook.Sheets[workbook.SheetNames[0]];
+
+    const data =
+        XLSX.utils.sheet_to_json(
+            sheet,
+            { header: 1 }
+        );
+
+    const codeToTour = new Map();
+
+    const tourCodes = new Map();
+
+
+    for (let i = 1; i < data.length; i++) {
+
+        const row = data[i] || [];
+
+        const code = normalizeCode(row[0]);
+
+        const rawTour = row[2];
+
+        if (!code || rawTour == null) {
+            continue;
+        }
+
+        const tour =
+            convertExcelTour(rawTour);
+
+        if (!tour) {
+            continue;
+        }
+
+        // Kód -> túra
+        codeToTour.set(code, tour);
+
+        // Túra -> kódok
+        if (!tourCodes.has(tour)) {
+            tourCodes.set(
+                tour,
+                new Set()
+            );
+        }
+
+        tourCodes.get(tour).add(code);
+    }
+
+    massExcelData = {
+        codeToTour,
+        tourCodes
+    };
+
+    return massExcelData;
+}
+
+
+// ============================================================
+// DONE STÍLUS
+// ============================================================
 
 function applyDoneStyles() {
 
     const buttons =
-        document.querySelectorAll("#buttonsContainer button");
+        document.querySelectorAll(
+            '#buttonsContainer button'
+        );
 
     buttons.forEach(btn => {
 
-        btn.style.backgroundColor = "rgba(0,0,0,0.4)";
-        btn.style.borderColor = "#FFD700";
-        btn.style.color = "#FFD700";
+        btn.style.backgroundColor =
+            "rgba(0,0,0,0.4)";
 
+        btn.style.borderColor =
+            "#FFD700";
+
+        btn.style.color =
+            "#FFD700";
     });
+
 
     DONE_KEYS.forEach(key => {
 
         if (localStorage.getItem(key) === "true") {
 
-            const code = key.replace("done_", "");
+            const code =
+                key.replace("done_", "");
 
             const btn =
                 document.querySelector(
@@ -609,9 +718,9 @@ function applyDoneStyles() {
 }
 
 
-/* ============================================================
-   EXCEL ALAPJÁN GOMBOK MUTATÁSA
-   ============================================================ */
+// ============================================================
+// EXCEL ALAPJÁN GOMBOK MUTATÁSA
+// ============================================================
 
 async function updateButtonsVisibilityFromExcel() {
 
@@ -619,16 +728,22 @@ async function updateButtonsVisibilityFromExcel() {
 
     try {
 
-        const resp = await fetch(XLSX_URL);
+        const resp =
+            await fetch(XLSX_URL);
 
         const buffer =
             await resp.arrayBuffer();
 
         const wb =
-            XLSX.read(buffer, { type: "array" });
+            XLSX.read(
+                buffer,
+                { type: "array" }
+            );
 
         const sheet =
-            wb.Sheets[wb.SheetNames[0]];
+            wb.Sheets[
+                wb.SheetNames[0]
+            ];
 
         const data =
             XLSX.utils.sheet_to_json(
@@ -636,11 +751,18 @@ async function updateButtonsVisibilityFromExcel() {
                 { header: 1 }
             );
 
-        for (let i = 1; i < data.length; i++) {
 
-            const row = data[i] || [];
+        for (
+            let i = 1;
+            i < data.length;
+            i++
+        ) {
 
-            const val = row[2];
+            const row =
+                data[i] || [];
+
+            const val =
+                row[2];
 
             if (val == null) {
                 continue;
@@ -681,24 +803,28 @@ async function updateButtonsVisibilityFromExcel() {
 
     const buttons =
         document.querySelectorAll(
-            "#buttonsContainer button"
+            '#buttonsContainer button'
         );
 
 
     buttons.forEach(btn => {
 
         const code =
-            btn.getAttribute("data-code");
+            btn.getAttribute(
+                "data-code"
+            );
 
-        if (!code) {
-            return;
-        }
+        if (!code) return;
 
         const upperCode =
             code.toUpperCase();
 
 
-        if (excelBaseTours.has(upperCode)) {
+        if (
+            excelBaseTours.has(
+                upperCode
+            )
+        ) {
 
             btn.style.display = "";
 
@@ -706,151 +832,16 @@ async function updateButtonsVisibilityFromExcel() {
         else {
 
             btn.style.display = "none";
-
         }
-
     });
 }
 
 
-/* ============================================================
-   ============================================================
-   TÖMEGES ELLENŐRZÉS – PLUSZ FUNKCIÓ
-   ============================================================
-   ============================================================ */
+// ============================================================
+// TÖMEGES ELLENŐRZÉS
+// ============================================================
 
-
-/* ============================================================
-   TÖMEGES EXCEL ADATOK
-   ============================================================ */
-
-let massExcelData = null;
-
-
-/* ============================================================
-   EXCEL BETÖLTÉSE
-   A = QR / vonalkód
-   C = túrakód
-   ============================================================ */
-
-async function loadMassExcelData() {
-
-    if (massExcelData !== null) {
-
-        return massExcelData;
-    }
-
-
-    const response =
-        await fetch(XLSX_URL);
-
-
-    if (!response.ok) {
-
-        throw new Error(
-            "Nem sikerült betölteni az Excel fájlt."
-        );
-    }
-
-
-    const buffer =
-        await response.arrayBuffer();
-
-
-    const workbook =
-        XLSX.read(
-            buffer,
-            { type: "array" }
-        );
-
-
-    const sheet =
-        workbook.Sheets[
-            workbook.SheetNames[0]
-        ];
-
-
-    const data =
-        XLSX.utils.sheet_to_json(
-            sheet,
-            { header: 1 }
-        );
-
-
-    const codeToTour = new Map();
-
-    const tourCodes = new Map();
-
-
-    for (let i = 1; i < data.length; i++) {
-
-        const row = data[i] || [];
-
-        /* A oszlop */
-        const code =
-            normalizeCode(row[0]);
-
-        /* C oszlop */
-        const rawTour =
-            row[2];
-
-
-        if (!code || rawTour == null) {
-
-            continue;
-        }
-
-
-        const tour =
-            convertExcelTour(rawTour);
-
-
-        if (!tour) {
-
-            continue;
-        }
-
-
-        /* KÓD → TÚRA */
-
-        codeToTour.set(
-            code,
-            tour
-        );
-
-
-        /* TÚRA → KÓDOK */
-
-        if (!tourCodes.has(tour)) {
-
-            tourCodes.set(
-                tour,
-                new Set()
-            );
-        }
-
-
-        tourCodes
-            .get(tour)
-            .add(code);
-    }
-
-
-    massExcelData = {
-        codeToTour,
-        tourCodes
-    };
-
-
-    return massExcelData;
-}
-
-
-/* ============================================================
-   TÖMEGES VÁLTOZÓK
-   ============================================================ */
-
-let massHtml5QrCode = null;
+let html5QrCode = null;
 
 let massCheckRunning = false;
 
@@ -861,9 +852,9 @@ let massTourCounts = {};
 let massRecentlyScanned = new Set();
 
 
-/* ============================================================
-   TÖMEGES ELLENŐRZÉS MEGNYITÁSA
-   ============================================================ */
+// ============================================================
+// TÖMEGES ELLENŐRZÉS MEGNYITÁSA
+// ============================================================
 
 async function openMassCheck() {
 
@@ -929,80 +920,48 @@ async function openMassCheck() {
 }
 
 
-/* ============================================================
-   KAMERA INDÍTÁSA
-   ============================================================ */
+// ============================================================
+// KAMERA INDÍTÁSA
+//
+// FONTOS:
+// NINCS QRBOX.
+//
+// Ez azt jelenti, hogy a html5-qrcode
+// nem rajzol fehér négyzetet.
+//
+// Csak a kamera képe látszik.
+// ============================================================
 
 function startMassScanner() {
 
-    if (massHtml5QrCode) {
+    if (html5QrCode) {
 
         try {
-            massHtml5QrCode.stop();
+            html5QrCode.stop();
         }
         catch (e) {}
-
     }
 
 
-    massHtml5QrCode =
-        new Html5Qrcode("reader");
+    html5QrCode =
+        new Html5Qrcode(
+            "reader"
+        );
 
 
     const config = {
 
         fps: 10,
 
-        qrbox:
-            function(
-                viewfinderWidth,
-                viewfinderHeight
-            ) {
-
-                const size =
-                    Math.min(
-                        viewfinderWidth,
-                        viewfinderHeight
-                    ) * 0.7;
-
-
-                return {
-                    width: size,
-                    height: size
-                };
-            },
-
         aspectRatio: 1.0,
 
-        /* QR + vonalkód formátumok */
+        disableFlip: false
 
-        formatsToSupport: [
-
-            Html5QrcodeSupportedFormats.QR_CODE,
-
-            Html5QrcodeSupportedFormats.CODE_128,
-
-            Html5QrcodeSupportedFormats.CODE_39,
-
-            Html5QrcodeSupportedFormats.CODE_93,
-
-            Html5QrcodeSupportedFormats.CODABAR,
-
-            Html5QrcodeSupportedFormats.EAN_13,
-
-            Html5QrcodeSupportedFormats.EAN_8,
-
-            Html5QrcodeSupportedFormats.ITF,
-
-            Html5QrcodeSupportedFormats.UPC_A,
-
-            Html5QrcodeSupportedFormats.UPC_E
-
-        ]
+        // qrbox SZÁNDÉKOSAN NINCS
     };
 
 
-    massHtml5QrCode.start(
+    html5QrCode.start(
 
         {
             facingMode: {
@@ -1015,12 +974,11 @@ function startMassScanner() {
         onMassScanSuccess,
 
         function(errorMessage) {
-
-            /* normál esetben nincs teendő */
-
+            // Normál esetben nincs teendő.
         }
 
     )
+
     .then(() => {
 
         massCheckRunning = true;
@@ -1034,9 +992,9 @@ function startMassScanner() {
             "status-info";
 
         status.textContent =
-            "📷 Keresem a QR-kódot / vonalkódot...";
-
+            "📷 Keresem a QR-kódot...";
     })
+
     .catch(error => {
 
         console.error(
@@ -1045,71 +1003,47 @@ function startMassScanner() {
         );
 
         startMassScannerFallback();
-
     });
 }
 
 
-/* ============================================================
-   KAMERA TARTALÉK MÓD
-   ============================================================ */
+// ============================================================
+// KAMERA TARTALÉK MÓD
+//
+// ITT SINCS qrbox,
+// tehát itt sem jelenik meg fehér négyzet.
+// ============================================================
 
 function startMassScannerFallback() {
 
-    if (massHtml5QrCode) {
+    if (html5QrCode) {
 
         try {
-
-            massHtml5QrCode.clear();
-
+            html5QrCode.clear();
         }
         catch (e) {}
-
     }
 
 
-    massHtml5QrCode =
-        new Html5Qrcode("reader");
+    html5QrCode =
+        new Html5Qrcode(
+            "reader"
+        );
 
 
     const config = {
 
         fps: 10,
 
-        qrbox: {
-            width: 250,
-            height: 250
-        },
-
         aspectRatio: 1.0,
 
-        formatsToSupport: [
+        disableFlip: false
 
-            Html5QrcodeSupportedFormats.QR_CODE,
-
-            Html5QrcodeSupportedFormats.CODE_128,
-
-            Html5QrcodeSupportedFormats.CODE_39,
-
-            Html5QrcodeSupportedFormats.CODE_93,
-
-            Html5QrcodeSupportedFormats.CODABAR,
-
-            Html5QrcodeSupportedFormats.EAN_13,
-
-            Html5QrcodeSupportedFormats.EAN_8,
-
-            Html5QrcodeSupportedFormats.ITF,
-
-            Html5QrcodeSupportedFormats.UPC_A,
-
-            Html5QrcodeSupportedFormats.UPC_E
-
-        ]
+        // NINCS qrbox
     };
 
 
-    massHtml5QrCode.start(
+    html5QrCode.start(
 
         {
             facingMode: "environment"
@@ -1122,6 +1056,7 @@ function startMassScannerFallback() {
         function(errorMessage) {}
 
     )
+
     .then(() => {
 
         massCheckRunning = true;
@@ -1135,9 +1070,9 @@ function startMassScannerFallback() {
             "status-info";
 
         status.textContent =
-            "📷 Keresem a QR-kódot / vonalkódot...";
-
+            "📷 Keresem a QR-kódot...";
     })
+
     .catch(error => {
 
         console.error(error);
@@ -1152,42 +1087,40 @@ function startMassScannerFallback() {
 
         status.textContent =
             "❌ Nem sikerült elindítani a kamerát.";
-
     });
 }
 
 
-/* ============================================================
-   BEOLVASÁS
-   ============================================================ */
+// ============================================================
+// QR KÓD BEOLVASÁSA
+// ============================================================
 
 function onMassScanSuccess(decodedText) {
 
     if (!massCheckRunning) {
-
         return;
     }
 
 
     const code =
-        normalizeCode(decodedText);
+        normalizeCode(
+            decodedText
+        );
 
 
     if (!code) {
-
         return;
     }
 
 
     /*
-     * A kamera rövid idő alatt
+     * Ugyanaz a kamera rövid időn belül
      * többször is felismerheti ugyanazt.
      */
 
     if (
         massRecentlyScanned.has(code)
     ) {
-
         return;
     }
 
@@ -1197,7 +1130,9 @@ function onMassScanSuccess(decodedText) {
 
     setTimeout(() => {
 
-        massRecentlyScanned.delete(code);
+        massRecentlyScanned.delete(
+            code
+        );
 
     }, 1500);
 
@@ -1206,9 +1141,9 @@ function onMassScanSuccess(decodedText) {
 }
 
 
-/* ============================================================
-   KÓD FELDOLGOZÁSA
-   ============================================================ */
+// ============================================================
+// BEOLVASOTT KÓD FELDOLGOZÁSA
+// ============================================================
 
 function processMassCode(code) {
 
@@ -1217,22 +1152,21 @@ function processMassCode(code) {
             "scanStatus"
         );
 
-
     const data =
         massExcelData;
 
 
     /*
-     * A oszlopban keressük.
+     * Megkeressük az A oszlopban.
      */
 
     const tour =
         data.codeToTour.get(code);
 
 
-    /* ========================================================
-       NINCS TALÁLAT
-       ======================================================== */
+    // --------------------------------------------------------
+    // NINCS TALÁLAT
+    // --------------------------------------------------------
 
     if (!tour) {
 
@@ -1253,7 +1187,8 @@ function processMassCode(code) {
 
 
     /*
-     * Meglévő sessionStorage lista
+     * A meglévő túraoldalak JSON tömbként
+     * tárolják a beolvasott kódokat.
      */
 
     let scannedList = [];
@@ -1275,8 +1210,8 @@ function processMassCode(code) {
 
             if (Array.isArray(parsed)) {
 
-                scannedList = parsed;
-
+                scannedList =
+                    parsed;
             }
         }
 
@@ -1287,12 +1222,12 @@ function processMassCode(code) {
             "Scanned lista olvasási hiba:",
             e
         );
-
     }
 
 
     /*
-     * DUPLIKÁCIÓ
+     * Megnézzük, hogy ezt a kódot
+     * már ellenőrizték-e.
      */
 
     const alreadyScanned =
@@ -1308,10 +1243,10 @@ function processMassCode(code) {
             "status-info";
 
         status.textContent =
-            "⚠️ MÁR ELLENŐRIZVE: " +
-            code +
-            " → " +
-            tour;
+            "🔄 MÁR ELLENŐRIZVE: "
+            + code
+            + " › "
+            + tour;
 
         beepWarning();
 
@@ -1319,26 +1254,23 @@ function processMassCode(code) {
     }
 
 
-    /* ========================================================
-       ÚJ KÓD
-       ======================================================== */
+    // --------------------------------------------------------
+    // ÚJ KÓD
+    // --------------------------------------------------------
 
     scannedList.push(code);
 
 
     sessionStorage.setItem(
-
         scanKey,
-
         JSON.stringify(
             scannedList
         )
-
     );
 
 
     /*
-     * STATISZTIKA
+     * Statisztika
      */
 
     massTotalScanned++;
@@ -1347,7 +1279,6 @@ function processMassCode(code) {
     if (!massTourCounts[tour]) {
 
         massTourCounts[tour] = 0;
-
     }
 
 
@@ -1355,7 +1286,8 @@ function processMassCode(code) {
 
 
     /*
-     * Kész-e a túra?
+     * Megnézzük, hogy elkészült-e
+     * már a túra.
      */
 
     checkMassTourDone(
@@ -1365,7 +1297,7 @@ function processMassCode(code) {
 
 
     /*
-     * Képernyő frissítés
+     * Frissítjük a képernyőt.
      */
 
     updateMassSummary();
@@ -1374,21 +1306,20 @@ function processMassCode(code) {
     status.className =
         "status-success";
 
-
     status.textContent =
-        "✅ " +
-        code +
-        " → " +
-        tour;
+        "✅ "
+        + code
+        + " › "
+        + tour;
 
 
     beepSuccess();
 }
 
 
-/* ============================================================
-   TÚRA KÉSZ-E?
-   ============================================================ */
+// ============================================================
+// TÚRA KÉSZ-E?
+// ============================================================
 
 function checkMassTourDone(
     tour,
@@ -1396,7 +1327,6 @@ function checkMassTourDone(
 ) {
 
     if (!massExcelData) {
-
         return;
     }
 
@@ -1408,7 +1338,6 @@ function checkMassTourDone(
 
 
     if (!tourCodes) {
-
         return;
     }
 
@@ -1422,16 +1351,17 @@ function checkMassTourDone(
         );
 
 
+    /*
+     * Csak akkor kész, ha minden Excelben
+     * szereplő A oszlopos kód megvan.
+     */
+
     let allDone = true;
 
 
-    for (
-        const code of tourCodes
-    ) {
+    for (const code of tourCodes) {
 
-        if (
-            !scannedSet.has(code)
-        ) {
+        if (!scannedSet.has(code)) {
 
             allDone = false;
 
@@ -1448,18 +1378,14 @@ function checkMassTourDone(
         );
 
 
-        /*
-         * Az eredeti zöldítés használata.
-         */
-
         applyDoneStyles();
     }
 }
 
 
-/* ============================================================
-   ÖSSZESÍTÉS
-   ============================================================ */
+// ============================================================
+// ÖSSZESÍTÉS
+// ============================================================
 
 function updateMassSummary() {
 
@@ -1483,24 +1409,24 @@ function updateMassSummary() {
         Object.keys(
             massTourCounts
         )
-        .sort((a, b) => {
+        .sort(
+            (a, b) => {
 
-            const na =
-                parseInt(
-                    a.replace("SZ-", ""),
-                    10
-                );
+                const na =
+                    parseInt(
+                        a.replace("SZ-", ""),
+                        10
+                    );
 
+                const nb =
+                    parseInt(
+                        b.replace("SZ-", ""),
+                        10
+                    );
 
-            const nb =
-                parseInt(
-                    b.replace("SZ-", ""),
-                    10
-                );
-
-
-            return na - nb;
-        });
+                return na - nb;
+            }
+        );
 
 
     if (tours.length === 0) {
@@ -1522,7 +1448,6 @@ function updateMassSummary() {
                 "div"
             );
 
-
         row.className =
             "summaryRow";
 
@@ -1532,10 +1457,8 @@ function updateMassSummary() {
                 "span"
             );
 
-
         tourSpan.className =
             "summaryTour";
-
 
         tourSpan.textContent =
             tour;
@@ -1546,20 +1469,17 @@ function updateMassSummary() {
                 "span"
             );
 
-
         countSpan.className =
             "summaryCount";
 
-
         countSpan.textContent =
-            massTourCounts[tour] +
-            " db";
+            massTourCounts[tour]
+            + " db";
 
 
         row.appendChild(
             tourSpan
         );
-
 
         row.appendChild(
             countSpan
@@ -1569,29 +1489,27 @@ function updateMassSummary() {
         summary.appendChild(
             row
         );
-
     });
 }
 
 
-/* ============================================================
-   KAMERA LEÁLLÍTÁSA
-   ============================================================ */
+// ============================================================
+// KAMERA LEÁLLÍTÁSA
+// ============================================================
 
 async function stopMassScanner() {
 
     massCheckRunning = false;
 
 
-    if (!massHtml5QrCode) {
-
+    if (!html5QrCode) {
         return;
     }
 
 
     try {
 
-        await massHtml5QrCode.stop();
+        await html5QrCode.stop();
 
     }
     catch (e) {
@@ -1600,25 +1518,24 @@ async function stopMassScanner() {
             "Kamera leállítás:",
             e
         );
-
     }
 
 
     try {
 
-        massHtml5QrCode.clear();
+        html5QrCode.clear();
 
     }
     catch (e) {}
 
 
-    massHtml5QrCode = null;
+    html5QrCode = null;
 }
 
 
-/* ============================================================
-   TÖMEGES ELLENŐRZÉS BEZÁRÁSA
-   ============================================================ */
+// ============================================================
+// TÖMEGES ELLENŐRZÉS BEZÁRÁSA
+// ============================================================
 
 async function closeMassCheck() {
 
@@ -1648,9 +1565,9 @@ async function closeMassCheck() {
 }
 
 
-/* ============================================================
-   HANGJELZÉSEK
-   ============================================================ */
+// ============================================================
+// HANGJELZÉSEK
+// ============================================================
 
 function beepSuccess() {
 
@@ -1660,14 +1577,11 @@ function beepSuccess() {
             window.AudioContext ||
             window.webkitAudioContext;
 
-
         const ctx =
             new AudioContext();
 
-
         const oscillator =
             ctx.createOscillator();
-
 
         const gain =
             ctx.createGain();
@@ -1676,10 +1590,8 @@ function beepSuccess() {
         oscillator.frequency.value =
             1000;
 
-
         oscillator.type =
             "sine";
-
 
         gain.gain.value =
             0.15;
@@ -1693,7 +1605,6 @@ function beepSuccess() {
 
 
         oscillator.start();
-
 
         oscillator.stop(
             ctx.currentTime + 0.12
@@ -1712,14 +1623,11 @@ function beepWarning() {
             window.AudioContext ||
             window.webkitAudioContext;
 
-
         const ctx =
             new AudioContext();
 
-
         const oscillator =
             ctx.createOscillator();
-
 
         const gain =
             ctx.createGain();
@@ -1728,10 +1636,8 @@ function beepWarning() {
         oscillator.frequency.value =
             500;
 
-
         oscillator.type =
             "sine";
-
 
         gain.gain.value =
             0.12;
@@ -1745,7 +1651,6 @@ function beepWarning() {
 
 
         oscillator.start();
-
 
         oscillator.stop(
             ctx.currentTime + 0.18
@@ -1764,14 +1669,11 @@ function beepError() {
             window.AudioContext ||
             window.webkitAudioContext;
 
-
         const ctx =
             new AudioContext();
 
-
         const oscillator =
             ctx.createOscillator();
-
 
         const gain =
             ctx.createGain();
@@ -1780,10 +1682,8 @@ function beepError() {
         oscillator.frequency.value =
             250;
 
-
         oscillator.type =
             "square";
-
 
         gain.gain.value =
             0.15;
@@ -1798,7 +1698,6 @@ function beepError() {
 
         oscillator.start();
 
-
         oscillator.stop(
             ctx.currentTime + 0.25
         );
@@ -1808,25 +1707,22 @@ function beepError() {
 }
 
 
-/* ============================================================
-   ESEMÉNYKEZELÉS
-   ============================================================ */
+// ============================================================
+// ESEMÉNYKEZELÉS
+// ============================================================
 
 window.addEventListener(
     "DOMContentLoaded",
     () => {
-
-
-        /* EREDETI */
 
         applyDoneStyles();
 
         updateButtonsVisibilityFromExcel();
 
 
-        /* ====================================================
-           TÖMEGES ELLENŐRZÉS
-           ==================================================== */
+        // ---------------------------------------------
+        // TÖMEGES ELLENŐRZÉS
+        // ---------------------------------------------
 
         document
             .getElementById(
@@ -1838,9 +1734,9 @@ window.addEventListener(
             );
 
 
-        /* ====================================================
-           BEZÁRÁS
-           ==================================================== */
+        // ---------------------------------------------
+        // BEZÁRÁS
+        // ---------------------------------------------
 
         document
             .getElementById(
@@ -1852,9 +1748,9 @@ window.addEventListener(
             );
 
 
-        /* ====================================================
-           VISSZA
-           ==================================================== */
+        // ---------------------------------------------
+        // VISSZA
+        // ---------------------------------------------
 
         document
             .getElementById(
@@ -1866,14 +1762,13 @@ window.addEventListener(
 
                     window.location.href =
                         "arukiadas.html";
-
                 }
             );
 
 
-        /* ====================================================
-           FRISSÍT
-           ==================================================== */
+        // ---------------------------------------------
+        // FRISSÍT
+        // ---------------------------------------------
 
         document
             .getElementById(
@@ -1890,7 +1785,6 @@ window.addEventListener(
 
 
                     if (!ok) {
-
                         return;
                     }
 
@@ -1902,33 +1796,33 @@ window.addEventListener(
 
 
                     /*
-                     * Minden SZ túra scanned listája
+                     * Az összes SZ- túra
+                     * scanned listáját töröljük.
                      */
 
                     Object.keys(
                         sessionStorage
-                    ).forEach(key => {
+                    ).forEach(
+                        key => {
 
-                        if (
-                            key.startsWith("SZ-") &&
-                            key.endsWith(
-                                "_scannedList"
-                            )
-                        ) {
+                            if (
+                                key.startsWith("SZ-") &&
+                                key.endsWith(
+                                    "_scannedList"
+                                )
+                            ) {
 
-                            sessionStorage.removeItem(
-                                key
-                            );
+                                sessionStorage.removeItem(
+                                    key
+                                );
+                            }
                         }
-
-                    });
+                    );
 
 
                     applyDoneStyles();
-
                 }
             );
-
     }
 );
 
