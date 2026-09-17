@@ -7,259 +7,233 @@
 
 <style>
 html, body {
-    margin: 0;
-    padding: 0;
-    min-height: 100%;
-    font-family: Arial, sans-serif;
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family:Arial,sans-serif;
     background:
-        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+        linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35)),
         url("icons/logo.png") no-repeat center center fixed;
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    position: relative;
-    color: white;
+    background-size:cover;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:center;
+    position:relative;
+    color:white;
 }
 
-/* Gombok rácsa – 4 oszlop */
+/* =========================
+   4 OSZLOPOS GOMBSOR
+   ========================= */
+
 #buttonsContainer {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-top: 60px;
-    z-index: 1;
-    width: 100%;
-    max-width: 720px;
-    padding: 0 16px 180px 16px;
-    box-sizing: border-box;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px;
+    margin-top:60px;
+    z-index:1;
+    width:100%;
+    max-width:600px;
+    padding:0 10px;
+    box-sizing:border-box;
 }
 
 button {
-    padding: 14px;
-    font-size: 20px;
-    color: #FFD700;
-    background: rgba(0,0,0,0.4);
-    border: 2px solid #FFD700;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    padding:16px 8px;
+    font-size:20px;
+    font-weight:600;
+    color:#FFD700;
+    background:rgba(0,0,0,0.4);
+    border:2px solid #FFD700;
+    border-radius:12px;
+    cursor:pointer;
+    transition:all 0.3s ease;
 }
 
 button:hover {
-    background: rgba(255,215,0,0.2);
-    transform: scale(1.05);
+    background:rgba(255,215,0,0.2);
+    transform:scale(1.03);
 }
 
+/* Minden SZ gomb azonos méretű */
 button.temp-small {
-    padding: 10px;
-    font-size: 16px;
+    padding:16px 8px;
+    font-size:20px;
 }
 
-/* Alsó gombsor */
+/* =========================
+   ALSÓ GOMBSOR
+   ========================= */
+
 #bottomActions {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 10;
-    width: 90%;
-    max-width: 400px;
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:20px;
+    z-index:1;
+    width:80%;
+    max-width:400px;
+    justify-content:center;
 }
 
 #bottomActions button {
-    width: 100%;
-    padding: 12px 0;
-    font-size: 18px;
+    width:32%;
+    padding:12px 0;
+    font-size:18px;
 }
 
-/* Tömeges ellenőrzés gomb */
+/* =========================
+   TÖMEGES ELLENŐRZÉS
+   ========================= */
+
 #massCheckButton {
-    color: #ffffff;
-    background: rgba(0,90,160,0.85);
-    border-color: #00aaff;
-    font-weight: bold;
+    color:#ffffff;
+    background:rgba(0,90,160,0.85);
+    border-color:#00aaff;
+    font-weight:bold;
 }
 
 #massCheckButton:hover {
-    background: rgba(0,130,220,0.9);
+    background:rgba(0,130,220,0.9);
 }
 
-/* Tömeges ellenőrzés ablak */
+/* =========================
+   TÖMEGES ELLENŐRZÉS ABLAK
+   ========================= */
+
 #massCheckModal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.92);
-    z-index: 1000;
-    overflow-y: auto;
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.92);
+    z-index:1000;
+    overflow-y:auto;
 }
 
 #massCheckContent {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    min-height: 100%;
-    box-sizing: border-box;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
+    width:100%;
+    max-width:600px;
+    margin:0 auto;
+    min-height:100%;
+    box-sizing:border-box;
+    padding:15px;
+    display:flex;
+    flex-direction:column;
 }
 
 #massCheckTitle {
-    text-align: center;
-    color: #FFD700;
-    font-size: 25px;
-    margin: 5px 0 12px 0;
+    text-align:center;
+    color:#FFD700;
+    font-size:25px;
+    margin:5px 0 12px 0;
 }
 
-/*
- * KAMERA
- *
- * Fontos:
- * A html5-qrcode alapértelmezett qrbox keretét
- * nem használjuk.
- *
- * Így csak a kamera képe jelenik meg.
- */
-#reader {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #111;
+/* Csak a kamera képe */
+#massReader {
+    width:100%;
+    max-width:600px;
+    margin:0 auto;
+    border-radius:12px;
+    overflow:hidden;
+    background:#111;
 }
 
-/* A html5-qrcode esetleges belső elemei */
-#reader > div {
-    width: 100% !important;
+#massReader video {
+    width:100% !important;
+    height:auto !important;
+    display:block;
 }
 
-#reader video {
-    width: 100% !important;
-    height: auto !important;
-    display: block;
-    object-fit: cover;
+#massReader__scan_region {
+    background:transparent !important;
 }
 
-/* Ha a könyvtár mégis létrehozna scan-region elemet,
-   annak keretét és hátterét eltüntetjük. */
-#reader__scan_region {
-    background: transparent !important;
+#massReader__scan_region > img {
+    display:none !important;
 }
 
-#reader__scan_region > img {
-    display: none !important;
+#massScanStatus {
+    margin-top:12px;
+    padding:14px;
+    border-radius:10px;
+    text-align:center;
+    font-size:19px;
+    font-weight:bold;
+    background:rgba(255,255,255,0.1);
+    min-height:25px;
 }
 
-#reader__dashboard_section_csr {
-    background: transparent !important;
+.mass-status-success {
+    color:#00ff66;
+    border:2px solid #00aa44;
+    background:rgba(0,128,0,0.25) !important;
 }
 
-/* Állapot */
-#scanStatus {
-    margin-top: 12px;
-    padding: 14px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 19px;
-    font-weight: bold;
-    background: rgba(255,255,255,0.1);
-    min-height: 25px;
+.mass-status-error {
+    color:#ff5555;
+    border:2px solid #cc2222;
+    background:rgba(150,0,0,0.25) !important;
 }
 
-.status-success {
-    color: #00ff66;
-    border: 2px solid #00aa44;
-    background: rgba(0,128,0,0.25) !important;
+.mass-status-info {
+    color:#FFD700;
+    border:2px solid #aa8800;
 }
 
-.status-error {
-    color: #ff5555;
-    border: 2px solid #cc2222;
-    background: rgba(150,0,0,0.25) !important;
-}
-
-.status-info {
-    color: #FFD700;
-    border: 2px solid #aa8800;
-}
-
-/* Összesítés */
 #massSummary {
-    margin-top: 12px;
-    padding: 12px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 10px;
+    margin-top:12px;
+    padding:12px;
+    background:rgba(255,255,255,0.08);
+    border-radius:10px;
 }
 
 #massSummary h3 {
-    margin: 0 0 8px 0;
-    color: #FFD700;
-    text-align: center;
+    margin:0 0 8px 0;
+    color:#FFD700;
+    text-align:center;
 }
 
-.summaryRow {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-    font-size: 17px;
+.massSummaryRow {
+    display:flex;
+    justify-content:space-between;
+    padding:6px 8px;
+    border-bottom:1px solid rgba(255,255,255,0.15);
+    font-size:17px;
 }
 
-.summaryRow:last-child {
-    border-bottom: none;
+.massSummaryRow:last-child {
+    border-bottom:none;
 }
 
-.summaryTour {
-    color: #FFD700;
-    font-weight: bold;
+.massSummaryTour {
+    color:#FFD700;
+    font-weight:bold;
 }
 
-.summaryCount {
-    color: #00ff66;
-    font-weight: bold;
-}
-
-/* Bezárás */
-#closeMassCheck {
-    margin-top: 15px;
-    background: rgba(160,0,0,0.8);
-    border-color: #ff4444;
-    color: white;
-    font-weight: bold;
+.massSummaryCount {
+    color:#00ff66;
+    font-weight:bold;
 }
 
 #massTotal {
-    text-align: center;
-    margin-top: 8px;
-    font-size: 18px;
-    color: #ffffff;
+    text-align:center;
+    margin-top:8px;
+    font-size:18px;
+    color:#ffffff;
 }
 
-/* Telefonon maradjon használható */
-@media (max-width: 600px) {
-    #buttonsContainer {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        padding-left: 8px;
-        padding-right: 8px;
-    }
-
-    #buttonsContainer button {
-        padding: 10px 4px;
-        font-size: 14px;
-    }
-
-    button.temp-small {
-        padding: 8px 4px;
-        font-size: 13px;
-    }
+#closeMassCheck {
+    margin-top:15px;
+    background:rgba(160,0,0,0.8);
+    border-color:#ff4444;
+    color:white;
+    font-weight:bold;
 }
 </style>
 </head>
@@ -387,7 +361,7 @@ button.temp-small {
 <div id="bottomActions">
 
     <button id="massCheckButton">
-        📷 TÖMEGES ELLENŐRZÉS
+        TÖMEGES ELLENŐRZÉS
     </button>
 
     <button id="backButton">
@@ -400,20 +374,21 @@ button.temp-small {
 
 </div>
 
-
-<!-- Tömeges ellenőrzés -->
+<!-- =========================
+     TÖMEGES ELLENŐRZÉS ABLAK
+     ========================= -->
 
 <div id="massCheckModal">
 
     <div id="massCheckContent">
 
         <div id="massCheckTitle">
-            📷 TÖMEGES ELLENŐRZÉS
+            TÖMEGES ELLENŐRZÉS
         </div>
 
-        <div id="reader"></div>
+        <div id="massReader"></div>
 
-        <div id="scanStatus" class="status-info">
+        <div id="massScanStatus" class="mass-status-info">
             Kamera indítása...
         </div>
 
@@ -425,43 +400,40 @@ button.temp-small {
 
         <div id="massSummary">
 
-            <h3>📦 Túrák összesítése</h3>
+            <h3>
+                Túrák összesítése
+            </h3>
 
-            <div id="summaryList">
+            <div id="massSummaryList">
                 Nincs még beolvasott kód.
             </div>
 
         </div>
 
         <button id="closeMassCheck">
-            ✕ BEZÁRÁS
+            BEZÁRÁS
         </button>
 
     </div>
 
 </div>
 
-
-<!-- XLSX a táblázat olvasásához -->
+<!-- XLSX -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
-<!-- QR olvasó -->
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
 
 <script>
 
-// ============================================================
-// ALAPBEÁLLÍTÁSOK
-// ============================================================
+/* =========================
+   EXCEL
+   ========================= */
 
 const XLSX_URL =
     "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
 
 
-// ============================================================
-// DONE JELÖLÉSEK
-// ============================================================
+/* =========================
+   DONE KULCSOK
+   ========================= */
 
 const DONE_KEYS = [
     "done_SZ-1000",
@@ -505,176 +477,60 @@ const DONE_KEYS = [
 ];
 
 
-// ============================================================
-// SCAN KULCS SEGÉD
-// ============================================================
+/* =========================
+   SCANNED LIST KULCSOK
+   ========================= */
 
-function getScanKey(tour) {
-    return tour + "_scannedList";
-}
-
-
-// ============================================================
-// KÓD NORMALIZÁLÁSA
-// ============================================================
-
-function normalizeCode(value) {
-
-    if (value == null) return "";
-
-    return String(value)
-        .trim()
-        .toUpperCase()
-        .replace(/\s+/g, "")
-        .replace(/[‐-‒–—―]/g, "-");
-}
-
-
-// ============================================================
-// EXCEL TÚRA ÁTALAKÍTÁSA
-//
-// SZ-2   -> SZ-2
-// SZ-802 -> SZ-2
-// SZ-835 -> SZ-35
-// SZ-860 -> SZ-60
-// SZ-8101 -> SZ-101
-// ============================================================
-
-function convertExcelTour(value) {
-
-    let norm = normalizeCode(value);
-
-    if (!norm.startsWith("SZ-")) {
-        return null;
-    }
-
-    const numStr = norm.slice(3);
-
-    if (!/^\d+$/.test(numStr)) {
-        return null;
-    }
-
-    const rawNum = parseInt(numStr, 10);
-
-    if (isNaN(rawNum)) {
-        return null;
-    }
-
-    let baseNum;
-
-    if (rawNum >= 8000) {
-        baseNum = rawNum - 8000;
-    }
-    else if (rawNum >= 800) {
-        baseNum = rawNum - 800;
-    }
-    else {
-        baseNum = rawNum;
-    }
-
-    return "SZ-" + baseNum;
-}
+const SCAN_KEYS = [
+    "SZ-1000_scannedList",
+    "SZ-2_scannedList",
+    "SZ-3_scannedList",
+    "SZ-4_scannedList",
+    "SZ-0_scannedList",
+    "SZ-7_scannedList",
+    "SZ-9_scannedList",
+    "SZ-10_scannedList",
+    "SZ-101_scannedList",
+    "SZ-1_scannedList",
+    "SZ-5_scannedList",
+    "SZ-12_scannedList",
+    "SZ-14_scannedList",
+    "SZ-15_scannedList",
+    "SZ-18_scannedList",
+    "SZ-19_scannedList",
+    "SZ-20_scannedList",
+    "SZ-21_scannedList",
+    "SZ-22_scannedList",
+    "SZ-23_scannedList",
+    "SZ-25_scannedList",
+    "SZ-27_scannedList",
+    "SZ-28_scannedList",
+    "SZ-29_scannedList",
+    "SZ-30_scannedList",
+    "SZ-32_scannedList",
+    "SZ-33_scannedList",
+    "SZ-34_scannedList",
+    "SZ-35_scannedList",
+    "SZ-36_scannedList",
+    "SZ-37_scannedList",
+    "SZ-38_scannedList",
+    "SZ-40_scannedList",
+    "SZ-50_scannedList",
+    "SZ-60_scannedList",
+    "SZ-70_scannedList",
+    "SZ-54_scannedList"
+];
 
 
-// ============================================================
-// EXCEL ADATOK
-// ============================================================
-
-let massExcelData = null;
-
-
-// ============================================================
-// EXCEL BETÖLTÉSE
-//
-// A = QR / csomagkód
-// C = túrakód
-// ============================================================
-
-async function loadMassExcelData() {
-
-    if (massExcelData !== null) {
-        return massExcelData;
-    }
-
-    const response = await fetch(XLSX_URL);
-
-    if (!response.ok) {
-        throw new Error(
-            "Nem sikerült betölteni az Excel fájlt."
-        );
-    }
-
-    const buffer = await response.arrayBuffer();
-
-    const workbook = XLSX.read(buffer, {
-        type: "array"
-    });
-
-    const sheet =
-        workbook.Sheets[workbook.SheetNames[0]];
-
-    const data =
-        XLSX.utils.sheet_to_json(
-            sheet,
-            { header: 1 }
-        );
-
-    const codeToTour = new Map();
-
-    const tourCodes = new Map();
-
-
-    for (let i = 1; i < data.length; i++) {
-
-        const row = data[i] || [];
-
-        const code = normalizeCode(row[0]);
-
-        const rawTour = row[2];
-
-        if (!code || rawTour == null) {
-            continue;
-        }
-
-        const tour =
-            convertExcelTour(rawTour);
-
-        if (!tour) {
-            continue;
-        }
-
-        // Kód -> túra
-        codeToTour.set(code, tour);
-
-        // Túra -> kódok
-        if (!tourCodes.has(tour)) {
-            tourCodes.set(
-                tour,
-                new Set()
-            );
-        }
-
-        tourCodes.get(tour).add(code);
-    }
-
-    massExcelData = {
-        codeToTour,
-        tourCodes
-    };
-
-    return massExcelData;
-}
-
-
-// ============================================================
-// DONE STÍLUS
-// ============================================================
+/* =========================
+   DONE STÍLUS
+   ========================= */
 
 function applyDoneStyles() {
 
     const buttons =
         document.querySelectorAll(
-            '#buttonsContainer button'
+            "#buttonsContainer button"
         );
 
     buttons.forEach(btn => {
@@ -692,7 +548,10 @@ function applyDoneStyles() {
 
     DONE_KEYS.forEach(key => {
 
-        if (localStorage.getItem(key) === "true") {
+        if (
+            localStorage.getItem(key)
+            === "true"
+        ) {
 
             const code =
                 key.replace("done_", "");
@@ -718,13 +577,14 @@ function applyDoneStyles() {
 }
 
 
-// ============================================================
-// EXCEL ALAPJÁN GOMBOK MUTATÁSA
-// ============================================================
+/* =========================
+   EXCEL ALAPÚ LÁTHATÓSÁG
+   ========================= */
 
 async function updateButtonsVisibilityFromExcel() {
 
-    let excelBaseTours = new Set();
+    let excelBaseTours =
+        new Set();
 
     try {
 
@@ -737,7 +597,7 @@ async function updateButtonsVisibilityFromExcel() {
         const wb =
             XLSX.read(
                 buffer,
-                { type: "array" }
+                { type:"array" }
             );
 
         const sheet =
@@ -748,7 +608,7 @@ async function updateButtonsVisibilityFromExcel() {
         const data =
             XLSX.utils.sheet_to_json(
                 sheet,
-                { header: 1 }
+                { header:1 }
             );
 
 
@@ -764,26 +624,79 @@ async function updateButtonsVisibilityFromExcel() {
             const val =
                 row[2];
 
-            if (val == null) {
+            if (val == null)
                 continue;
+
+
+            let norm =
+                String(val)
+                    .trim()
+                    .toUpperCase();
+
+            if (
+                !norm.startsWith("SZ-")
+            )
+                continue;
+
+
+            norm =
+                norm.replace(
+                    /\s+/g,
+                    ""
+                );
+
+
+            const numStr =
+                norm.slice(3);
+
+            if (
+                !/^\d+$/.test(numStr)
+            )
+                continue;
+
+
+            const rawNum =
+                parseInt(
+                    numStr,
+                    10
+                );
+
+            if (isNaN(rawNum))
+                continue;
+
+
+            let baseNum;
+
+
+            if (rawNum >= 8000) {
+
+                baseNum =
+                    rawNum - 8000;
+
+            } else if (rawNum >= 800) {
+
+                baseNum =
+                    rawNum - 800;
+
+            } else {
+
+                baseNum =
+                    rawNum;
             }
+
 
             const baseCode =
-                convertExcelTour(val);
+                "SZ-" + baseNum;
 
-            if (baseCode) {
-
-                excelBaseTours.add(
-                    baseCode.toUpperCase()
-                );
-            }
+            excelBaseTours.add(
+                baseCode.toUpperCase()
+            );
         }
 
-    }
-    catch (e) {
+    } catch (e) {
 
         console.error(
-            "Excel betöltési hiba a Szami oldalon:",
+            "Excel betöltési hiba:",
             e
         );
 
@@ -791,7 +704,9 @@ async function updateButtonsVisibilityFromExcel() {
     }
 
 
-    if (excelBaseTours.size === 0) {
+    if (
+        excelBaseTours.size === 0
+    ) {
 
         console.warn(
             "Nem találtam SZ túrákat az Excelben."
@@ -803,7 +718,7 @@ async function updateButtonsVisibilityFromExcel() {
 
     const buttons =
         document.querySelectorAll(
-            '#buttonsContainer button'
+            "#buttonsContainer button"
         );
 
 
@@ -814,7 +729,9 @@ async function updateButtonsVisibilityFromExcel() {
                 "data-code"
             );
 
-        if (!code) return;
+        if (!code)
+            return;
+
 
         const upperCode =
             code.toUpperCase();
@@ -826,890 +743,21 @@ async function updateButtonsVisibilityFromExcel() {
             )
         ) {
 
-            btn.style.display = "";
+            btn.style.display =
+                "";
 
-        }
-        else {
+        } else {
 
-            btn.style.display = "none";
+            btn.style.display =
+                "none";
         }
     });
 }
 
 
-// ============================================================
-// TÖMEGES ELLENŐRZÉS
-// ============================================================
-
-let html5QrCode = null;
-
-let massCheckRunning = false;
-
-let massTotalScanned = 0;
-
-let massTourCounts = {};
-
-let massRecentlyScanned = new Set();
-
-
-// ============================================================
-// TÖMEGES ELLENŐRZÉS MEGNYITÁSA
-// ============================================================
-
-async function openMassCheck() {
-
-    const modal =
-        document.getElementById(
-            "massCheckModal"
-        );
-
-    const status =
-        document.getElementById(
-            "scanStatus"
-        );
-
-
-    modal.style.display = "block";
-
-
-    status.className =
-        "status-info";
-
-    status.textContent =
-        "Excel adatok betöltése...";
-
-
-    try {
-
-        await loadMassExcelData();
-
-    }
-    catch (error) {
-
-        console.error(error);
-
-        status.className =
-            "status-error";
-
-        status.textContent =
-            "❌ Nem sikerült betölteni az Excel fájlt.";
-
-        return;
-    }
-
-
-    massTotalScanned = 0;
-
-    massTourCounts = {};
-
-    massRecentlyScanned =
-        new Set();
-
-
-    updateMassSummary();
-
-
-    status.className =
-        "status-info";
-
-    status.textContent =
-        "📷 Kamera indítása...";
-
-
-    startMassScanner();
-}
-
-
-// ============================================================
-// KAMERA INDÍTÁSA
-//
-// FONTOS:
-// NINCS QRBOX.
-//
-// Ez azt jelenti, hogy a html5-qrcode
-// nem rajzol fehér négyzetet.
-//
-// Csak a kamera képe látszik.
-// ============================================================
-
-function startMassScanner() {
-
-    if (html5QrCode) {
-
-        try {
-            html5QrCode.stop();
-        }
-        catch (e) {}
-    }
-
-
-    html5QrCode =
-        new Html5Qrcode(
-            "reader"
-        );
-
-
-    const config = {
-
-        fps: 10,
-
-        aspectRatio: 1.0,
-
-        disableFlip: false
-
-        // qrbox SZÁNDÉKOSAN NINCS
-    };
-
-
-    html5QrCode.start(
-
-        {
-            facingMode: {
-                exact: "environment"
-            }
-        },
-
-        config,
-
-        onMassScanSuccess,
-
-        function(errorMessage) {
-            // Normál esetben nincs teendő.
-        }
-
-    )
-
-    .then(() => {
-
-        massCheckRunning = true;
-
-        const status =
-            document.getElementById(
-                "scanStatus"
-            );
-
-        status.className =
-            "status-info";
-
-        status.textContent =
-            "📷 Keresem a QR-kódot...";
-    })
-
-    .catch(error => {
-
-        console.error(
-            "Kamera indítási hiba:",
-            error
-        );
-
-        startMassScannerFallback();
-    });
-}
-
-
-// ============================================================
-// KAMERA TARTALÉK MÓD
-//
-// ITT SINCS qrbox,
-// tehát itt sem jelenik meg fehér négyzet.
-// ============================================================
-
-function startMassScannerFallback() {
-
-    if (html5QrCode) {
-
-        try {
-            html5QrCode.clear();
-        }
-        catch (e) {}
-    }
-
-
-    html5QrCode =
-        new Html5Qrcode(
-            "reader"
-        );
-
-
-    const config = {
-
-        fps: 10,
-
-        aspectRatio: 1.0,
-
-        disableFlip: false
-
-        // NINCS qrbox
-    };
-
-
-    html5QrCode.start(
-
-        {
-            facingMode: "environment"
-        },
-
-        config,
-
-        onMassScanSuccess,
-
-        function(errorMessage) {}
-
-    )
-
-    .then(() => {
-
-        massCheckRunning = true;
-
-        const status =
-            document.getElementById(
-                "scanStatus"
-            );
-
-        status.className =
-            "status-info";
-
-        status.textContent =
-            "📷 Keresem a QR-kódot...";
-    })
-
-    .catch(error => {
-
-        console.error(error);
-
-        const status =
-            document.getElementById(
-                "scanStatus"
-            );
-
-        status.className =
-            "status-error";
-
-        status.textContent =
-            "❌ Nem sikerült elindítani a kamerát.";
-    });
-}
-
-
-// ============================================================
-// QR KÓD BEOLVASÁSA
-// ============================================================
-
-function onMassScanSuccess(decodedText) {
-
-    if (!massCheckRunning) {
-        return;
-    }
-
-
-    const code =
-        normalizeCode(
-            decodedText
-        );
-
-
-    if (!code) {
-        return;
-    }
-
-
-    /*
-     * Ugyanaz a kamera rövid időn belül
-     * többször is felismerheti ugyanazt.
-     */
-
-    if (
-        massRecentlyScanned.has(code)
-    ) {
-        return;
-    }
-
-
-    massRecentlyScanned.add(code);
-
-
-    setTimeout(() => {
-
-        massRecentlyScanned.delete(
-            code
-        );
-
-    }, 1500);
-
-
-    processMassCode(code);
-}
-
-
-// ============================================================
-// BEOLVASOTT KÓD FELDOLGOZÁSA
-// ============================================================
-
-function processMassCode(code) {
-
-    const status =
-        document.getElementById(
-            "scanStatus"
-        );
-
-    const data =
-        massExcelData;
-
-
-    /*
-     * Megkeressük az A oszlopban.
-     */
-
-    const tour =
-        data.codeToTour.get(code);
-
-
-    // --------------------------------------------------------
-    // NINCS TALÁLAT
-    // --------------------------------------------------------
-
-    if (!tour) {
-
-        status.className =
-            "status-error";
-
-        status.textContent =
-            "❌ NEM TALÁLHATÓ: " + code;
-
-        beepError();
-
-        return;
-    }
-
-
-    const scanKey =
-        getScanKey(tour);
-
-
-    /*
-     * A meglévő túraoldalak JSON tömbként
-     * tárolják a beolvasott kódokat.
-     */
-
-    let scannedList = [];
-
-
-    try {
-
-        const stored =
-            sessionStorage.getItem(
-                scanKey
-            );
-
-
-        if (stored) {
-
-            const parsed =
-                JSON.parse(stored);
-
-
-            if (Array.isArray(parsed)) {
-
-                scannedList =
-                    parsed;
-            }
-        }
-
-    }
-    catch (e) {
-
-        console.error(
-            "Scanned lista olvasási hiba:",
-            e
-        );
-    }
-
-
-    /*
-     * Megnézzük, hogy ezt a kódot
-     * már ellenőrizték-e.
-     */
-
-    const alreadyScanned =
-        scannedList.some(
-            item =>
-                normalizeCode(item) === code
-        );
-
-
-    if (alreadyScanned) {
-
-        status.className =
-            "status-info";
-
-        status.textContent =
-            "🔄 MÁR ELLENŐRIZVE: "
-            + code
-            + " › "
-            + tour;
-
-        beepWarning();
-
-        return;
-    }
-
-
-    // --------------------------------------------------------
-    // ÚJ KÓD
-    // --------------------------------------------------------
-
-    scannedList.push(code);
-
-
-    sessionStorage.setItem(
-        scanKey,
-        JSON.stringify(
-            scannedList
-        )
-    );
-
-
-    /*
-     * Statisztika
-     */
-
-    massTotalScanned++;
-
-
-    if (!massTourCounts[tour]) {
-
-        massTourCounts[tour] = 0;
-    }
-
-
-    massTourCounts[tour]++;
-
-
-    /*
-     * Megnézzük, hogy elkészült-e
-     * már a túra.
-     */
-
-    checkMassTourDone(
-        tour,
-        scannedList
-    );
-
-
-    /*
-     * Frissítjük a képernyőt.
-     */
-
-    updateMassSummary();
-
-
-    status.className =
-        "status-success";
-
-    status.textContent =
-        "✅ "
-        + code
-        + " › "
-        + tour;
-
-
-    beepSuccess();
-}
-
-
-// ============================================================
-// TÚRA KÉSZ-E?
-// ============================================================
-
-function checkMassTourDone(
-    tour,
-    scannedList
-) {
-
-    if (!massExcelData) {
-        return;
-    }
-
-
-    const tourCodes =
-        massExcelData.tourCodes.get(
-            tour
-        );
-
-
-    if (!tourCodes) {
-        return;
-    }
-
-
-    const scannedSet =
-        new Set(
-            scannedList.map(
-                code =>
-                    normalizeCode(code)
-            )
-        );
-
-
-    /*
-     * Csak akkor kész, ha minden Excelben
-     * szereplő A oszlopos kód megvan.
-     */
-
-    let allDone = true;
-
-
-    for (const code of tourCodes) {
-
-        if (!scannedSet.has(code)) {
-
-            allDone = false;
-
-            break;
-        }
-    }
-
-
-    if (allDone) {
-
-        localStorage.setItem(
-            "done_" + tour,
-            "true"
-        );
-
-
-        applyDoneStyles();
-    }
-}
-
-
-// ============================================================
-// ÖSSZESÍTÉS
-// ============================================================
-
-function updateMassSummary() {
-
-    const totalElement =
-        document.getElementById(
-            "massTotalCount"
-        );
-
-
-    totalElement.textContent =
-        massTotalScanned;
-
-
-    const summary =
-        document.getElementById(
-            "summaryList"
-        );
-
-
-    const tours =
-        Object.keys(
-            massTourCounts
-        )
-        .sort(
-            (a, b) => {
-
-                const na =
-                    parseInt(
-                        a.replace("SZ-", ""),
-                        10
-                    );
-
-                const nb =
-                    parseInt(
-                        b.replace("SZ-", ""),
-                        10
-                    );
-
-                return na - nb;
-            }
-        );
-
-
-    if (tours.length === 0) {
-
-        summary.innerHTML =
-            "Nincs még beolvasott kód.";
-
-        return;
-    }
-
-
-    summary.innerHTML = "";
-
-
-    tours.forEach(tour => {
-
-        const row =
-            document.createElement(
-                "div"
-            );
-
-        row.className =
-            "summaryRow";
-
-
-        const tourSpan =
-            document.createElement(
-                "span"
-            );
-
-        tourSpan.className =
-            "summaryTour";
-
-        tourSpan.textContent =
-            tour;
-
-
-        const countSpan =
-            document.createElement(
-                "span"
-            );
-
-        countSpan.className =
-            "summaryCount";
-
-        countSpan.textContent =
-            massTourCounts[tour]
-            + " db";
-
-
-        row.appendChild(
-            tourSpan
-        );
-
-        row.appendChild(
-            countSpan
-        );
-
-
-        summary.appendChild(
-            row
-        );
-    });
-}
-
-
-// ============================================================
-// KAMERA LEÁLLÍTÁSA
-// ============================================================
-
-async function stopMassScanner() {
-
-    massCheckRunning = false;
-
-
-    if (!html5QrCode) {
-        return;
-    }
-
-
-    try {
-
-        await html5QrCode.stop();
-
-    }
-    catch (e) {
-
-        console.warn(
-            "Kamera leállítás:",
-            e
-        );
-    }
-
-
-    try {
-
-        html5QrCode.clear();
-
-    }
-    catch (e) {}
-
-
-    html5QrCode = null;
-}
-
-
-// ============================================================
-// TÖMEGES ELLENŐRZÉS BEZÁRÁSA
-// ============================================================
-
-async function closeMassCheck() {
-
-    await stopMassScanner();
-
-
-    document.getElementById(
-        "massCheckModal"
-    ).style.display = "none";
-
-
-    document.getElementById(
-        "reader"
-    ).innerHTML = "";
-
-
-    document.getElementById(
-        "scanStatus"
-    ).className =
-        "status-info";
-
-
-    document.getElementById(
-        "scanStatus"
-    ).textContent =
-        "Kamera leállítva.";
-}
-
-
-// ============================================================
-// HANGJELZÉSEK
-// ============================================================
-
-function beepSuccess() {
-
-    try {
-
-        const AudioContext =
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-        const ctx =
-            new AudioContext();
-
-        const oscillator =
-            ctx.createOscillator();
-
-        const gain =
-            ctx.createGain();
-
-
-        oscillator.frequency.value =
-            1000;
-
-        oscillator.type =
-            "sine";
-
-        gain.gain.value =
-            0.15;
-
-
-        oscillator.connect(gain);
-
-        gain.connect(
-            ctx.destination
-        );
-
-
-        oscillator.start();
-
-        oscillator.stop(
-            ctx.currentTime + 0.12
-        );
-
-    }
-    catch (e) {}
-}
-
-
-function beepWarning() {
-
-    try {
-
-        const AudioContext =
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-        const ctx =
-            new AudioContext();
-
-        const oscillator =
-            ctx.createOscillator();
-
-        const gain =
-            ctx.createGain();
-
-
-        oscillator.frequency.value =
-            500;
-
-        oscillator.type =
-            "sine";
-
-        gain.gain.value =
-            0.12;
-
-
-        oscillator.connect(gain);
-
-        gain.connect(
-            ctx.destination
-        );
-
-
-        oscillator.start();
-
-        oscillator.stop(
-            ctx.currentTime + 0.18
-        );
-
-    }
-    catch (e) {}
-}
-
-
-function beepError() {
-
-    try {
-
-        const AudioContext =
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-        const ctx =
-            new AudioContext();
-
-        const oscillator =
-            ctx.createOscillator();
-
-        const gain =
-            ctx.createGain();
-
-
-        oscillator.frequency.value =
-            250;
-
-        oscillator.type =
-            "square";
-
-        gain.gain.value =
-            0.15;
-
-
-        oscillator.connect(gain);
-
-        gain.connect(
-            ctx.destination
-        );
-
-
-        oscillator.start();
-
-        oscillator.stop(
-            ctx.currentTime + 0.25
-        );
-
-    }
-    catch (e) {}
-}
-
-
-// ============================================================
-// ESEMÉNYKEZELÉS
-// ============================================================
+/* =========================
+   OLDAL INDÍTÁSA
+   ========================= */
 
 window.addEventListener(
     "DOMContentLoaded",
@@ -1720,42 +768,8 @@ window.addEventListener(
         updateButtonsVisibilityFromExcel();
 
 
-        // ---------------------------------------------
-        // TÖMEGES ELLENŐRZÉS
-        // ---------------------------------------------
-
         document
-            .getElementById(
-                "massCheckButton"
-            )
-            .addEventListener(
-                "click",
-                openMassCheck
-            );
-
-
-        // ---------------------------------------------
-        // BEZÁRÁS
-        // ---------------------------------------------
-
-        document
-            .getElementById(
-                "closeMassCheck"
-            )
-            .addEventListener(
-                "click",
-                closeMassCheck
-            );
-
-
-        // ---------------------------------------------
-        // VISSZA
-        // ---------------------------------------------
-
-        document
-            .getElementById(
-                "backButton"
-            )
+            .getElementById("backButton")
             .addEventListener(
                 "click",
                 () => {
@@ -1766,14 +780,8 @@ window.addEventListener(
             );
 
 
-        // ---------------------------------------------
-        // FRISSÍT
-        // ---------------------------------------------
-
         document
-            .getElementById(
-                "refreshButton"
-            )
+            .getElementById("refreshButton")
             .addEventListener(
                 "click",
                 () => {
@@ -1783,10 +791,8 @@ window.addEventListener(
                             "Biztosan törlöd az összes jelölést és beolvasott kódot?"
                         );
 
-
-                    if (!ok) {
+                    if (!ok)
                         return;
-                    }
 
 
                     DONE_KEYS.forEach(
@@ -1795,28 +801,9 @@ window.addEventListener(
                     );
 
 
-                    /*
-                     * Az összes SZ- túra
-                     * scanned listáját töröljük.
-                     */
-
-                    Object.keys(
-                        sessionStorage
-                    ).forEach(
-                        key => {
-
-                            if (
-                                key.startsWith("SZ-") &&
-                                key.endsWith(
-                                    "_scannedList"
-                                )
-                            ) {
-
-                                sessionStorage.removeItem(
-                                    key
-                                );
-                            }
-                        }
+                    SCAN_KEYS.forEach(
+                        k =>
+                            sessionStorage.removeItem(k)
                     );
 
 
@@ -1825,6 +812,1232 @@ window.addEventListener(
             );
     }
 );
+
+</script>
+
+
+<!-- =========================
+     HTML5 QR CODE
+     ========================= -->
+
+<script
+    src="https://unpkg.com/html5-qrcode"
+    type="text/javascript">
+</script>
+
+
+<script>
+
+(function () {
+
+    "use strict";
+
+
+    const MASS_XLSX_URL =
+        "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
+
+
+    let massExcelData = null;
+
+    let massQrReader = null;
+
+    let massScannerRunning = false;
+
+    let massTotalScanned = 0;
+
+    let massTourCounts = {};
+
+    let massRecentlyScanned =
+        new Set();
+
+
+    /* =========================
+       KÓD NORMALIZÁLÁS
+       ========================= */
+
+    function massNormalizeCode(value) {
+
+        if (value == null)
+            return "";
+
+        return String(value)
+            .trim()
+            .toUpperCase()
+            .replace(/\s+/g, "")
+            .replace(/[–—]/g, "-");
+    }
+
+
+    /* =========================
+       TÚRA ÁTALAKÍTÁS
+       ========================= */
+
+    function massConvertTour(value) {
+
+        let norm =
+            massNormalizeCode(value);
+
+
+        if (
+            !norm.startsWith("SZ-")
+        )
+            return null;
+
+
+        const numStr =
+            norm.slice(3);
+
+
+        if (
+            !/^\d+$/.test(numStr)
+        )
+            return null;
+
+
+        const rawNum =
+            parseInt(
+                numStr,
+                10
+            );
+
+
+        if (isNaN(rawNum))
+            return null;
+
+
+        let baseNum;
+
+
+        if (rawNum >= 8000) {
+
+            baseNum =
+                rawNum - 8000;
+
+        } else if (rawNum >= 800) {
+
+            baseNum =
+                rawNum - 800;
+
+        } else {
+
+            baseNum =
+                rawNum;
+        }
+
+
+        return "SZ-" + baseNum;
+    }
+
+
+    /* =========================
+       EXCEL BETÖLTÉS
+       ========================= */
+
+    async function loadMassExcelData() {
+
+        if (
+            massExcelData !== null
+        ) {
+
+            return massExcelData;
+        }
+
+
+        const response =
+            await fetch(
+                MASS_XLSX_URL
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Nem sikerült betölteni az Excel fájlt."
+            );
+        }
+
+
+        const buffer =
+            await response.arrayBuffer();
+
+
+        const workbook =
+            XLSX.read(
+                buffer,
+                { type:"array" }
+            );
+
+
+        const sheet =
+            workbook.Sheets[
+                workbook.SheetNames[0]
+            ];
+
+
+        const rows =
+            XLSX.utils.sheet_to_json(
+                sheet,
+                { header:1 }
+            );
+
+
+        const codeToTour =
+            new Map();
+
+        const tourCodes =
+            new Map();
+
+
+        for (
+            let i = 1;
+            i < rows.length;
+            i++
+        ) {
+
+            const row =
+                rows[i] || [];
+
+
+            /* A = QR / csomagkód */
+            const code =
+                massNormalizeCode(
+                    row[0]
+                );
+
+
+            /* C = túrakód */
+            const tour =
+                massConvertTour(
+                    row[2]
+                );
+
+
+            if (
+                !code ||
+                !tour
+            )
+                continue;
+
+
+            codeToTour.set(
+                code,
+                tour
+            );
+
+
+            if (
+                !tourCodes.has(tour)
+            ) {
+
+                tourCodes.set(
+                    tour,
+                    new Set()
+                );
+            }
+
+
+            tourCodes
+                .get(tour)
+                .add(code);
+        }
+
+
+        massExcelData = {
+
+            codeToTour,
+
+            tourCodes
+        };
+
+
+        return massExcelData;
+    }
+
+
+    /* =========================
+       SESSION STORAGE
+       ========================= */
+
+    function massGetScanKey(tour) {
+
+        return tour +
+            "_scannedList";
+    }
+
+
+    function massGetStoredList(tour) {
+
+        let list = [];
+
+
+        try {
+
+            const stored =
+                sessionStorage.getItem(
+                    massGetScanKey(tour)
+                );
+
+
+            if (stored) {
+
+                const parsed =
+                    JSON.parse(stored);
+
+
+                if (
+                    Array.isArray(parsed)
+                ) {
+
+                    list = parsed;
+                }
+            }
+
+        } catch (e) {
+
+            console.error(
+                "scanned lista olvasási hiba",
+                e
+            );
+        }
+
+
+        return list;
+    }
+
+
+    function massSetStoredList(
+        tour,
+        list
+    ) {
+
+        sessionStorage.setItem(
+
+            massGetScanKey(tour),
+
+            JSON.stringify(list)
+        );
+    }
+
+
+    /* =========================
+       ÖSSZESÍTÉS
+       ========================= */
+
+    function massUpdateSummary() {
+
+        document
+            .getElementById(
+                "massTotalCount"
+            )
+            .textContent =
+                massTotalScanned;
+
+
+        const summary =
+            document.getElementById(
+                "massSummaryList"
+            );
+
+
+        const tours =
+            Object.keys(
+                massTourCounts
+            ).sort(
+                function (a,b) {
+
+                    const na =
+                        parseInt(
+                            a.replace(
+                                "SZ-",
+                                ""
+                            ),
+                            10
+                        );
+
+                    const nb =
+                        parseInt(
+                            b.replace(
+                                "SZ-",
+                                ""
+                            ),
+                            10
+                        );
+
+                    return na - nb;
+                }
+            );
+
+
+        if (
+            tours.length === 0
+        ) {
+
+            summary.textContent =
+                "Nincs még beolvasott kód.";
+
+            return;
+        }
+
+
+        summary.innerHTML = "";
+
+
+        tours.forEach(
+            function (tour) {
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+                row.className =
+                    "massSummaryRow";
+
+
+                const tourSpan =
+                    document.createElement(
+                        "span"
+                    );
+
+                tourSpan.className =
+                    "massSummaryTour";
+
+                tourSpan.textContent =
+                    tour;
+
+
+                const countSpan =
+                    document.createElement(
+                        "span"
+                    );
+
+                countSpan.className =
+                    "massSummaryCount";
+
+                countSpan.textContent =
+                    massTourCounts[tour] +
+                    " db";
+
+
+                row.appendChild(
+                    tourSpan
+                );
+
+                row.appendChild(
+                    countSpan
+                );
+
+
+                summary.appendChild(
+                    row
+                );
+            }
+        );
+    }
+
+
+    /* =========================
+       ÁLLAPOT
+       ========================= */
+
+    function massSetStatus(
+        type,
+        text
+    ) {
+
+        const status =
+            document.getElementById(
+                "massScanStatus"
+            );
+
+
+        status.className =
+            "mass-status-" +
+            type;
+
+
+        status.textContent =
+            text;
+    }
+
+
+    /* =========================
+       SIKERES HANG
+       ========================= */
+
+    function massBeepSuccess() {
+
+        try {
+
+            const AudioContext =
+                window.AudioContext ||
+                window.webkitAudioContext;
+
+
+            const ctx =
+                new AudioContext();
+
+
+            const oscillator =
+                ctx.createOscillator();
+
+
+            const gain =
+                ctx.createGain();
+
+
+            oscillator.frequency.value =
+                1000;
+
+            oscillator.type =
+                "sine";
+
+            gain.gain.value =
+                0.15;
+
+
+            oscillator.connect(
+                gain
+            );
+
+            gain.connect(
+                ctx.destination
+            );
+
+
+            oscillator.start();
+
+            oscillator.stop(
+                ctx.currentTime +
+                0.12
+            );
+
+        } catch (e) {}
+    }
+
+
+    /* =========================
+       FIGYELMEZTETŐ HANG
+       ========================= */
+
+    function massBeepWarning() {
+
+        try {
+
+            const AudioContext =
+                window.AudioContext ||
+                window.webkitAudioContext;
+
+
+            const ctx =
+                new AudioContext();
+
+
+            const oscillator =
+                ctx.createOscillator();
+
+
+            const gain =
+                ctx.createGain();
+
+
+            oscillator.frequency.value =
+                500;
+
+            oscillator.type =
+                "sine";
+
+            gain.gain.value =
+                0.12;
+
+
+            oscillator.connect(
+                gain
+            );
+
+            gain.connect(
+                ctx.destination
+            );
+
+
+            oscillator.start();
+
+            oscillator.stop(
+                ctx.currentTime +
+                0.18
+            );
+
+        } catch (e) {}
+    }
+
+
+    /* =========================
+       HIBÁS HANG
+       ========================= */
+
+    function massBeepError() {
+
+        try {
+
+            const AudioContext =
+                window.AudioContext ||
+                window.webkitAudioContext;
+
+
+            const ctx =
+                new AudioContext();
+
+
+            const oscillator =
+                ctx.createOscillator();
+
+
+            const gain =
+                ctx.createGain();
+
+
+            oscillator.frequency.value =
+                250;
+
+            oscillator.type =
+                "square";
+
+            gain.gain.value =
+                0.15;
+
+
+            oscillator.connect(
+                gain
+            );
+
+            gain.connect(
+                ctx.destination
+            );
+
+
+            oscillator.start();
+
+            oscillator.stop(
+                ctx.currentTime +
+                0.25
+            );
+
+        } catch (e) {}
+    }
+
+
+    /* =========================
+       TÚRA ELLENŐRZÉS
+       ========================= */
+
+    function massCheckTourDone(
+        tour,
+        scannedList
+    ) {
+
+        if (!massExcelData)
+            return;
+
+
+        const tourCodes =
+            massExcelData.tourCodes
+                .get(tour);
+
+
+        if (!tourCodes)
+            return;
+
+
+        const scannedSet =
+            new Set(
+                scannedList.map(
+                    function (code) {
+
+                        return massNormalizeCode(
+                            code
+                        );
+                    }
+                )
+            );
+
+
+        for (
+            const code of tourCodes
+        ) {
+
+            if (
+                !scannedSet.has(code)
+            ) {
+
+                return;
+            }
+        }
+
+
+        localStorage.setItem(
+            "done_" + tour,
+            "true"
+        );
+
+
+        if (
+            typeof applyDoneStyles
+            === "function"
+        ) {
+
+            applyDoneStyles();
+        }
+    }
+
+
+    /* =========================
+       BEOLVASOTT KÓD FELDOLGOZÁSA
+       ========================= */
+
+    function processMassCode(
+        decodedText
+    ) {
+
+        const code =
+            massNormalizeCode(
+                decodedText
+            );
+
+
+        if (
+            !code ||
+            !massExcelData
+        )
+            return;
+
+
+        const tour =
+            massExcelData.codeToTour
+                .get(code);
+
+
+        if (!tour) {
+
+            massSetStatus(
+                "error",
+                "NEM TALÁLHATÓ: " +
+                code
+            );
+
+
+            massBeepError();
+
+            return;
+        }
+
+
+        const scannedList =
+            massGetStoredList(
+                tour
+            );
+
+
+        const alreadyScanned =
+            scannedList.some(
+                function (item) {
+
+                    return (
+                        massNormalizeCode(
+                            item
+                        ) === code
+                    );
+                }
+            );
+
+
+        if (alreadyScanned) {
+
+            massSetStatus(
+                "info",
+                "MÁR ELLENŐRIZVE: " +
+                code +
+                " › " +
+                tour
+            );
+
+
+            massBeepWarning();
+
+            return;
+        }
+
+
+        scannedList.push(
+            code
+        );
+
+
+        massSetStoredList(
+            tour,
+            scannedList
+        );
+
+
+        massTotalScanned++;
+
+
+        if (
+            !massTourCounts[tour]
+        ) {
+
+            massTourCounts[tour] =
+                0;
+        }
+
+
+        massTourCounts[tour]++;
+
+
+        massCheckTourDone(
+            tour,
+            scannedList
+        );
+
+
+        massUpdateSummary();
+
+
+        massSetStatus(
+            "success",
+            code +
+            " › " +
+            tour
+        );
+
+
+        massBeepSuccess();
+    }
+
+
+    /* =========================
+       QR SIKER
+       ========================= */
+
+    function onMassScanSuccess(
+        decodedText
+    ) {
+
+        if (
+            !massScannerRunning
+        )
+            return;
+
+
+        const code =
+            massNormalizeCode(
+                decodedText
+            );
+
+
+        if (!code)
+            return;
+
+
+        if (
+            massRecentlyScanned.has(
+                code
+            )
+        ) {
+
+            return;
+        }
+
+
+        massRecentlyScanned.add(
+            code
+        );
+
+
+        setTimeout(
+            function () {
+
+                massRecentlyScanned.delete(
+                    code
+                );
+
+            },
+            1500
+        );
+
+
+        processMassCode(
+            code
+        );
+    }
+
+
+    /* =========================
+       KAMERA LEÁLLÍTÁSA
+       ========================= */
+
+    async function stopMassScanner() {
+
+        massScannerRunning =
+            false;
+
+
+        if (!massQrReader)
+            return;
+
+
+        try {
+
+            await massQrReader.stop();
+
+        } catch (e) {
+
+            console.warn(
+                "Kamera leállítás:",
+                e
+            );
+        }
+
+
+        try {
+
+            massQrReader.clear();
+
+        } catch (e) {}
+
+
+        massQrReader =
+            null;
+    }
+
+
+    /* =========================
+       KAMERA INDÍTÁSA
+       ========================= */
+
+    async function startMassScanner() {
+
+        await stopMassScanner();
+
+
+        const readerElement =
+            document.getElementById(
+                "massReader"
+            );
+
+
+        readerElement.innerHTML =
+            "";
+
+
+        massQrReader =
+            new Html5Qrcode(
+                "massReader"
+            );
+
+
+        const formats = [];
+
+
+        if (
+            typeof Html5QrcodeSupportedFormats
+            !== "undefined"
+        ) {
+
+            [
+                "QR_CODE",
+                "CODE_128",
+                "CODE_39",
+                "CODE_93",
+                "CODABAR",
+                "EAN_13",
+                "EAN_8",
+                "ITF",
+                "UPC_A",
+                "UPC_E"
+            ].forEach(
+                function (name) {
+
+                    if (
+                        Html5QrcodeSupportedFormats[
+                            name
+                        ] !== undefined
+                    ) {
+
+                        formats.push(
+                            Html5QrcodeSupportedFormats[
+                                name
+                            ]
+                        );
+                    }
+                }
+            );
+        }
+
+
+        /*
+         * FONTOS:
+         * NINCS qrbox!
+         *
+         * Ezért a tömeges olvasásnál
+         * nincs fehér négyzet,
+         * csak a kamera képe.
+         */
+
+        const config = {
+
+            fps:10,
+
+            aspectRatio:1.0
+        };
+
+
+        if (
+            formats.length > 0
+        ) {
+
+            config.formatsToSupport =
+                formats;
+        }
+
+
+        try {
+
+            await massQrReader.start(
+
+                {
+                    facingMode:{
+                        exact:"environment"
+                    }
+                },
+
+                config,
+
+                onMassScanSuccess,
+
+                function () {}
+            );
+
+
+            massScannerRunning =
+                true;
+
+
+            massSetStatus(
+                "info",
+                "Keresem a QR- vagy vonalkódot..."
+            );
+
+
+        } catch (firstError) {
+
+            console.warn(
+                "Tömeges kamera első indítás sikertelen:",
+                firstError
+            );
+
+
+            try {
+
+                await massQrReader.clear();
+
+            } catch (e) {}
+
+
+            massQrReader =
+                new Html5Qrcode(
+                    "massReader"
+                );
+
+
+            /*
+             * Fallback esetén sincs qrbox.
+             */
+
+            const fallbackConfig = {
+
+                fps:10,
+
+                aspectRatio:1.0
+            };
+
+
+            if (
+                formats.length > 0
+            ) {
+
+                fallbackConfig.formatsToSupport =
+                    formats;
+            }
+
+
+            try {
+
+                await massQrReader.start(
+
+                    {
+                        facingMode:
+                            "environment"
+                    },
+
+                    fallbackConfig,
+
+                    onMassScanSuccess,
+
+                    function () {}
+                );
+
+
+                massScannerRunning =
+                    true;
+
+
+                massSetStatus(
+                    "info",
+                    "Keresem a QR- vagy vonalkódot..."
+                );
+
+
+            } catch (secondError) {
+
+                console.error(
+                    "Tömeges kamera indítási hiba:",
+                    secondError
+                );
+
+
+                massSetStatus(
+                    "error",
+                    "Nem sikerült elindítani a kamerát."
+                );
+            }
+        }
+    }
+
+
+    /* =========================
+       TÖMEGES ABLAK MEGNYITÁSA
+       ========================= */
+
+    async function openMassCheck() {
+
+        const modal =
+            document.getElementById(
+                "massCheckModal"
+            );
+
+
+        modal.style.display =
+            "block";
+
+
+        massTotalScanned =
+            0;
+
+
+        massTourCounts =
+            {};
+
+
+        massRecentlyScanned =
+            new Set();
+
+
+        massUpdateSummary();
+
+
+        massSetStatus(
+            "info",
+            "Excel adatok betöltése..."
+        );
+
+
+        try {
+
+            await loadMassExcelData();
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            massSetStatus(
+                "error",
+                "Nem sikerült betölteni az Excel fájlt."
+            );
+
+
+            return;
+        }
+
+
+        massSetStatus(
+            "info",
+            "Kamera indítása..."
+        );
+
+
+        await startMassScanner();
+    }
+
+
+    /* =========================
+       TÖMEGES ABLAK BEZÁRÁSA
+       ========================= */
+
+    async function closeMassCheck() {
+
+        await stopMassScanner();
+
+
+        document.getElementById(
+            "massCheckModal"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "massReader"
+        ).innerHTML =
+            "";
+
+
+        massSetStatus(
+            "info",
+            "Kamera leállítva."
+        );
+    }
+
+
+    /* =========================
+       GOMBOK
+       ========================= */
+
+    window.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            document
+                .getElementById(
+                    "massCheckButton"
+                )
+                .addEventListener(
+                    "click",
+                    openMassCheck
+                );
+
+
+            document
+                .getElementById(
+                    "closeMassCheck"
+                )
+                .addEventListener(
+                    "click",
+                    closeMassCheck
+                );
+        }
+    );
+
+})();
 
 </script>
 
