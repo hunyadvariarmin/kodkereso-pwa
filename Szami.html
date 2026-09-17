@@ -51,12 +51,19 @@ button {
     border:2px solid #FFD700;
     border-radius:12px;
     cursor:pointer;
-    transition:all 0.3s ease;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 button:hover {
-    background:rgba(255,215,0,0.2);
-    transform:scale(1.03);
+    background:rgba(255,215,0,0.18);
+    transform:scale(1.02);
+}
+
+button:active {
+    transform:scale(0.98);
 }
 
 /* Minden SZ gomb azonos méretű */
@@ -65,28 +72,94 @@ button.temp-small {
     font-size:20px;
 }
 
-/* =========================
+
+/* =====================================================
    ALSÓ GOMBSOR
-   ========================= */
+   ===================================================== */
 
 #bottomActions {
     position:absolute;
-    bottom:40px;
+    bottom:28px;
     left:50%;
     transform:translateX(-50%);
+
     display:flex;
-    gap:20px;
-    z-index:1;
-    width:80%;
-    max-width:400px;
+    align-items:center;
     justify-content:center;
+
+    gap:8px;
+
+    width:100%;
+    max-width:430px;
+
+    padding:0 10px;
+
+    box-sizing:border-box;
+
+    z-index:10;
 }
 
+
+/* Mindhárom alsó gomb */
 #bottomActions button {
-    width:32%;
-    padding:12px 0;
-    font-size:18px;
+    flex:1 1 0;
+
+    width:0;
+    min-width:0;
+
+    padding:10px 5px;
+
+    font-size:14px;
+    font-weight:600;
+
+    line-height:1.15;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    box-sizing:border-box;
+
+    border-radius:10px;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
+
+
+/* =========================
+   VISSZA
+   ========================= */
+
+#backButton {
+    color:#ffffff;
+    background:rgba(50,50,50,0.85);
+    border:1px solid rgba(255,255,255,0.45);
+}
+
+#backButton:hover {
+    background:rgba(80,80,80,0.95);
+    box-shadow:0 3px 10px rgba(0,0,0,0.35);
+}
+
+
+/* =========================
+   FRISSÍT
+   ========================= */
+
+#refreshButton {
+    color:#ffffff;
+    background:rgba(40,100,150,0.85);
+    border:1px solid rgba(100,200,255,0.7);
+}
+
+#refreshButton:hover {
+    background:rgba(50,125,185,0.95);
+    box-shadow:0 3px 10px rgba(0,0,0,0.35);
+}
+
 
 /* =========================
    TÖMEGES ELLENŐRZÉS
@@ -94,14 +167,16 @@ button.temp-small {
 
 #massCheckButton {
     color:#ffffff;
-    background:rgba(0,90,160,0.85);
-    border-color:#00aaff;
-    font-weight:bold;
+    background:rgba(0,100,70,0.9);
+    border:1px solid rgba(0,255,150,0.65);
+    font-weight:700;
 }
 
 #massCheckButton:hover {
-    background:rgba(0,130,220,0.9);
+    background:rgba(0,135,90,0.95);
+    box-shadow:0 3px 10px rgba(0,0,0,0.35);
 }
+
 
 /* =========================
    TÖMEGES ELLENŐRZÉS ABLAK
@@ -109,260 +184,493 @@ button.temp-small {
 
 #massCheckModal {
     display:none;
+
     position:fixed;
     inset:0;
+
     background:rgba(0,0,0,0.92);
+
     z-index:1000;
+
     overflow-y:auto;
 }
+
 
 #massCheckContent {
     width:100%;
     max-width:600px;
+
     margin:0 auto;
+
     min-height:100%;
+
     box-sizing:border-box;
+
     padding:15px;
+
     display:flex;
     flex-direction:column;
 }
 
+
 #massCheckTitle {
     text-align:center;
+
     color:#FFD700;
+
     font-size:25px;
+
     margin:5px 0 12px 0;
 }
 
-/* Csak a kamera képe */
+
+/* =========================
+   KAMERA
+   ========================= */
+
 #massReader {
     width:100%;
     max-width:600px;
+
     margin:0 auto;
+
     border-radius:12px;
+
     overflow:hidden;
+
     background:#111;
 }
+
 
 #massReader video {
     width:100% !important;
     height:auto !important;
+
     display:block;
 }
+
 
 #massReader__scan_region {
     background:transparent !important;
 }
 
+
 #massReader__scan_region > img {
     display:none !important;
 }
 
+
+/* =========================
+   ÁLLAPOT
+   ========================= */
+
 #massScanStatus {
     margin-top:12px;
+
     padding:14px;
+
     border-radius:10px;
+
     text-align:center;
+
     font-size:19px;
     font-weight:bold;
+
     background:rgba(255,255,255,0.1);
+
     min-height:25px;
+
+    box-sizing:border-box;
 }
+
 
 .mass-status-success {
     color:#00ff66;
+
     border:2px solid #00aa44;
+
     background:rgba(0,128,0,0.25) !important;
 }
 
+
 .mass-status-error {
     color:#ff5555;
+
     border:2px solid #cc2222;
+
     background:rgba(150,0,0,0.25) !important;
 }
 
+
 .mass-status-info {
     color:#FFD700;
+
     border:2px solid #aa8800;
 }
 
+
+/* =========================
+   ÖSSZESÍTÉS
+   ========================= */
+
 #massSummary {
     margin-top:12px;
+
     padding:12px;
+
     background:rgba(255,255,255,0.08);
+
     border-radius:10px;
 }
 
+
 #massSummary h3 {
     margin:0 0 8px 0;
+
     color:#FFD700;
+
     text-align:center;
 }
 
+
 .massSummaryRow {
     display:flex;
+
     justify-content:space-between;
+
     padding:6px 8px;
+
     border-bottom:1px solid rgba(255,255,255,0.15);
+
     font-size:17px;
 }
+
 
 .massSummaryRow:last-child {
     border-bottom:none;
 }
 
+
 .massSummaryTour {
     color:#FFD700;
+
     font-weight:bold;
 }
+
 
 .massSummaryCount {
     color:#00ff66;
+
     font-weight:bold;
 }
+
 
 #massTotal {
     text-align:center;
+
     margin-top:8px;
+
     font-size:18px;
+
     color:#ffffff;
 }
 
+
+/* =========================
+   BEZÁRÁS
+   ========================= */
+
 #closeMassCheck {
     margin-top:15px;
+
+    width:100%;
+
+    padding:13px;
+
     background:rgba(160,0,0,0.8);
-    border-color:#ff4444;
+
+    border:2px solid #ff4444;
+
     color:white;
+
     font-weight:bold;
+
+    border-radius:10px;
 }
+
+
+/* =========================
+   KISEBB KIJELZŐ
+   ========================= */
+
+@media (max-width:480px) {
+
+    #buttonsContainer {
+        gap:7px;
+        padding:0 7px;
+    }
+
+    button {
+        padding:14px 5px;
+        font-size:17px;
+        border-radius:10px;
+    }
+
+    button.temp-small {
+        padding:14px 5px;
+        font-size:17px;
+    }
+
+    #bottomActions {
+        bottom:20px;
+        gap:6px;
+        max-width:390px;
+        padding:0 8px;
+    }
+
+    #bottomActions button {
+        padding:9px 3px;
+        font-size:12px;
+        border-radius:9px;
+    }
+}
+
+
+/* =========================
+   NAGYON KIS KIJELZŐ
+   ========================= */
+
+@media (max-width:360px) {
+
+    #bottomActions {
+        gap:4px;
+        padding:0 5px;
+    }
+
+    #bottomActions button {
+        padding:8px 2px;
+        font-size:11px;
+    }
+}
+
 </style>
 </head>
 
 <body>
 
+
+<!-- =====================================================
+     TÚRAGOMBOK
+     ===================================================== -->
+
 <div id="buttonsContainer">
 
-    <button data-code="SZ-0" class="temp-small"
-        onclick="window.location.href='SZ-0.html'">SZ-0</button>
+    <button data-code="SZ-0"
+        class="temp-small"
+        onclick="window.location.href='SZ-0.html'">
+        SZ-0
+    </button>
 
     <button data-code="SZ-1"
-        onclick="window.location.href='SZ-1.html'">SZ-1</button>
+        onclick="window.location.href='SZ-1.html'">
+        SZ-1
+    </button>
 
-    <button data-code="SZ-2" class="temp-small"
-        onclick="window.location.href='SZ-2.html'">SZ-2</button>
+    <button data-code="SZ-2"
+        class="temp-small"
+        onclick="window.location.href='SZ-2.html'">
+        SZ-2
+    </button>
 
     <button data-code="SZ-3"
-        onclick="window.location.href='SZ-3.html'">SZ-3</button>
+        onclick="window.location.href='SZ-3.html'">
+        SZ-3
+    </button>
 
-    <button data-code="SZ-4" class="temp-small"
-        onclick="window.location.href='SZ-4.html'">SZ-4</button>
+    <button data-code="SZ-4"
+        class="temp-small"
+        onclick="window.location.href='SZ-4.html'">
+        SZ-4
+    </button>
 
     <button data-code="SZ-5"
-        onclick="window.location.href='SZ-5.html'">SZ-5</button>
+        onclick="window.location.href='SZ-5.html'">
+        SZ-5
+    </button>
 
-    <button data-code="SZ-7" class="temp-small"
-        onclick="window.location.href='SZ-7.html'">SZ-7</button>
+    <button data-code="SZ-7"
+        class="temp-small"
+        onclick="window.location.href='SZ-7.html'">
+        SZ-7
+    </button>
 
-    <button data-code="SZ-9" class="temp-small"
-        onclick="window.location.href='SZ-9.html'">SZ-9</button>
+    <button data-code="SZ-9"
+        class="temp-small"
+        onclick="window.location.href='SZ-9.html'">
+        SZ-9
+    </button>
 
-    <button data-code="SZ-10" class="temp-small"
-        onclick="window.location.href='SZ-10.html'">SZ-10</button>
+    <button data-code="SZ-10"
+        class="temp-small"
+        onclick="window.location.href='SZ-10.html'">
+        SZ-10
+    </button>
 
     <button data-code="SZ-12"
-        onclick="window.location.href='SZ-12.html'">SZ-12</button>
+        onclick="window.location.href='SZ-12.html'">
+        SZ-12
+    </button>
 
     <button data-code="SZ-14"
-        onclick="window.location.href='SZ-14.html'">SZ-14</button>
+        onclick="window.location.href='SZ-14.html'">
+        SZ-14
+    </button>
 
     <button data-code="SZ-15"
-        onclick="window.location.href='SZ-15.html'">SZ-15</button>
+        onclick="window.location.href='SZ-15.html'">
+        SZ-15
+    </button>
 
     <button data-code="SZ-18"
-        onclick="window.location.href='SZ-18.html'">SZ-18</button>
+        onclick="window.location.href='SZ-18.html'">
+        SZ-18
+    </button>
 
     <button data-code="SZ-19"
-        onclick="window.location.href='SZ-19.html'">SZ-19</button>
+        onclick="window.location.href='SZ-19.html'">
+        SZ-19
+    </button>
 
     <button data-code="SZ-20"
-        onclick="window.location.href='SZ-20.html'">SZ-20</button>
+        onclick="window.location.href='SZ-20.html'">
+        SZ-20
+    </button>
 
     <button data-code="SZ-21"
-        onclick="window.location.href='SZ-21.html'">SZ-21</button>
+        onclick="window.location.href='SZ-21.html'">
+        SZ-21
+    </button>
 
     <button data-code="SZ-22"
-        onclick="window.location.href='SZ-22.html'">SZ-22</button>
+        onclick="window.location.href='SZ-22.html'">
+        SZ-22
+    </button>
 
     <button data-code="SZ-23"
-        onclick="window.location.href='SZ-23.html'">SZ-23</button>
+        onclick="window.location.href='SZ-23.html'">
+        SZ-23
+    </button>
 
     <button data-code="SZ-25"
-        onclick="window.location.href='SZ-25.html'">SZ-25</button>
+        onclick="window.location.href='SZ-25.html'">
+        SZ-25
+    </button>
 
     <button data-code="SZ-26"
-        onclick="window.location.href='SZ-26.html'">SZ-26</button>
+        onclick="window.location.href='SZ-26.html'">
+        SZ-26
+    </button>
 
     <button data-code="SZ-27"
-        onclick="window.location.href='SZ-27.html'">SZ-27</button>
+        onclick="window.location.href='SZ-27.html'">
+        SZ-27
+    </button>
 
     <button data-code="SZ-28"
-        onclick="window.location.href='SZ-28.html'">SZ-28</button>
+        onclick="window.location.href='SZ-28.html'">
+        SZ-28
+    </button>
 
     <button data-code="SZ-29"
-        onclick="window.location.href='SZ-29.html'">SZ-29</button>
+        onclick="window.location.href='SZ-29.html'">
+        SZ-29
+    </button>
 
     <button data-code="SZ-30"
-        onclick="window.location.href='SZ-30.html'">SZ-30</button>
+        onclick="window.location.href='SZ-30.html'">
+        SZ-30
+    </button>
 
     <button data-code="SZ-32"
-        onclick="window.location.href='SZ-32.html'">SZ-32</button>
+        onclick="window.location.href='SZ-32.html'">
+        SZ-32
+    </button>
 
     <button data-code="SZ-33"
-        onclick="window.location.href='SZ-33.html'">SZ-33</button>
+        onclick="window.location.href='SZ-33.html'">
+        SZ-33
+    </button>
 
     <button data-code="SZ-34"
-        onclick="window.location.href='SZ-34.html'">SZ-34</button>
+        onclick="window.location.href='SZ-34.html'">
+        SZ-34
+    </button>
 
     <button data-code="SZ-35"
-        onclick="window.location.href='SZ-35.html'">SZ-35</button>
+        onclick="window.location.href='SZ-35.html'">
+        SZ-35
+    </button>
 
     <button data-code="SZ-36"
-        onclick="window.location.href='SZ-36.html'">SZ-36</button>
+        onclick="window.location.href='SZ-36.html'">
+        SZ-36
+    </button>
 
     <button data-code="SZ-37"
-        onclick="window.location.href='SZ-37.html'">SZ-37</button>
+        onclick="window.location.href='SZ-37.html'">
+        SZ-37
+    </button>
 
     <button data-code="SZ-38"
-        onclick="window.location.href='SZ-38.html'">SZ-38</button>
+        onclick="window.location.href='SZ-38.html'">
+        SZ-38
+    </button>
 
     <button data-code="SZ-40"
-        onclick="window.location.href='SZ-40.html'">SZ-40</button>
+        onclick="window.location.href='SZ-40.html'">
+        SZ-40
+    </button>
 
     <button data-code="SZ-50"
-        onclick="window.location.href='SZ-50.html'">SZ-50</button>
+        onclick="window.location.href='SZ-50.html'">
+        SZ-50
+    </button>
 
     <button data-code="SZ-54"
-        onclick="window.location.href='SZ-54.html'">SZ-54</button>
+        onclick="window.location.href='SZ-54.html'">
+        SZ-54
+    </button>
 
     <button data-code="SZ-60"
-        onclick="window.location.href='SZ-60.html'">SZ-60</button>
+        onclick="window.location.href='SZ-60.html'">
+        SZ-60
+    </button>
 
     <button data-code="SZ-70"
-        onclick="window.location.href='SZ-70.html'">SZ-70</button>
+        onclick="window.location.href='SZ-70.html'">
+        SZ-70
+    </button>
 
-    <button data-code="SZ-101" class="temp-small"
-        onclick="window.location.href='SZ-101.html'">SZ-101</button>
+    <button data-code="SZ-101"
+        class="temp-small"
+        onclick="window.location.href='SZ-101.html'">
+        SZ-101
+    </button>
 
-    <button data-code="SZ-1000" class="temp-small"
-        onclick="window.location.href='SZ-1000.html'">SZ-1000</button>
+    <button data-code="SZ-1000"
+        class="temp-small"
+        onclick="window.location.href='SZ-1000.html'">
+        SZ-1000
+    </button>
 
 </div>
 
-<div id="bottomActions">
 
-    <button id="massCheckButton">
-        TÖMEGES ELLENŐRZÉS
-    </button>
+<!-- =====================================================
+     ALSÓ GOMBOK
+     ===================================================== -->
+
+<div id="bottomActions">
 
     <button id="backButton">
         Vissza
@@ -372,11 +680,16 @@ button.temp-small {
         Frissít
     </button>
 
+    <button id="massCheckButton">
+        TÖMEGES ELLENŐRZÉS
+    </button>
+
 </div>
 
-<!-- =========================
-     TÖMEGES ELLENŐRZÉS ABLAK
-     ========================= -->
+
+<!-- =====================================================
+     TÖMEGES ELLENŐRZÉS MODAL
+     ===================================================== -->
 
 <div id="massCheckModal">
 
@@ -386,17 +699,27 @@ button.temp-small {
             TÖMEGES ELLENŐRZÉS
         </div>
 
+
+        <!--
+            Nincs qrbox!
+            Csak a kamera képe jelenik meg.
+        -->
+
         <div id="massReader"></div>
 
-        <div id="massScanStatus" class="mass-status-info">
+
+        <div id="massScanStatus"
+             class="mass-status-info">
             Kamera indítása...
         </div>
+
 
         <div id="massTotal">
             Ellenőrizve:
             <span id="massTotalCount">0</span>
             db
         </div>
+
 
         <div id="massSummary">
 
@@ -410,6 +733,7 @@ button.temp-small {
 
         </div>
 
+
         <button id="closeMassCheck">
             BEZÁRÁS
         </button>
@@ -418,22 +742,27 @@ button.temp-small {
 
 </div>
 
-<!-- XLSX -->
+
+<!-- =====================================================
+     XLSX
+     ===================================================== -->
+
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 
 <script>
 
-/* =========================
+/* =====================================================
    EXCEL
-   ========================= */
+   ===================================================== */
 
 const XLSX_URL =
     "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
 
 
-/* =========================
+/* =====================================================
    DONE KULCSOK
-   ========================= */
+   ===================================================== */
 
 const DONE_KEYS = [
     "done_SZ-1000",
@@ -477,9 +806,9 @@ const DONE_KEYS = [
 ];
 
 
-/* =========================
+/* =====================================================
    SCANNED LIST KULCSOK
-   ========================= */
+   ===================================================== */
 
 const SCAN_KEYS = [
     "SZ-1000_scannedList",
@@ -522,9 +851,9 @@ const SCAN_KEYS = [
 ];
 
 
-/* =========================
+/* =====================================================
    DONE STÍLUS
-   ========================= */
+   ===================================================== */
 
 function applyDoneStyles() {
 
@@ -532,6 +861,7 @@ function applyDoneStyles() {
         document.querySelectorAll(
             "#buttonsContainer button"
         );
+
 
     buttons.forEach(btn => {
 
@@ -556,10 +886,12 @@ function applyDoneStyles() {
             const code =
                 key.replace("done_", "");
 
+
             const btn =
                 document.querySelector(
                     `button[data-code="${code}"]`
                 );
+
 
             if (btn) {
 
@@ -577,22 +909,25 @@ function applyDoneStyles() {
 }
 
 
-/* =========================
+/* =====================================================
    EXCEL ALAPÚ LÁTHATÓSÁG
-   ========================= */
+   ===================================================== */
 
 async function updateButtonsVisibilityFromExcel() {
 
     let excelBaseTours =
         new Set();
 
+
     try {
 
         const resp =
             await fetch(XLSX_URL);
 
+
         const buffer =
             await resp.arrayBuffer();
+
 
         const wb =
             XLSX.read(
@@ -600,10 +935,12 @@ async function updateButtonsVisibilityFromExcel() {
                 { type:"array" }
             );
 
+
         const sheet =
             wb.Sheets[
                 wb.SheetNames[0]
             ];
+
 
         const data =
             XLSX.utils.sheet_to_json(
@@ -621,8 +958,10 @@ async function updateButtonsVisibilityFromExcel() {
             const row =
                 data[i] || [];
 
+
             const val =
                 row[2];
+
 
             if (val == null)
                 continue;
@@ -632,6 +971,7 @@ async function updateButtonsVisibilityFromExcel() {
                 String(val)
                     .trim()
                     .toUpperCase();
+
 
             if (
                 !norm.startsWith("SZ-")
@@ -649,6 +989,7 @@ async function updateButtonsVisibilityFromExcel() {
             const numStr =
                 norm.slice(3);
 
+
             if (
                 !/^\d+$/.test(numStr)
             )
@@ -660,6 +1001,7 @@ async function updateButtonsVisibilityFromExcel() {
                     numStr,
                     10
                 );
+
 
             if (isNaN(rawNum))
                 continue;
@@ -688,10 +1030,12 @@ async function updateButtonsVisibilityFromExcel() {
             const baseCode =
                 "SZ-" + baseNum;
 
+
             excelBaseTours.add(
                 baseCode.toUpperCase()
             );
         }
+
 
     } catch (e) {
 
@@ -729,6 +1073,7 @@ async function updateButtonsVisibilityFromExcel() {
                 "data-code"
             );
 
+
         if (!code)
             return;
 
@@ -755,9 +1100,9 @@ async function updateButtonsVisibilityFromExcel() {
 }
 
 
-/* =========================
+/* =====================================================
    OLDAL INDÍTÁSA
-   ========================= */
+   ===================================================== */
 
 window.addEventListener(
     "DOMContentLoaded",
@@ -769,7 +1114,9 @@ window.addEventListener(
 
 
         document
-            .getElementById("backButton")
+            .getElementById(
+                "backButton"
+            )
             .addEventListener(
                 "click",
                 () => {
@@ -781,7 +1128,9 @@ window.addEventListener(
 
 
         document
-            .getElementById("refreshButton")
+            .getElementById(
+                "refreshButton"
+            )
             .addEventListener(
                 "click",
                 () => {
@@ -790,6 +1139,7 @@ window.addEventListener(
                         confirm(
                             "Biztosan törlöd az összes jelölést és beolvasott kódot?"
                         );
+
 
                     if (!ok)
                         return;
@@ -816,9 +1166,9 @@ window.addEventListener(
 </script>
 
 
-<!-- =========================
+<!-- =====================================================
      HTML5 QR CODE
-     ========================= -->
+     ===================================================== -->
 
 <script
     src="https://unpkg.com/html5-qrcode"
@@ -851,14 +1201,15 @@ window.addEventListener(
         new Set();
 
 
-    /* =========================
+    /* =================================================
        KÓD NORMALIZÁLÁS
-       ========================= */
+       ================================================= */
 
     function massNormalizeCode(value) {
 
         if (value == null)
             return "";
+
 
         return String(value)
             .trim()
@@ -868,9 +1219,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        TÚRA ÁTALAKÍTÁS
-       ========================= */
+       ================================================= */
 
     function massConvertTour(value) {
 
@@ -929,9 +1280,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        EXCEL BETÖLTÉS
-       ========================= */
+       ================================================= */
 
     async function loadMassExcelData() {
 
@@ -984,6 +1335,7 @@ window.addEventListener(
         const codeToTour =
             new Map();
 
+
         const tourCodes =
             new Map();
 
@@ -998,14 +1350,12 @@ window.addEventListener(
                 rows[i] || [];
 
 
-            /* A = QR / csomagkód */
             const code =
                 massNormalizeCode(
                     row[0]
                 );
 
 
-            /* C = túrakód */
             const tour =
                 massConvertTour(
                     row[2]
@@ -1054,9 +1404,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        SESSION STORAGE
-       ========================= */
+       ================================================= */
 
     function massGetScanKey(tour) {
 
@@ -1119,9 +1469,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        ÖSSZESÍTÉS
-       ========================= */
+       ================================================= */
 
     function massUpdateSummary() {
 
@@ -1154,6 +1504,7 @@ window.addEventListener(
                             10
                         );
 
+
                     const nb =
                         parseInt(
                             b.replace(
@@ -1162,6 +1513,7 @@ window.addEventListener(
                             ),
                             10
                         );
+
 
                     return na - nb;
                 }
@@ -1190,6 +1542,7 @@ window.addEventListener(
                         "div"
                     );
 
+
                 row.className =
                     "massSummaryRow";
 
@@ -1199,8 +1552,10 @@ window.addEventListener(
                         "span"
                     );
 
+
                 tourSpan.className =
                     "massSummaryTour";
+
 
                 tourSpan.textContent =
                     tour;
@@ -1211,8 +1566,10 @@ window.addEventListener(
                         "span"
                     );
 
+
                 countSpan.className =
                     "massSummaryCount";
+
 
                 countSpan.textContent =
                     massTourCounts[tour] +
@@ -1222,6 +1579,7 @@ window.addEventListener(
                 row.appendChild(
                     tourSpan
                 );
+
 
                 row.appendChild(
                     countSpan
@@ -1236,9 +1594,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        ÁLLAPOT
-       ========================= */
+       ================================================= */
 
     function massSetStatus(
         type,
@@ -1261,9 +1619,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        SIKERES HANG
-       ========================= */
+       ================================================= */
 
     function massBeepSuccess() {
 
@@ -1289,8 +1647,10 @@ window.addEventListener(
             oscillator.frequency.value =
                 1000;
 
+
             oscillator.type =
                 "sine";
+
 
             gain.gain.value =
                 0.15;
@@ -1300,12 +1660,14 @@ window.addEventListener(
                 gain
             );
 
+
             gain.connect(
                 ctx.destination
             );
 
 
             oscillator.start();
+
 
             oscillator.stop(
                 ctx.currentTime +
@@ -1316,9 +1678,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        FIGYELMEZTETŐ HANG
-       ========================= */
+       ================================================= */
 
     function massBeepWarning() {
 
@@ -1344,8 +1706,10 @@ window.addEventListener(
             oscillator.frequency.value =
                 500;
 
+
             oscillator.type =
                 "sine";
+
 
             gain.gain.value =
                 0.12;
@@ -1355,12 +1719,14 @@ window.addEventListener(
                 gain
             );
 
+
             gain.connect(
                 ctx.destination
             );
 
 
             oscillator.start();
+
 
             oscillator.stop(
                 ctx.currentTime +
@@ -1371,9 +1737,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        HIBÁS HANG
-       ========================= */
+       ================================================= */
 
     function massBeepError() {
 
@@ -1399,8 +1765,10 @@ window.addEventListener(
             oscillator.frequency.value =
                 250;
 
+
             oscillator.type =
                 "square";
+
 
             gain.gain.value =
                 0.15;
@@ -1410,12 +1778,14 @@ window.addEventListener(
                 gain
             );
 
+
             gain.connect(
                 ctx.destination
             );
 
 
             oscillator.start();
+
 
             oscillator.stop(
                 ctx.currentTime +
@@ -1426,9 +1796,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        TÚRA ELLENŐRZÉS
-       ========================= */
+       ================================================= */
 
     function massCheckTourDone(
         tour,
@@ -1490,9 +1860,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        BEOLVASOTT KÓD FELDOLGOZÁSA
-       ========================= */
+       ================================================= */
 
     function processMassCode(
         decodedText
@@ -1526,6 +1896,7 @@ window.addEventListener(
 
 
             massBeepError();
+
 
             return;
         }
@@ -1562,6 +1933,7 @@ window.addEventListener(
 
 
             massBeepWarning();
+
 
             return;
         }
@@ -1614,9 +1986,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        QR SIKER
-       ========================= */
+       ================================================= */
 
     function onMassScanSuccess(
         decodedText
@@ -1671,9 +2043,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        KAMERA LEÁLLÍTÁSA
-       ========================= */
+       ================================================= */
 
     async function stopMassScanner() {
 
@@ -1710,9 +2082,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        KAMERA INDÍTÁSA
-       ========================= */
+       ================================================= */
 
     async function startMassScanner() {
 
@@ -1778,8 +2150,7 @@ window.addEventListener(
          * FONTOS:
          * NINCS qrbox!
          *
-         * Ezért a tömeges olvasásnál
-         * nincs fehér négyzet,
+         * Így nincs fehér QR-négyzet,
          * csak a kamera képe.
          */
 
@@ -1849,10 +2220,6 @@ window.addEventListener(
                 );
 
 
-            /*
-             * Fallback esetén sincs qrbox.
-             */
-
             const fallbackConfig = {
 
                 fps:10,
@@ -1914,9 +2281,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        TÖMEGES ABLAK MEGNYITÁSA
-       ========================= */
+       ================================================= */
 
     async function openMassCheck() {
 
@@ -1980,9 +2347,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        TÖMEGES ABLAK BEZÁRÁSA
-       ========================= */
+       ================================================= */
 
     async function closeMassCheck() {
 
@@ -2008,9 +2375,9 @@ window.addEventListener(
     }
 
 
-    /* =========================
+    /* =================================================
        GOMBOK
-       ========================= */
+       ================================================= */
 
     window.addEventListener(
         "DOMContentLoaded",
