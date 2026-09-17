@@ -67,20 +67,25 @@ button.temp-small {
 }
 
 /* =========================
-   ALSÓ GOMBSOR
+   ALSÓ 3 GOMB
    ========================= */
 
 #bottomActions {
     position:absolute;
-    bottom:40px;
+    bottom:28px;
     left:50%;
     transform:translateX(-50%);
+
     display:flex;
     gap:8px;
-    z-index:1;
+
+    z-index:10;
+
     width:calc(100% - 20px);
     max-width:600px;
+
     justify-content:center;
+    align-items:stretch;
     box-sizing:border-box;
 }
 
@@ -88,19 +93,20 @@ button.temp-small {
     flex:1 1 0;
     width:0;
     min-width:0;
-    padding:13px 6px;
-    font-size:16px;
+
+    padding:13px 5px;
+
+    font-size:15px;
     line-height:1.15;
+
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    box-sizing:border-box;
+
+    border-radius:10px;
 }
 
-/* =========================
-   TÖMEGES ELLENŐRZÉS
-   ========================= */
-
+/* TÖMEGES */
 #massCheckButton {
     color:#ffffff;
     background:rgba(0,90,160,0.85);
@@ -111,6 +117,56 @@ button.temp-small {
 #massCheckButton:hover {
     background:rgba(0,130,220,0.9);
 }
+
+/* VISSZA */
+#backButton {
+    color:#ffffff;
+    background:rgba(60,60,60,0.9);
+    border-color:#999999;
+}
+
+#backButton:hover {
+    background:rgba(90,90,90,0.95);
+}
+
+/* FRISSÍT */
+#refreshButton {
+    color:#ffffff;
+    background:rgba(0,110,60,0.9);
+    border-color:#00cc66;
+}
+
+#refreshButton:hover {
+    background:rgba(0,145,75,0.95);
+}
+
+/* Kisebb kijelző */
+@media(max-width:480px) {
+
+    #bottomActions {
+        gap:6px;
+        width:calc(100% - 14px);
+        bottom:25px;
+    }
+
+    #bottomActions button {
+        padding:11px 3px;
+        font-size:13px;
+    }
+}
+
+@media(max-width:360px) {
+
+    #bottomActions {
+        gap:5px;
+    }
+
+    #bottomActions button {
+        padding:10px 2px;
+        font-size:11px;
+    }
+}
+
 
 /* =========================
    TÖMEGES ELLENŐRZÉS ABLAK
@@ -143,7 +199,10 @@ button.temp-small {
     margin:5px 0 12px 0;
 }
 
-/* Csak a kamera képe */
+/* =========================
+   KAMERA
+   ========================= */
+
 #massReader {
     width:100%;
     max-width:600px;
@@ -167,6 +226,7 @@ button.temp-small {
     display:none !important;
 }
 
+
 /* =========================
    KÉZI BEVITEL
    ========================= */
@@ -174,8 +234,8 @@ button.temp-small {
 #manualInputArea {
     display:none;
     width:100%;
-    margin:0 auto;
     box-sizing:border-box;
+    margin:0 auto 10px auto;
 }
 
 #manualInputTitle {
@@ -183,69 +243,84 @@ button.temp-small {
     color:#FFD700;
     font-size:20px;
     font-weight:bold;
-    margin:5px 0 10px 0;
+    margin-bottom:10px;
 }
 
 #manualCodeInput {
     display:block;
+
     width:100%;
     box-sizing:border-box;
+
     padding:16px 12px;
-    border-radius:10px;
-    border:2px solid #FFD700;
-    background:rgba(0,0,0,0.65);
-    color:#ffffff;
-    font-size:24px;
+
+    font-size:23px;
     font-weight:bold;
+
     text-align:center;
+
+    color:#ffffff;
+    background:rgba(0,0,0,0.65);
+
+    border:2px solid #FFD700;
+    border-radius:12px;
+
     outline:none;
 }
 
 #manualCodeInput:focus {
     border-color:#00ff66;
-    box-shadow:0 0 10px rgba(0,255,100,0.35);
+    box-shadow:0 0 10px rgba(0,255,102,0.25);
 }
 
 #manualCodeInput::placeholder {
     color:rgba(255,255,255,0.55);
-    font-size:18px;
-    font-weight:normal;
 }
 
-#manualModeButtons {
+
+/* =========================
+   MÓDVÁLTÓ GOMBOK
+   ========================= */
+
+#massModeButtons {
     display:flex;
     gap:8px;
+    width:100%;
     margin-top:10px;
 }
 
-#switchManualButton,
-#switchCameraButton {
+#massModeButtons button {
     flex:1;
-    padding:11px 8px;
+    padding:11px 6px;
     font-size:15px;
-    font-weight:bold;
-    box-sizing:border-box;
+    border-radius:10px;
 }
 
 #switchManualButton {
     color:#ffffff;
-    background:rgba(80,80,80,0.85);
-    border-color:#cccccc;
+    background:rgba(90,70,0,0.9);
+    border-color:#FFD700;
 }
 
 #switchManualButton:hover {
-    background:rgba(110,110,110,0.9);
+    background:rgba(130,100,0,0.95);
 }
 
 #switchCameraButton {
+    display:none;
     color:#ffffff;
-    background:rgba(0,90,160,0.85);
+    background:rgba(0,90,160,0.9);
     border-color:#00aaff;
 }
 
 #switchCameraButton:hover {
-    background:rgba(0,130,220,0.9);
+    background:rgba(0,130,220,0.95);
 }
+
+
+/* =========================
+   ÁLLAPOT
+   ========================= */
 
 #massScanStatus {
     margin-top:12px;
@@ -274,6 +349,11 @@ button.temp-small {
     color:#FFD700;
     border:2px solid #aa8800;
 }
+
+
+/* =========================
+   ÖSSZESÍTÉS
+   ========================= */
 
 #massSummary {
     margin-top:12px;
@@ -323,34 +403,6 @@ button.temp-small {
     border-color:#ff4444;
     color:white;
     font-weight:bold;
-}
-
-/* Kis kijelzőknél is maradjon egy sor */
-@media (max-width:480px) {
-
-    #bottomActions {
-        gap:6px;
-        width:calc(100% - 12px);
-        bottom:30px;
-    }
-
-    #bottomActions button {
-        padding:12px 4px;
-        font-size:14px;
-    }
-}
-
-@media (max-width:360px) {
-
-    #bottomActions {
-        gap:5px;
-        width:calc(100% - 8px);
-    }
-
-    #bottomActions button {
-        padding:11px 3px;
-        font-size:12px;
-    }
 }
 </style>
 </head>
@@ -475,6 +527,7 @@ button.temp-small {
 
 </div>
 
+
 <div id="bottomActions">
 
     <button id="massCheckButton">
@@ -491,8 +544,9 @@ button.temp-small {
 
 </div>
 
+
 <!-- =========================
-     TÖMEGES ELLENŐRZÉS ABLAK
+     TÖMEGES ELLENŐRZÉS
      ========================= -->
 
 <div id="massCheckModal">
@@ -503,13 +557,14 @@ button.temp-small {
             TÖMEGES ELLENŐRZÉS
         </div>
 
+        <!-- KAMERA -->
         <div id="massReader"></div>
 
         <!-- KÉZI BEVITEL -->
         <div id="manualInputArea">
 
             <div id="manualInputTitle">
-                KÉZI BEVITEL / VONALKÓDOLVASÓ
+                KÉZI BEVITEL
             </div>
 
             <input
@@ -521,29 +576,34 @@ button.temp-small {
                 placeholder="Olvasd be a kódot..."
             >
 
-            <div id="manualModeButtons">
+        </div>
 
-                <button id="switchCameraButton">
-                    Váltás kamerára
-                </button>
 
-            </div>
+        <!-- MÓDVÁLTÓ GOMBOK -->
+        <div id="massModeButtons">
+
+            <button id="switchManualButton">
+                VÁLTÁS KÉZI BEVITELRE
+            </button>
+
+            <button id="switchCameraButton">
+                VÁLTÁS KAMERÁRA
+            </button>
 
         </div>
 
-        <button id="switchManualButton">
-            Váltás kézi bevitelre
-        </button>
 
         <div id="massScanStatus" class="mass-status-info">
             Kamera indítása...
         </div>
+
 
         <div id="massTotal">
             Ellenőrizve:
             <span id="massTotalCount">0</span>
             db
         </div>
+
 
         <div id="massSummary">
 
@@ -557,6 +617,7 @@ button.temp-small {
 
         </div>
 
+
         <button id="closeMassCheck">
             BEZÁRÁS
         </button>
@@ -564,6 +625,7 @@ button.temp-small {
     </div>
 
 </div>
+
 
 <!-- XLSX -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -1145,14 +1207,12 @@ window.addEventListener(
                 rows[i] || [];
 
 
-            /* A = QR / csomagkód */
             const code =
                 massNormalizeCode(
                     row[0]
                 );
 
 
-            /* C = túrakód */
             const tour =
                 massConvertTour(
                     row[2]
@@ -1409,7 +1469,7 @@ window.addEventListener(
 
 
     /* =========================
-       SIKERES HANG
+       HANGOK
        ========================= */
 
     function massBeepSuccess() {
@@ -1420,18 +1480,14 @@ window.addEventListener(
                 window.AudioContext ||
                 window.webkitAudioContext;
 
-
             const ctx =
                 new AudioContext();
-
 
             const oscillator =
                 ctx.createOscillator();
 
-
             const gain =
                 ctx.createGain();
-
 
             oscillator.frequency.value =
                 1000;
@@ -1442,30 +1498,18 @@ window.addEventListener(
             gain.gain.value =
                 0.15;
 
-
-            oscillator.connect(
-                gain
-            );
-
-            gain.connect(
-                ctx.destination
-            );
-
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
 
             oscillator.start();
 
             oscillator.stop(
-                ctx.currentTime +
-                0.12
+                ctx.currentTime + 0.12
             );
 
         } catch (e) {}
     }
 
-
-    /* =========================
-       FIGYELMEZTETŐ HANG
-       ========================= */
 
     function massBeepWarning() {
 
@@ -1475,18 +1519,14 @@ window.addEventListener(
                 window.AudioContext ||
                 window.webkitAudioContext;
 
-
             const ctx =
                 new AudioContext();
-
 
             const oscillator =
                 ctx.createOscillator();
 
-
             const gain =
                 ctx.createGain();
-
 
             oscillator.frequency.value =
                 500;
@@ -1497,30 +1537,18 @@ window.addEventListener(
             gain.gain.value =
                 0.12;
 
-
-            oscillator.connect(
-                gain
-            );
-
-            gain.connect(
-                ctx.destination
-            );
-
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
 
             oscillator.start();
 
             oscillator.stop(
-                ctx.currentTime +
-                0.18
+                ctx.currentTime + 0.18
             );
 
         } catch (e) {}
     }
 
-
-    /* =========================
-       HIBÁS HANG
-       ========================= */
 
     function massBeepError() {
 
@@ -1530,18 +1558,14 @@ window.addEventListener(
                 window.AudioContext ||
                 window.webkitAudioContext;
 
-
             const ctx =
                 new AudioContext();
-
 
             const oscillator =
                 ctx.createOscillator();
 
-
             const gain =
                 ctx.createGain();
-
 
             oscillator.frequency.value =
                 250;
@@ -1552,21 +1576,13 @@ window.addEventListener(
             gain.gain.value =
                 0.15;
 
-
-            oscillator.connect(
-                gain
-            );
-
-            gain.connect(
-                ctx.destination
-            );
-
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
 
             oscillator.start();
 
             oscillator.stop(
-                ctx.currentTime +
-                0.25
+                ctx.currentTime + 0.25
             );
 
         } catch (e) {}
@@ -1638,7 +1654,7 @@ window.addEventListener(
 
 
     /* =========================
-       BEOLVASOTT KÓD FELDOLGOZÁSA
+       KÓD FELDOLGOZÁSA
        ========================= */
 
     function processMassCode(
@@ -1670,7 +1686,6 @@ window.addEventListener(
                 "NEM TALÁLHATÓ: " +
                 code
             );
-
 
             massBeepError();
 
@@ -1706,7 +1721,6 @@ window.addEventListener(
                 " › " +
                 tour
             );
-
 
             massBeepWarning();
 
@@ -1872,8 +1886,25 @@ window.addEventListener(
             );
 
 
+        readerElement.style.display =
+            "block";
+
         readerElement.innerHTML =
             "";
+
+
+        if (
+            typeof Html5Qrcode ===
+            "undefined"
+        ) {
+
+            massSetStatus(
+                "error",
+                "A kameraolvasó nem töltődött be."
+            );
+
+            return;
+        }
 
 
         massQrReader =
@@ -1920,15 +1951,6 @@ window.addEventListener(
             );
         }
 
-
-        /*
-         * FONTOS:
-         * NINCS qrbox!
-         *
-         * Ezért a tömeges olvasásnál
-         * nincs fehér négyzet,
-         * csak a kamera képe.
-         */
 
         const config = {
 
@@ -1978,7 +2000,7 @@ window.addEventListener(
         } catch (firstError) {
 
             console.warn(
-                "Tömeges kamera első indítás sikertelen:",
+                "Első kameraindítás sikertelen:",
                 firstError
             );
 
@@ -1996,27 +2018,6 @@ window.addEventListener(
                 );
 
 
-            /*
-             * Fallback esetén sincs qrbox.
-             */
-
-            const fallbackConfig = {
-
-                fps:10,
-
-                aspectRatio:1.0
-            };
-
-
-            if (
-                formats.length > 0
-            ) {
-
-                fallbackConfig.formatsToSupport =
-                    formats;
-            }
-
-
             try {
 
                 await massQrReader.start(
@@ -2026,7 +2027,7 @@ window.addEventListener(
                             "environment"
                     },
 
-                    fallbackConfig,
+                    config,
 
                     onMassScanSuccess,
 
@@ -2062,45 +2063,36 @@ window.addEventListener(
 
 
     /* =========================
-       KÉZI BEVITELRE VÁLTÁS
+       KÉZI BEVITEL AKTIVÁLÁSA
        ========================= */
 
-    async function switchToManualMode() {
+    async function switchToManual() {
 
         await stopMassScanner();
 
 
-        const reader =
-            document.getElementById(
-                "massReader"
-            );
-
-        const manualArea =
-            document.getElementById(
-                "manualInputArea"
-            );
-
-        const manualButton =
-            document.getElementById(
-                "switchManualButton"
-            );
-
-        const input =
-            document.getElementById(
-                "manualCodeInput"
-            );
-
-
-        reader.style.display =
+        document.getElementById(
+            "massReader"
+        ).style.display =
             "none";
 
 
-        manualArea.style.display =
+        document.getElementById(
+            "manualInputArea"
+        ).style.display =
             "block";
 
 
-        manualButton.style.display =
+        document.getElementById(
+            "switchManualButton"
+        ).style.display =
             "none";
+
+
+        document.getElementById(
+            "switchCameraButton"
+        ).style.display =
+            "block";
 
 
         massSetStatus(
@@ -2109,57 +2101,45 @@ window.addEventListener(
         );
 
 
-        setTimeout(
-            function () {
-
-                input.focus();
-
-            },
-            100
-        );
-    }
-
-
-    /* =========================
-       KAMERÁRA VISSZAVÁLTÁS
-       ========================= */
-
-    async function switchToCameraMode() {
-
-        const reader =
-            document.getElementById(
-                "massReader"
-            );
-
-        const manualArea =
-            document.getElementById(
-                "manualInputArea"
-            );
-
-        const manualButton =
-            document.getElementById(
-                "switchManualButton"
-            );
-
         const input =
             document.getElementById(
                 "manualCodeInput"
             );
 
 
-        input.value =
-            "";
+        input.value = "";
+
+        input.focus();
+    }
 
 
-        manualArea.style.display =
+    /* =========================
+       VISSZA KAMERÁRA
+       ========================= */
+
+    async function switchToCamera() {
+
+        document.getElementById(
+            "manualInputArea"
+        ).style.display =
             "none";
 
 
-        manualButton.style.display =
-            "";
+        document.getElementById(
+            "switchCameraButton"
+        ).style.display =
+            "none";
 
 
-        reader.style.display =
+        document.getElementById(
+            "switchManualButton"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "massReader"
+        ).style.display =
             "block";
 
 
@@ -2185,13 +2165,6 @@ window.addEventListener(
             );
 
 
-        /*
-         * A legtöbb USB/Bluetooth vonalkódolvasó
-         * billentyűzetként működik.
-         *
-         * Beírja a kódot, majd Entert küld.
-         */
-
         input.addEventListener(
             "keydown",
             function (event) {
@@ -2206,17 +2179,303 @@ window.addEventListener(
 
 
                 const code =
-                    input.value;
+                    input.value.trim();
 
 
-                input.value =
-                    "";
+                input.value = "";
 
 
-                if (
-                    code.trim()
-                ) {
+                if (code) {
 
                     processMassCode(
                         code
+                    );
+                }
+
+
+                /*
+                 * Nagyon fontos:
+                 * a vonalkódolvasó ENTER után
+                 * azonnal visszakapja a fókuszt.
+                 */
+
+                setTimeout(
+                    function () {
+
+                        input.focus();
+
+                    },
+                    20
+                );
+            }
+        );
+
+
+        /*
+         * Ha a scanner valamiért nem küld
+         * ENTER-t, akkor a mező akkor is
+         * használható marad.
+         */
+    }
+
+
+    /* =========================
+       TÖMEGES ABLAK MEGNYITÁSA
+       ========================= */
+
+    async function openMassCheck() {
+
+        const modal =
+            document.getElementById(
+                "massCheckModal"
+            );
+
+
+        modal.style.display =
+            "block";
+
+
+        massTotalScanned =
+            0;
+
+
+        massTourCounts =
+            {};
+
+
+        massRecentlyScanned =
+            new Set();
+
+
+        /*
+         * Mindig kamera móddal indulunk.
+         */
+
+        document.getElementById(
+            "massReader"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "manualInputArea"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "switchManualButton"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "switchCameraButton"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "manualCodeInput"
+        ).value = "";
+
+
+        massUpdateSummary();
+
+
+        massSetStatus(
+            "info",
+            "Excel adatok betöltése..."
+        );
+
+
+        try {
+
+            await loadMassExcelData();
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            massSetStatus(
+                "error",
+                "Nem sikerült betölteni az Excel fájlt."
+            );
+
+
+            return;
+        }
+
+
+        massSetStatus(
+            "info",
+            "Kamera indítása..."
+        );
+
+
+        await startMassScanner();
+    }
+
+
+    /* =========================
+       TÖMEGES ABLAK BEZÁRÁSA
+       ========================= */
+
+    async function closeMassCheck() {
+
+        await stopMassScanner();
+
+
+        document.getElementById(
+            "massCheckModal"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "massReader"
+        ).innerHTML =
+            "";
+
+
+        document.getElementById(
+            "massReader"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "manualInputArea"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "switchManualButton"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "switchCameraButton"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "manualCodeInput"
+        ).value = "";
+    }
+
+
+    /* =========================
+       GOMBOK
+       ========================= */
+
+    window.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            /*
+             * Kézi bevitel beállítása
+             */
+            setupManualInput();
+
+
+            /*
+             * Tömeges ellenőrzés
+             */
+            const massButton =
+                document.getElementById(
+                    "massCheckButton"
+                );
+
+            if (massButton) {
+
+                massButton.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+
+                        openMassCheck();
+                    }
+                );
+            }
+
+
+            /*
+             * Kézi mód
+             */
+            const manualButton =
+                document.getElementById(
+                    "switchManualButton"
+                );
+
+            if (manualButton) {
+
+                manualButton.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+
+                        switchToManual();
+                    }
+                );
+            }
+
+
+            /*
+             * Kamera mód
+             */
+            const cameraButton =
+                document.getElementById(
+                    "switchCameraButton"
+                );
+
+            if (cameraButton) {
+
+                cameraButton.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+
+                        switchToCamera();
+                    }
+                );
+            }
+
+
+            /*
+             * Bezárás
+             */
+            const closeButton =
+                document.getElementById(
+                    "closeMassCheck"
+                );
+
+            if (closeButton) {
+
+                closeButton.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+
+                        closeMassCheck();
+                    }
+                );
+            }
+        }
+    );
+
+})();
+
+</script>
+
+</body>
+</html>
 ```
