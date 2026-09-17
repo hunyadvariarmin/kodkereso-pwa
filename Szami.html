@@ -21,54 +21,63 @@ body {
     height: 100%;
     overflow: hidden;
     font-family: Arial, Helvetica, sans-serif;
-    background: #111;
-    color: white;
 }
+
+/* =========================================================
+   FŐ OLDAL
+   ========================================================= */
 
 body {
-    position: relative;
+    background:
+        linear-gradient(
+            rgba(0,0,0,0.45),
+            rgba(0,0,0,0.45)
+        ),
+        #202020;
+    color: white;
 }
-
-/* =========================
-   FŐOLDAL
-   ========================= */
 
 #mainPage {
     width: 100%;
     height: 100%;
+    position: relative;
+
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative;
+
     padding-top: 18px;
-    padding-bottom: 105px;
+    padding-bottom: 100px;
 }
 
 #title {
+    color: #ffd800;
     font-size: 27px;
     font-weight: bold;
-    color: #ffd800;
     text-align: center;
-    margin-bottom: 16px;
+
+    margin-bottom: 15px;
 }
 
-/* =========================
+/* =========================================================
    TÚRAGOMBOK
-   ========================= */
+   ========================================================= */
 
 #buttonsContainer {
     width: 100%;
     max-width: 700px;
+
     padding: 0 10px;
 
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
 
+    flex: 1;
+
     overflow-y: auto;
     overflow-x: hidden;
 
-    flex: 1;
     align-content: start;
 }
 
@@ -82,7 +91,8 @@ body {
     font-weight: bold;
 
     color: #ffd800;
-    background: rgba(30, 30, 30, 0.92);
+
+    background: rgba(20, 20, 20, 0.88);
 
     border: 2px solid #ffd800;
     border-radius: 10px;
@@ -108,7 +118,6 @@ body {
     transform: scale(0.97);
 }
 
-/* Kész túra */
 .tourButton.done {
     background: #159447;
     border-color: #42ef88;
@@ -120,25 +129,36 @@ body {
     color: white;
 }
 
-/* =========================
+/*
+ * FONTOS:
+ * induláskor minden gomb rejtve van.
+ * Az Excel alapján csak a tényleges túrák jelennek meg.
+ */
+.tourButton.hiddenByExcel {
+    display: none !important;
+}
+
+/* =========================================================
    ALSÓ GOMBOK
-   ========================= */
+   ========================================================= */
 
 #bottomActions {
     position: absolute;
+
     left: 50%;
     bottom: 22px;
+
     transform: translateX(-50%);
 
     width: 100%;
     max-width: 470px;
 
+    padding: 0 10px;
+
     display: flex;
     gap: 9px;
 
-    padding: 0 10px;
-
-    z-index: 10;
+    z-index: 50;
 }
 
 #bottomActions button {
@@ -189,9 +209,9 @@ body {
     color: white;
 }
 
-/* =========================
-   TÖMEGES ELLENŐRZÉS MODAL
-   ========================= */
+/* =========================================================
+   TÖMEGES ELLENŐRZÉS
+   ========================================================= */
 
 #massCheckModal {
     position: fixed;
@@ -202,11 +222,11 @@ body {
     align-items: center;
     justify-content: center;
 
-    background: rgba(0, 0, 0, 0.90);
+    padding: 12px;
+
+    background: rgba(0,0,0,0.90);
 
     z-index: 1000;
-
-    padding: 12px;
 }
 
 #massCheckContent {
@@ -216,27 +236,31 @@ body {
 
     overflow-y: auto;
 
+    padding: 16px;
+
     background: #181818;
+
     border: 2px solid #ffd800;
     border-radius: 16px;
 
-    padding: 16px;
-
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.65);
+    box-shadow:
+        0 0 30px rgba(0,0,0,0.7);
 
     text-align: center;
 }
 
 #massCheckTitle {
+    color: #ffd800;
+
     font-size: 24px;
     font-weight: bold;
-    color: #ffd800;
+
     margin-bottom: 14px;
 }
 
-/* =========================
+/* =========================================================
    KAMERA
-   ========================= */
+   ========================================================= */
 
 #massReader {
     width: 100%;
@@ -244,15 +268,17 @@ body {
 
     margin: 0 auto;
 
-    border-radius: 12px;
-    overflow: hidden;
-
     background: #111;
+
+    border-radius: 12px;
+
+    overflow: hidden;
 }
 
 #massReader video {
     width: 100% !important;
     height: auto !important;
+
     display: block;
 }
 
@@ -264,9 +290,9 @@ body {
     display: none !important;
 }
 
-/* =========================
+/* =========================================================
    KÉZI BEVITEL
-   ========================= */
+   ========================================================= */
 
 #manualInputArea {
     width: 100%;
@@ -277,8 +303,10 @@ body {
 
 #manualInputTitle {
     color: #ffd800;
+
     font-size: 17px;
     font-weight: bold;
+
     margin-bottom: 8px;
 }
 
@@ -287,22 +315,23 @@ body {
 
     padding: 17px 14px;
 
+    background: #0d0d0d;
+    color: white;
+
     border: 2px solid #ffd800;
     border-radius: 11px;
 
-    background: #0f0f0f;
-    color: white;
+    outline: none;
 
     font-size: 23px;
     font-weight: bold;
 
     text-align: center;
-
-    outline: none;
 }
 
 #manualCodeInput:focus {
-    box-shadow: 0 0 0 3px rgba(255, 216, 0, 0.20);
+    box-shadow:
+        0 0 0 3px rgba(255,216,0,0.20);
 }
 
 #manualCodeInput::placeholder {
@@ -311,19 +340,18 @@ body {
     font-weight: normal;
 }
 
-/* =========================
+/* =========================================================
    MÓDVÁLTÓ GOMBOK
-   ========================= */
+   ========================================================= */
 
 #massModeButtons {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-
     width: 100%;
     max-width: 600px;
 
     margin: 10px auto;
+
+    display: flex;
+    gap: 8px;
 }
 
 #massModeButtons button {
@@ -334,12 +362,12 @@ body {
     border: none;
     border-radius: 9px;
 
+    color: white;
+
     font-size: 14px;
     font-weight: bold;
 
     cursor: pointer;
-
-    color: white;
 }
 
 #switchManualButton {
@@ -350,27 +378,28 @@ body {
     background: #1976d2;
 }
 
-/* =========================
+/* =========================================================
    STÁTUSZ
-   ========================= */
+   ========================================================= */
 
 #massScanStatus {
-    min-height: 42px;
+    width: 100%;
+    max-width: 600px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 42px;
 
     margin: 8px auto;
 
     padding: 8px 10px;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     border-radius: 9px;
 
     font-size: 15px;
     font-weight: bold;
-
-    max-width: 600px;
 }
 
 .mass-status-info {
@@ -393,17 +422,15 @@ body {
     color: #ff7777;
 }
 
-/* =========================
+/* =========================================================
    ÖSSZESÍTÉS
-   ========================= */
+   ========================================================= */
 
 #massTotal {
     margin: 12px 0;
 
     font-size: 18px;
     font-weight: bold;
-
-    color: white;
 }
 
 #massTotalCount {
@@ -419,6 +446,7 @@ body {
     padding: 12px;
 
     background: #101010;
+
     border-radius: 11px;
 
     text-align: left;
@@ -428,6 +456,7 @@ body {
     margin: 0 0 9px;
 
     color: #ffd800;
+
     font-size: 17px;
 
     text-align: center;
@@ -440,6 +469,7 @@ body {
 
 .mass-summary-row {
     display: flex;
+
     justify-content: space-between;
     align-items: center;
 
@@ -457,9 +487,9 @@ body {
     font-weight: bold;
 }
 
-/* =========================
+/* =========================================================
    BEZÁRÁS
-   ========================= */
+   ========================================================= */
 
 #closeMassCheck {
     width: 100%;
@@ -483,9 +513,9 @@ body {
     filter: brightness(1.15);
 }
 
-/* =========================
+/* =========================================================
    MOBIL
-   ========================= */
+   ========================================================= */
 
 @media (max-width: 480px) {
 
@@ -507,7 +537,6 @@ body {
     .tourButton {
         padding: 15px 4px;
         font-size: 17px;
-        border-radius: 9px;
     }
 
     #bottomActions {
@@ -519,7 +548,6 @@ body {
     #bottomActions button {
         padding: 11px 4px;
         font-size: 13px;
-        border-radius: 9px;
     }
 
     #massCheckContent {
@@ -564,7 +592,9 @@ body {
 
 <div id="mainPage">
 
-    <div id="title">SZÁMÍT TÚRÁK</div>
+    <div id="title">
+        SZÁMÍT TÚRÁK
+    </div>
 
     <div id="buttonsContainer">
 
@@ -619,17 +649,27 @@ body {
     </div>
 
     <div id="bottomActions">
-        <button id="backButton">Vissza</button>
-        <button id="refreshButton">Frissít</button>
-        <button id="massCheckButton">TÖMEGES ELLENŐRZÉS</button>
+
+        <button id="backButton">
+            Vissza
+        </button>
+
+        <button id="refreshButton">
+            Frissít
+        </button>
+
+        <button id="massCheckButton">
+            TÖMEGES ELLENŐRZÉS
+        </button>
+
     </div>
 
 </div>
 
 
-<!-- =========================
-     TÖMEGES ELLENŐRZÉS
-     ========================= -->
+<!-- =======================================================
+     TÖMEGES ELLENŐRZÉS MODAL
+     ======================================================= -->
 
 <div id="massCheckModal">
 
@@ -641,7 +681,10 @@ body {
 
         <div id="massReader"></div>
 
-        <div id="manualInputArea" style="display:none;">
+        <div
+            id="manualInputArea"
+            style="display:none;"
+        >
 
             <div id="manualInputTitle">
                 KÉZI BEVITEL / VONALKÓDOLVASÓ
@@ -653,6 +696,7 @@ body {
                 autocomplete="off"
                 autocapitalize="characters"
                 spellcheck="false"
+                inputmode="none"
                 placeholder="Olvasd be a kódot..."
             >
 
@@ -664,13 +708,19 @@ body {
                 Váltás kézi bevitelre
             </button>
 
-            <button id="switchCameraButton" style="display:none;">
+            <button
+                id="switchCameraButton"
+                style="display:none;"
+            >
                 Váltás kamerára
             </button>
 
         </div>
 
-        <div id="massScanStatus" class="mass-status-info">
+        <div
+            id="massScanStatus"
+            class="mass-status-info"
+        >
             Kamera indítása...
         </div>
 
@@ -682,7 +732,9 @@ body {
 
         <div id="massSummary">
 
-            <h3>Túrák összesítése</h3>
+            <h3>
+                Túrák összesítése
+            </h3>
 
             <div id="massSummaryList">
                 Nincs még beolvasott kód.
@@ -702,16 +754,12 @@ body {
 <script>
 
 /* =========================================================
-   ALAPBEÁLLÍTÁSOK
+   BEÁLLÍTÁSOK
    ========================================================= */
 
 const EXCEL_URL =
     "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
 
-
-/* =========================================================
-   TÚRÁK
-   ========================================================= */
 
 const TOUR_NAMES = [
     "SZ-0",
@@ -755,65 +803,68 @@ const TOUR_NAMES = [
 ];
 
 
-/* =========================================================
-   LOCAL STORAGE / SESSION STORAGE KULCSOK
-   ========================================================= */
-
-const DONE_KEYS = TOUR_NAMES.map(
-    tour => "done_" + tour
-);
-
-const SCAN_KEYS = TOUR_NAMES.map(
-    tour => tour + "_scannedList"
-);
+const DONE_KEYS =
+    TOUR_NAMES.map(
+        tour => "done_" + tour
+    );
 
 
-/* =========================================================
-   EXCEL ADATOK
-   ========================================================= */
+const SCAN_KEYS =
+    TOUR_NAMES.map(
+        tour => tour + "_scannedList"
+    );
+
 
 let excelData = null;
 
 
 /* =========================================================
-   TÚRAGOMBOK KATTINTÁSA
+   TÚRAGOMBOK
    ========================================================= */
 
-document.querySelectorAll(".tourButton").forEach(button => {
+document.querySelectorAll(".tourButton")
+    .forEach(button => {
 
-    button.addEventListener("click", function () {
+        button.addEventListener(
+            "click",
+            function () {
 
-        const tour = this.dataset.tour;
+                const tour =
+                    this.dataset.tour;
 
-        localStorage.setItem(
-            "selectedTour",
-            tour
+                localStorage.setItem(
+                    "selectedTour",
+                    tour
+                );
+
+                window.location.href =
+                    "arukiadas.html?tour=" +
+                    encodeURIComponent(tour);
+
+            }
         );
-
-        /*
-         * Ha nálad a túrák külön oldalra mennek,
-         * itt marad a korábbi arukiadas.html logika.
-         */
-        window.location.href =
-            "arukiadas.html?tour=" +
-            encodeURIComponent(tour);
 
     });
 
-});
-
 
 /* =========================================================
-   KÉSZ TÚRÁK ZÖLDRE ÁLLÍTÁSA
+   KÉSZ TÚRÁK
    ========================================================= */
 
 function applyDoneStyles() {
 
-    document.querySelectorAll(".tourButton").forEach(button => {
+    document.querySelectorAll(
+        ".tourButton"
+    ).forEach(button => {
 
-        const tour = button.dataset.tour;
+        const tour =
+            button.dataset.tour;
 
-        if (localStorage.getItem("done_" + tour) === "true") {
+        if (
+            localStorage.getItem(
+                "done_" + tour
+            ) === "true"
+        ) {
 
             button.classList.add("done");
 
@@ -829,58 +880,7 @@ function applyDoneStyles() {
 
 
 /* =========================================================
-   EXCEL BEOLVASÁSA
-   ========================================================= */
-
-async function loadExcel() {
-
-    try {
-
-        const response = await fetch(
-            EXCEL_URL + "?t=" + Date.now()
-        );
-
-        if (!response.ok) {
-            throw new Error("Excel betöltési hiba");
-        }
-
-        const arrayBuffer =
-            await response.arrayBuffer();
-
-        const workbook =
-            XLSX.read(arrayBuffer, {
-                type: "array"
-            });
-
-        const firstSheet =
-            workbook.Sheets[
-                workbook.SheetNames[0]
-            ];
-
-        excelData =
-            XLSX.utils.sheet_to_json(
-                firstSheet,
-                {
-                    header: 1,
-                    defval: ""
-                }
-            );
-
-        return excelData;
-
-    } catch (error) {
-
-        console.error(error);
-
-        return null;
-
-    }
-
-}
-
-
-/* =========================================================
-   EXCEL ALAPJÁN CSAK A MEGFELELŐ TÚRÁK MUTATÁSA
+   TÚRA SZÁM ÁTALAKÍTÁSA
    ========================================================= */
 
 function convertTourNumber(value) {
@@ -915,7 +915,92 @@ function convertTourNumber(value) {
 }
 
 
+/* =========================================================
+   EXCEL BETÖLTÉS
+   ========================================================= */
+
+async function loadExcel() {
+
+    try {
+
+        const response =
+            await fetch(
+                EXCEL_URL +
+                "?t=" +
+                Date.now()
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Excel betöltési hiba"
+            );
+        }
+
+        const arrayBuffer =
+            await response.arrayBuffer();
+
+        const workbook =
+            XLSX.read(
+                arrayBuffer,
+                {
+                    type: "array"
+                }
+            );
+
+        const sheet =
+            workbook.Sheets[
+                workbook.SheetNames[0]
+            ];
+
+        excelData =
+            XLSX.utils.sheet_to_json(
+                sheet,
+                {
+                    header: 1,
+                    defval: ""
+                }
+            );
+
+        return excelData;
+
+    } catch (error) {
+
+        console.error(
+            "Excel hiba:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+/* =========================================================
+   TÚRAGOMBOK SZŰRÉSE EXCEL ALAPJÁN
+   ========================================================= */
+
 function updateButtonsVisibilityFromExcel() {
+
+    const buttons =
+        document.querySelectorAll(
+            ".tourButton"
+        );
+
+    /*
+     * Először MINDEN gomb rejtve.
+     * Így hibás / üres Excel esetén sem
+     * jelenik meg automatikusan az összes túra.
+     */
+
+    buttons.forEach(button => {
+
+        button.classList.add(
+            "hiddenByExcel"
+        );
+
+    });
 
     if (!excelData) {
         return;
@@ -924,36 +1009,47 @@ function updateButtonsVisibilityFromExcel() {
     const availableTours =
         new Set();
 
-    for (const row of excelData) {
+    for (
+        const row of excelData
+    ) {
 
-        if (!row || row.length < 3) {
+        if (
+            !row ||
+            row.length < 3
+        ) {
             continue;
         }
 
         const tour =
-            convertTourNumber(row[2]);
+            convertTourNumber(
+                row[2]
+            );
 
-        if (tour) {
-            availableTours.add(tour);
+        if (
+            tour &&
+            TOUR_NAMES.includes(tour)
+        ) {
+
+            availableTours.add(
+                tour
+            );
+
         }
 
     }
 
-    document.querySelectorAll(".tourButton").forEach(button => {
+    buttons.forEach(button => {
 
         const tour =
             button.dataset.tour;
 
-        if (availableTours.size === 0) {
+        if (
+            availableTours.has(tour)
+        ) {
 
-            button.style.display = "";
-
-        } else {
-
-            button.style.display =
-                availableTours.has(tour)
-                    ? ""
-                    : "none";
+            button.classList.remove(
+                "hiddenByExcel"
+            );
 
         }
 
@@ -966,8 +1062,11 @@ function updateButtonsVisibilityFromExcel() {
    FRISSÍTÉS
    ========================================================= */
 
-document.getElementById("refreshButton")
-    .addEventListener("click", async function () {
+document.getElementById(
+    "refreshButton"
+).addEventListener(
+    "click",
+    async function () {
 
         const confirmed =
             confirm(
@@ -978,13 +1077,19 @@ document.getElementById("refreshButton")
             return;
         }
 
-        DONE_KEYS.forEach(key => {
-            localStorage.removeItem(key);
-        });
+        DONE_KEYS.forEach(
+            key =>
+                localStorage.removeItem(
+                    key
+                )
+        );
 
-        SCAN_KEYS.forEach(key => {
-            sessionStorage.removeItem(key);
-        });
+        SCAN_KEYS.forEach(
+            key =>
+                sessionStorage.removeItem(
+                    key
+                )
+        );
 
         applyDoneStyles();
 
@@ -992,22 +1097,29 @@ document.getElementById("refreshButton")
 
         updateButtonsVisibilityFromExcel();
 
-        alert("Az ellenőrzések törölve.");
+        alert(
+            "Az ellenőrzések törölve."
+        );
 
-    });
+    }
+);
 
 
 /* =========================================================
    VISSZA
    ========================================================= */
 
-document.getElementById("backButton")
-    .addEventListener("click", function () {
+document.getElementById(
+    "backButton"
+).addEventListener(
+    "click",
+    function () {
 
         window.location.href =
             "arukiadas.html";
 
-    });
+    }
+);
 
 
 /* =========================================================
@@ -1016,23 +1128,26 @@ document.getElementById("backButton")
 
 let massQrReader = null;
 
+let massScannerRunning =
+    false;
+
 let massExcelData = {
     codeToTour: new Map(),
     tourCodes: new Map()
 };
 
-let massTotalScanned = 0;
+let massTotalScanned =
+    0;
 
-let massTourCounts = {};
+let massTourCounts =
+    {};
 
 let massRecentlyScanned =
     new Set();
 
-let massScannerRunning = false;
-
 
 /* =========================================================
-   KÓD NORMALIZÁLÁSA
+   KÓD NORMALIZÁLÁS
    ========================================================= */
 
 function massNormalizeCode(code) {
@@ -1047,44 +1162,7 @@ function massNormalizeCode(code) {
 
 
 /* =========================================================
-   TÚRA ÁTALAKÍTÁSA
-   ========================================================= */
-
-function massConvertTour(value) {
-
-    const number =
-        Number(value);
-
-    if (!Number.isFinite(number)) {
-        return null;
-    }
-
-    let tourNumber;
-
-    if (number >= 8000) {
-
-        tourNumber =
-            number - 8000;
-
-    } else if (number >= 800) {
-
-        tourNumber =
-            number - 800;
-
-    } else {
-
-        tourNumber =
-            number;
-
-    }
-
-    return "SZ-" + tourNumber;
-
-}
-
-
-/* =========================================================
-   TÁROLT KÓDOK
+   TÁROLT LISTA
    ========================================================= */
 
 function massGetStoredList(tour) {
@@ -1093,18 +1171,19 @@ function massGetStoredList(tour) {
 
         const raw =
             sessionStorage.getItem(
-                tour + "_scannedList"
+                tour +
+                "_scannedList"
             );
 
         if (!raw) {
             return [];
         }
 
-        const parsed =
+        const list =
             JSON.parse(raw);
 
-        return Array.isArray(parsed)
-            ? parsed
+        return Array.isArray(list)
+            ? list
             : [];
 
     } catch (error) {
@@ -1118,10 +1197,14 @@ function massGetStoredList(tour) {
 }
 
 
-function massSetStoredList(tour, list) {
+function massSetStoredList(
+    tour,
+    list
+) {
 
     sessionStorage.setItem(
-        tour + "_scannedList",
+        tour +
+        "_scannedList",
         JSON.stringify(list)
     );
 
@@ -1129,7 +1212,7 @@ function massSetStoredList(tour, list) {
 
 
 /* =========================================================
-   EXCEL ADATOK FELÉPÍTÉSE
+   MASS EXCEL ADATOK
    ========================================================= */
 
 async function loadMassExcelData() {
@@ -1146,19 +1229,31 @@ async function loadMassExcelData() {
         tourCodes: new Map()
     };
 
-    for (const row of data) {
+    for (
+        const row of data
+    ) {
 
-        if (!row || row.length < 3) {
+        if (
+            !row ||
+            row.length < 3
+        ) {
             continue;
         }
 
         const code =
-            massNormalizeCode(row[0]);
+            massNormalizeCode(
+                row[0]
+            );
 
         const tour =
-            massConvertTour(row[2]);
+            convertTourNumber(
+                row[2]
+            );
 
-        if (!code || !tour) {
+        if (
+            !code ||
+            !tour
+        ) {
             continue;
         }
 
@@ -1167,7 +1262,11 @@ async function loadMassExcelData() {
             tour
         );
 
-        if (!massExcelData.tourCodes.has(tour)) {
+        if (
+            !massExcelData.tourCodes.has(
+                tour
+            )
+        ) {
 
             massExcelData.tourCodes.set(
                 tour,
@@ -1188,7 +1287,7 @@ async function loadMassExcelData() {
 
 
 /* =========================================================
-   ÖSSZESÍTÉS FRISSÍTÉSE
+   ÖSSZESÍTÉS
    ========================================================= */
 
 function massUpdateSummary() {
@@ -1199,23 +1298,27 @@ function massUpdateSummary() {
         );
 
     const tours =
-        Object.keys(massTourCounts)
-            .filter(
-                tour =>
-                    massTourCounts[tour] > 0
-            )
-            .sort(
-                (a, b) =>
-                    a.localeCompare(
-                        b,
-                        undefined,
-                        {
-                            numeric: true
-                        }
-                    )
-            );
+        Object.keys(
+            massTourCounts
+        )
+        .filter(
+            tour =>
+                massTourCounts[tour] > 0
+        )
+        .sort(
+            (a,b) =>
+                a.localeCompare(
+                    b,
+                    undefined,
+                    {
+                        numeric: true
+                    }
+                )
+        );
 
-    if (tours.length === 0) {
+    if (
+        tours.length === 0
+    ) {
 
         container.innerHTML =
             "Nincs még beolvasott kód.";
@@ -1225,18 +1328,17 @@ function massUpdateSummary() {
     }
 
     container.innerHTML =
-        tours.map(tour => {
-
-            return `
+        tours.map(
+            tour => `
                 <div class="mass-summary-row">
                     <span>${tour}</span>
+
                     <span class="mass-summary-count">
                         ${massTourCounts[tour]} db
                     </span>
                 </div>
-            `;
-
-        }).join("");
+            `
+        ).join("");
 
 }
 
@@ -1245,7 +1347,10 @@ function massUpdateSummary() {
    STÁTUSZ
    ========================================================= */
 
-function massSetStatus(type, text) {
+function massSetStatus(
+    type,
+    text
+) {
 
     const status =
         document.getElementById(
@@ -1253,7 +1358,8 @@ function massSetStatus(type, text) {
         );
 
     status.className =
-        "mass-status-" + type;
+        "mass-status-" +
+        type;
 
     status.textContent =
         text;
@@ -1262,13 +1368,13 @@ function massSetStatus(type, text) {
 
 
 /* =========================================================
-   HANGJELZÉSEK
+   HANGJELZÉS
    ========================================================= */
 
 function massBeep(
     frequency,
     duration,
-    type = "sine"
+    type
 ) {
 
     try {
@@ -1291,7 +1397,7 @@ function massBeep(
             context.createGain();
 
         oscillator.type =
-            type;
+            type || "sine";
 
         oscillator.frequency.value =
             frequency;
@@ -1300,7 +1406,10 @@ function massBeep(
             0.12;
 
         oscillator.connect(gain);
-        gain.connect(context.destination);
+
+        gain.connect(
+            context.destination
+        );
 
         oscillator.start();
 
@@ -1310,12 +1419,16 @@ function massBeep(
         );
 
         oscillator.onended =
-            () => context.close();
+            function () {
+
+                context.close();
+
+            };
 
     } catch (error) {
 
         console.warn(
-            "Hangjelzés nem sikerült:",
+            "Beep hiba:",
             error
         );
 
@@ -1358,7 +1471,7 @@ function massErrorBeep() {
 
 
 /* =========================================================
-   TÚRA TELJESÍTÉS ELLENŐRZÉSE
+   TÚRA TELJES
    ========================================================= */
 
 function massCheckTourDone(
@@ -1366,37 +1479,43 @@ function massCheckTourDone(
     scannedList
 ) {
 
-    const expectedSet =
-        massExcelData.tourCodes.get(tour);
+    const expected =
+        massExcelData.tourCodes.get(
+            tour
+        );
 
-    if (!expectedSet ||
-        expectedSet.size === 0) {
-
+    if (
+        !expected ||
+        expected.size === 0
+    ) {
         return;
-
     }
 
-    const scannedSet =
+    const scanned =
         new Set(
             scannedList.map(
                 massNormalizeCode
             )
         );
 
-    let allDone = true;
+    let complete = true;
 
-    for (const code of expectedSet) {
+    for (
+        const code of expected
+    ) {
 
-        if (!scannedSet.has(code)) {
+        if (
+            !scanned.has(code)
+        ) {
 
-            allDone = false;
+            complete = false;
             break;
 
         }
 
     }
 
-    if (allDone) {
+    if (complete) {
 
         localStorage.setItem(
             "done_" + tour,
@@ -1411,29 +1530,38 @@ function massCheckTourDone(
 
 
 /* =========================================================
-   KÓD FELDOLGOZÁSA
-   EZT HASZNÁLJA A KAMERA ÉS A VONALKÓDOLVASÓ IS
+   KÓD FELDOLGOZÁS
+   KAMERA ÉS SCANNER UGYANEZT HASZNÁLJA
    ========================================================= */
 
-function processMassCode(decodedText) {
+function processMassCode(
+    decodedText
+) {
 
     const code =
-        massNormalizeCode(decodedText);
+        massNormalizeCode(
+            decodedText
+        );
 
     if (!code) {
         return;
     }
 
     const tour =
-        massExcelData.codeToTour.get(code);
+        massExcelData.codeToTour.get(
+            code
+        );
 
-    /* ---------- NINCS AZ EXCELBEN ---------- */
+    /* ---------------------------------
+       NINCS AZ EXCELBEN
+       --------------------------------- */
 
     if (!tour) {
 
         massSetStatus(
             "error",
-            "ÉRVÉNYTELEN KÓD: " + code
+            "ÉRVÉNYTELEN KÓD: " +
+            code
         );
 
         massErrorBeep();
@@ -1442,20 +1570,26 @@ function processMassCode(decodedText) {
 
     }
 
-    /* ---------- DUPLIKÁCIÓ ---------- */
+    /* ---------------------------------
+       DUPLIKÁCIÓ
+       --------------------------------- */
 
     const storedList =
-        massGetStoredList(tour);
+        massGetStoredList(
+            tour
+        );
 
-    const alreadyScanned =
-        storedList.includes(code);
-
-    if (alreadyScanned) {
+    if (
+        storedList.includes(code)
+    ) {
 
         massSetStatus(
             "warning",
-            "MÁR BEOLVASVA: " + code +
-            " (" + tour + ")"
+            "MÁR BEOLVASVA: " +
+            code +
+            " (" +
+            tour +
+            ")"
         );
 
         massWarningBeep();
@@ -1464,7 +1598,9 @@ function processMassCode(decodedText) {
 
     }
 
-    /* ---------- ÚJ KÓD ---------- */
+    /* ---------------------------------
+       ÚJ KÓD
+       --------------------------------- */
 
     storedList.push(code);
 
@@ -1475,8 +1611,12 @@ function processMassCode(decodedText) {
 
     massTotalScanned++;
 
-    if (!massTourCounts[tour]) {
+    if (
+        !massTourCounts[tour]
+    ) {
+
         massTourCounts[tour] = 0;
+
     }
 
     massTourCounts[tour]++;
@@ -1495,8 +1635,10 @@ function processMassCode(decodedText) {
 
     massSetStatus(
         "success",
-        "OK: " + code +
-        " → " + tour
+        "OK: " +
+        code +
+        " → " +
+        tour
     );
 
     massSuccessBeep();
@@ -1505,7 +1647,7 @@ function processMassCode(decodedText) {
 
 
 /* =========================================================
-   KAMERA SCAN SIKERES
+   KAMERA SIKER
    ========================================================= */
 
 function onMassScanSuccess(
@@ -1513,29 +1655,36 @@ function onMassScanSuccess(
 ) {
 
     const code =
-        massNormalizeCode(decodedText);
+        massNormalizeCode(
+            decodedText
+        );
 
     if (!code) {
         return;
     }
 
-    /*
-     * A kamera néha ugyanazt a kódot
-     * több képkockán egymás után felismeri.
-     * Ez csak a nagyon gyors ismétlést szűri.
-     */
-
-    if (massRecentlyScanned.has(code)) {
+    if (
+        massRecentlyScanned.has(
+            code
+        )
+    ) {
         return;
     }
 
-    massRecentlyScanned.add(code);
+    massRecentlyScanned.add(
+        code
+    );
 
-    setTimeout(() => {
+    setTimeout(
+        function () {
 
-        massRecentlyScanned.delete(code);
+            massRecentlyScanned.delete(
+                code
+            );
 
-    }, 1500);
+        },
+        1500
+    );
 
     processMassCode(code);
 
@@ -1563,7 +1712,7 @@ async function stopMassScanner() {
     } catch (error) {
 
         console.warn(
-            "Kamera leállítási hiba:",
+            "Kamera stop:",
             error
         );
 
@@ -1576,15 +1725,17 @@ async function stopMassScanner() {
     } catch (error) {
 
         console.warn(
-            "Kamera törlési hiba:",
+            "Kamera clear:",
             error
         );
 
     }
 
-    massScannerRunning = false;
+    massScannerRunning =
+        false;
 
-    massQrReader = null;
+    massQrReader =
+        null;
 
 }
 
@@ -1597,12 +1748,12 @@ async function startMassScanner() {
 
     await stopMassScanner();
 
-    const readerElement =
+    const reader =
         document.getElementById(
             "massReader"
         );
 
-    readerElement.innerHTML = "";
+    reader.innerHTML = "";
 
     massQrReader =
         new Html5Qrcode(
@@ -1646,10 +1797,7 @@ async function startMassScanner() {
 
     } catch (error) {
 
-        console.warn(
-            "Vonalkód formátumok lekérése sikertelen:",
-            error
-        );
+        console.warn(error);
 
     }
 
@@ -1657,16 +1805,13 @@ async function startMassScanner() {
 
         fps: 10,
 
-        /*
-         * NINCS qrbox.
-         * Így nincs fehér négyzet a kameraképen.
-         */
-
         aspectRatio: 1.0
 
     };
 
-    if (formats.length > 0) {
+    if (
+        formats.length > 0
+    ) {
 
         config.formatsToSupport =
             formats;
@@ -1687,13 +1832,12 @@ async function startMassScanner() {
 
             onMassScanSuccess,
 
-            function () {
-                /* scan hiba figyelmen kívül hagyva */
-            }
+            function () {}
 
         );
 
-        massScannerRunning = true;
+        massScannerRunning =
+            true;
 
         massSetStatus(
             "info",
@@ -1703,7 +1847,7 @@ async function startMassScanner() {
     } catch (error) {
 
         console.warn(
-            "Pontos kameraindítás sikertelen:",
+            "Első kameraindítás sikertelen:",
             error
         );
 
@@ -1712,7 +1856,8 @@ async function startMassScanner() {
             await massQrReader.start(
 
                 {
-                    facingMode: "environment"
+                    facingMode:
+                        "environment"
                 },
 
                 config,
@@ -1723,7 +1868,8 @@ async function startMassScanner() {
 
             );
 
-            massScannerRunning = true;
+            massScannerRunning =
+                true;
 
             massSetStatus(
                 "info",
@@ -1736,7 +1882,8 @@ async function startMassScanner() {
                 fallbackError
             );
 
-            massScannerRunning = false;
+            massScannerRunning =
+                false;
 
             massSetStatus(
                 "error",
@@ -1751,7 +1898,7 @@ async function startMassScanner() {
 
 
 /* =========================================================
-   KÉZI MÓD BEKAPCSOLÁSA
+   KÉZI MÓD
    ========================================================= */
 
 async function switchToManualMode() {
@@ -1760,19 +1907,23 @@ async function switchToManualMode() {
 
     document.getElementById(
         "massReader"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
     document.getElementById(
         "manualInputArea"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
     document.getElementById(
         "switchManualButton"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
     document.getElementById(
         "switchCameraButton"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
     massSetStatus(
         "info",
@@ -1786,36 +1937,50 @@ async function switchToManualMode() {
 
     input.value = "";
 
-    setTimeout(() => {
+    setTimeout(
+        function () {
 
-        input.focus();
+            input.focus();
 
-    }, 100);
+        },
+        100
+    );
 
 }
 
 
 /* =========================================================
-   KAMERA MÓD VISSZAKAPCSOLÁSA
+   KAMERA VISSZA
    ========================================================= */
 
 async function switchToCameraMode() {
 
+    const input =
+        document.getElementById(
+            "manualCodeInput"
+        );
+
+    input.value = "";
+
     document.getElementById(
         "manualInputArea"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
     document.getElementById(
         "massReader"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
     document.getElementById(
         "switchManualButton"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
     document.getElementById(
         "switchCameraButton"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
     massSetStatus(
         "info",
@@ -1828,64 +1993,175 @@ async function switchToCameraMode() {
 
 
 /* =========================================================
-   KÉZI VONALKÓDOLVASÓ
+   SCANNER / KÉZI BEVITEL
    ========================================================= */
+
+/*
+ * A legtöbb csipogós scanner:
+ *
+ *   1. karakterenként "begépeli" a kódot
+ *   2. ENTER-t küld
+ *
+ * De vannak olyanok is, amelyek nem küldenek ENTER-t.
+ *
+ * Ezért kétféleképpen kezeljük:
+ *
+ *   ENTER -> azonnali feldolgozás
+ *
+ *   nincs ENTER ->
+ *   ha rövid ideig nem érkezik új karakter,
+ *   feldolgozzuk az addigi kódot.
+ */
 
 const manualInput =
     document.getElementById(
         "manualCodeInput"
     );
 
+let manualInputTimer =
+    null;
+
+let manualProcessing =
+    false;
+
+
+/* ENTER */
 
 manualInput.addEventListener(
     "keydown",
     function (event) {
 
-        /*
-         * A legtöbb USB/Bluetooth
-         * "csipogós" vonalkódolvasó
-         * ENTER-rel zárja le a bevitelt.
-         */
+        if (
+            event.key === "Enter"
+        ) {
 
-        if (event.key !== "Enter") {
+            event.preventDefault();
+
+            clearTimeout(
+                manualInputTimer
+            );
+
+            submitManualCode();
+
+        }
+
+    }
+);
+
+
+/* KARAKTEREK ÉRKEZÉSE */
+
+manualInput.addEventListener(
+    "input",
+    function () {
+
+        clearTimeout(
+            manualInputTimer
+        );
+
+        const value =
+            manualInput.value.trim();
+
+        if (!value) {
             return;
         }
 
-        event.preventDefault();
-
-        const code =
-            manualInput.value.trim();
-
-        manualInput.value = "";
-
-        if (code) {
-
-            /*
-             * PONTOSAN UGYANAZ A FUNKCIÓ,
-             * amit a kamera használ.
-             */
-
-            processMassCode(code);
-
-        }
-
         /*
-         * Azonnal visszafókuszálunk,
-         * így lehet egymás után csipogtatni.
+         * 120 ms szünet.
+         *
+         * A normál scanner nagyon gyorsan
+         * küldi a karaktereket, ezért ez
+         * gyakorlatilag a teljes kód után
+         * fut le.
          */
 
-        setTimeout(() => {
+        manualInputTimer =
+            setTimeout(
+                function () {
 
-            manualInput.focus();
+                    /*
+                     * Ha az input még mindig
+                     * ugyanazzal a kóddal
+                     * rendelkezik, feldolgozzuk.
+                     */
 
-        }, 0);
+                    if (
+                        manualInput.value.trim()
+                    ) {
+
+                        submitManualCode();
+
+                    }
+
+                },
+                120
+            );
 
     }
 );
 
 
 /* =========================================================
-   KÉZI MÓD GOMB
+   KÉZI KÓD ELKÜLDÉSE
+   ========================================================= */
+
+function submitManualCode() {
+
+    if (manualProcessing) {
+        return;
+    }
+
+    const code =
+        manualInput.value.trim();
+
+    if (!code) {
+
+        manualInput.focus();
+
+        return;
+
+    }
+
+    manualProcessing =
+        true;
+
+    /*
+     * Még feldolgozás előtt
+     * kiürítjük az inputot,
+     * így a következő scanner-kód
+     * azonnal írható.
+     */
+
+    manualInput.value = "";
+
+    /*
+     * UGYANAZ a feldolgozás,
+     * amit a kamera használ.
+     */
+
+    processMassCode(code);
+
+    manualProcessing =
+        false;
+
+    /*
+     * Azonnal vissza a mezőbe.
+     */
+
+    setTimeout(
+        function () {
+
+            manualInput.focus();
+
+        },
+        0
+    );
+
+}
+
+
+/* =========================================================
+   MÓDVÁLTÁS GOMBOK
    ========================================================= */
 
 document.getElementById(
@@ -1895,10 +2171,6 @@ document.getElementById(
     switchToManualMode
 );
 
-
-/* =========================================================
-   KAMERA MÓD GOMB
-   ========================================================= */
 
 document.getElementById(
     "switchCameraButton"
@@ -1922,40 +2194,57 @@ async function openMassCheck() {
     modal.style.display =
         "flex";
 
-    massTotalScanned = 0;
+    massTotalScanned =
+        0;
 
-    massTourCounts = {};
+    massTourCounts =
+        {};
 
     massRecentlyScanned =
         new Set();
 
+    manualProcessing =
+        false;
+
+    clearTimeout(
+        manualInputTimer
+    );
+
     document.getElementById(
         "massTotalCount"
-    ).textContent = "0";
-
-    massUpdateSummary();
-
-    /* mindig kamera módból induljon */
-
-    document.getElementById(
-        "massReader"
-    ).style.display = "block";
-
-    document.getElementById(
-        "manualInputArea"
-    ).style.display = "none";
-
-    document.getElementById(
-        "switchManualButton"
-    ).style.display = "block";
-
-    document.getElementById(
-        "switchCameraButton"
-    ).style.display = "none";
+    ).textContent =
+        "0";
 
     document.getElementById(
         "manualCodeInput"
-    ).value = "";
+    ).value =
+        "";
+
+    /*
+     * Mindig kamerával indul.
+     */
+
+    document.getElementById(
+        "massReader"
+    ).style.display =
+        "block";
+
+    document.getElementById(
+        "manualInputArea"
+    ).style.display =
+        "none";
+
+    document.getElementById(
+        "switchManualButton"
+    ).style.display =
+        "block";
+
+    document.getElementById(
+        "switchCameraButton"
+    ).style.display =
+        "none";
+
+    massUpdateSummary();
 
     massSetStatus(
         "info",
@@ -1992,6 +2281,10 @@ async function openMassCheck() {
 
 async function closeMassCheck() {
 
+    clearTimeout(
+        manualInputTimer
+    );
+
     await stopMassScanner();
 
     const modal =
@@ -2004,34 +2297,39 @@ async function closeMassCheck() {
 
     document.getElementById(
         "manualCodeInput"
-    ).value = "";
+    ).value =
+        "";
 
     /*
      * Következő megnyitáskor
-     * ismét kamerával indul.
+     * ismét kamera legyen.
      */
 
     document.getElementById(
         "massReader"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
     document.getElementById(
         "manualInputArea"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
     document.getElementById(
         "switchManualButton"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
     document.getElementById(
         "switchCameraButton"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
 }
 
 
 /* =========================================================
-   TÖMEGES GOMB
+   TÖMEGES ELLENŐRZÉS GOMB
    ========================================================= */
 
 document.getElementById(
@@ -2043,7 +2341,7 @@ document.getElementById(
 
 
 /* =========================================================
-   BEZÁRÁS GOMB
+   BEZÁRÁS
    ========================================================= */
 
 document.getElementById(
@@ -2055,7 +2353,7 @@ document.getElementById(
 
 
 /* =========================================================
-   MODAL KATTINTÁS KÍVÜLRE
+   MODAL KÍVÜL KATTINTÁS
    ========================================================= */
 
 document.getElementById(
@@ -2064,7 +2362,9 @@ document.getElementById(
     "click",
     function (event) {
 
-        if (event.target === this) {
+        if (
+            event.target === this
+        ) {
 
             closeMassCheck();
 
@@ -2075,12 +2375,27 @@ document.getElementById(
 
 
 /* =========================================================
-   OLDAL INDULÁSA
+   OLDAL INDÍTÁSA
    ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     async function () {
+
+        /*
+         * FONTOS:
+         * először minden túragomb rejtve.
+         */
+
+        document.querySelectorAll(
+            ".tourButton"
+        ).forEach(button => {
+
+            button.classList.add(
+                "hiddenByExcel"
+            );
+
+        });
 
         applyDoneStyles();
 
