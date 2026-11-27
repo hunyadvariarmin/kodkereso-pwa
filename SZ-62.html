@@ -192,9 +192,7 @@ button:hover {
     background: rgba(255,2150,0,0.15);
     transform: scale(1.02);
 }
-#menuRefresh {
-    margin-top: auto;
-}
+#menuRefresh { margin-top: auto; }
 
 /* Kézi bevitel modal */
 #manualOverlay {
@@ -433,15 +431,18 @@ button:hover {
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-/* ===== SZ-60 beállítások ===== */
-const BASE_NUM   = 62;
-const TOUR_ID    = "SZ-" + BASE_NUM;      // "SZ-60"
-const EXCEL_TOUR = "SZ-860";              // C oszlopban ezt keressük
+/* ===== SZ-túra beállítások =====
+   Itt elég EGY számot átírni (BASE_NUM),
+   a script magától kiszámolja az Excel-kódot.
+*/
+const BASE_NUM   = 62;                          // EZT írod át: 2, 33, 101, stb.
+const TOUR_ID    = "SZ-" + BASE_NUM;          // pl. "SZ-2"
+const EXCEL_TOUR = "SZ-" + (800 + BASE_NUM);  // pl. "SZ-802"
 const TOUR_LABEL = TOUR_ID + " túra";
 
 const XLSX_URL    = "https://raw.githubusercontent.com/hunyadvariarmin/kodkereso-pwa/main/1.xlsx";
-const SCANNED_KEY = TOUR_ID + "_scannedList";
-const DONE_KEY    = "done_" + TOUR_ID;
+const SCANNED_KEY = TOUR_ID + "_scannedList"; // pl. "SZ-2_scannedList"
+const DONE_KEY    = "done_" + TOUR_ID;        // pl. "done_SZ-2"
 
 let data = [];
 let allowedCodes = new Set();
@@ -496,7 +497,7 @@ function updateCounter() {
         scannedCodes.size + "/" + totalCount;
 }
 
-/* Excel betöltése – csak SZ-860 sorok */
+/* Excel betöltése + szűrés adott SZ-túrára (EXCEL_TOUR) */
 async function loadExcel() {
     try {
         const resp = await fetch(XLSX_URL);
@@ -514,6 +515,7 @@ async function loadExcel() {
             const tourValRaw = row[2];
             const tourVal = tourValRaw != null ? String(tourValRaw).trim() : "";
 
+            // Itt már az SZ-802, SZ-833 stb. kódot keressük:
             if (tourVal === EXCEL_TOUR) {
                 const aVal    = row[0];
                 const dVal    = row[3];
@@ -782,7 +784,7 @@ document.getElementById("cameraBackButton").addEventListener("click", () => {
     stopCamera();
 });
 
-/* SZ túra vissza Szami.html-re */
+/* Itt FELTÉTELEZEM, hogy SZ-es túrák a Szami.html-re mennek vissza */
 document.getElementById("finishButton").addEventListener("click", () => {
     if (scannedCodes.size < totalCount) {
         sessionStorage.removeItem(SCANNED_KEY);
